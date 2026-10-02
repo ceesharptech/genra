@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.18'
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -23,13 +23,13 @@ export type Database = {
           error: string | null
           id: string
           input: Json
-          kind: Database['public']['Enums']['ai_job_kind']
+          kind: Database["public"]["Enums"]["ai_job_kind"]
           model: string | null
           output: Json | null
           provider: string | null
           requested_by: string | null
           started_at: string | null
-          status: Database['public']['Enums']['ai_job_status']
+          status: Database["public"]["Enums"]["ai_job_status"]
         }
         Insert: {
           attempts?: number
@@ -39,13 +39,13 @@ export type Database = {
           error?: string | null
           id?: string
           input?: Json
-          kind: Database['public']['Enums']['ai_job_kind']
+          kind: Database["public"]["Enums"]["ai_job_kind"]
           model?: string | null
           output?: Json | null
           provider?: string | null
           requested_by?: string | null
           started_at?: string | null
-          status?: Database['public']['Enums']['ai_job_status']
+          status?: Database["public"]["Enums"]["ai_job_status"]
         }
         Update: {
           attempts?: number
@@ -55,28 +55,28 @@ export type Database = {
           error?: string | null
           id?: string
           input?: Json
-          kind: Database['public']['Enums']['ai_job_kind']
+          kind?: Database["public"]["Enums"]["ai_job_kind"]
           model?: string | null
           output?: Json | null
           provider?: string | null
           requested_by?: string | null
           started_at?: string | null
-          status?: Database['public']['Enums']['ai_job_status']
+          status?: Database["public"]["Enums"]["ai_job_status"]
         }
         Relationships: [
           {
-            foreignKeyName: 'ai_jobs_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "ai_jobs_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'ai_jobs_requested_by_fkey'
-            columns: ['requested_by']
+            foreignKeyName: "ai_jobs_requested_by_fkey"
+            columns: ["requested_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -104,11 +104,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'categories_parent_id_fkey'
-            columns: ['parent_id']
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -119,7 +119,7 @@ export type Database = {
           note: string | null
           position: number
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
         }
         Insert: {
           added_at?: string
@@ -127,7 +127,7 @@ export type Database = {
           note?: string | null
           position?: number
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
         }
         Update: {
           added_at?: string
@@ -135,15 +135,15 @@ export type Database = {
           note?: string | null
           position?: number
           target_id?: string
-          target_type?: Database['public']['Enums']['engagement_target']
+          target_type?: Database["public"]["Enums"]["engagement_target"]
         }
         Relationships: [
           {
-            foreignKeyName: 'collection_items_collection_id_fkey'
-            columns: ['collection_id']
+            foreignKeyName: "collection_items_collection_id_fkey"
+            columns: ["collection_id"]
             isOneToOne: false
-            referencedRelation: 'collections'
-            referencedColumns: ['id']
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -177,11 +177,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'collections_owner_id_fkey'
-            columns: ['owner_id']
+            foreignKeyName: "collections_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -218,25 +218,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'comments_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "comments_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'comments_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "comments_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'comments_parent_id_fkey'
-            columns: ['parent_id']
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: 'comments'
-            referencedColumns: ['id']
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -250,10 +250,10 @@ export type Database = {
           external_url: string | null
           height: number | null
           id: string
-          kind: Database['public']['Enums']['media_kind']
+          kind: Database["public"]["Enums"]["media_kind"]
           mime_type: string | null
           position: number
-          role: Database['public']['Enums']['media_role']
+          role: Database["public"]["Enums"]["media_role"]
           step_id: string | null
           storage_path: string | null
           width: number | null
@@ -267,10 +267,10 @@ export type Database = {
           external_url?: string | null
           height?: number | null
           id?: string
-          kind?: Database['public']['Enums']['media_kind']
+          kind?: Database["public"]["Enums"]["media_kind"]
           mime_type?: string | null
           position?: number
-          role?: Database['public']['Enums']['media_role']
+          role?: Database["public"]["Enums"]["media_role"]
           step_id?: string | null
           storage_path?: string | null
           width?: number | null
@@ -284,28 +284,28 @@ export type Database = {
           external_url?: string | null
           height?: number | null
           id?: string
-          kind?: Database['public']['Enums']['media_kind']
+          kind?: Database["public"]["Enums"]["media_kind"]
           mime_type?: string | null
           position?: number
-          role?: Database['public']['Enums']['media_role']
+          role?: Database["public"]["Enums"]["media_role"]
           step_id?: string | null
           storage_path?: string | null
           width?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: 'creation_media_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "creation_media_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_media_step_id_fkey'
-            columns: ['step_id']
+            foreignKeyName: "creation_media_step_id_fkey"
+            columns: ["step_id"]
             isOneToOne: false
-            referencedRelation: 'process_steps'
-            referencedColumns: ['id']
+            referencedRelation: "process_steps"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -333,25 +333,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'creation_prompts_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "creation_prompts_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_prompts_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "creation_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_prompts_step_id_fkey'
-            columns: ['step_id']
+            foreignKeyName: "creation_prompts_step_id_fkey"
+            columns: ["step_id"]
             isOneToOne: false
-            referencedRelation: 'process_steps'
-            referencedColumns: ['id']
+            referencedRelation: "process_steps"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -376,51 +376,51 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'creation_resources_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "creation_resources_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_resources_resource_id_fkey'
-            columns: ['resource_id']
+            foreignKeyName: "creation_resources_resource_id_fkey"
+            columns: ["resource_id"]
             isOneToOne: false
-            referencedRelation: 'resources'
-            referencedColumns: ['id']
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
           },
         ]
       }
       creation_tags: {
         Row: {
           creation_id: string
-          source: Database['public']['Enums']['content_source']
+          source: Database["public"]["Enums"]["content_source"]
           tag_id: number
         }
         Insert: {
           creation_id: string
-          source?: Database['public']['Enums']['content_source']
+          source?: Database["public"]["Enums"]["content_source"]
           tag_id: number
         }
         Update: {
           creation_id?: string
-          source?: Database['public']['Enums']['content_source']
+          source?: Database["public"]["Enums"]["content_source"]
           tag_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: 'creation_tags_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "creation_tags_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_tags_tag_id_fkey'
-            columns: ['tag_id']
+            foreignKeyName: "creation_tags_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: 'tags'
-            referencedColumns: ['id']
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -429,7 +429,7 @@ export type Database = {
           creation_id: string
           position: number
           role: string
-          source: Database['public']['Enums']['content_source']
+          source: Database["public"]["Enums"]["content_source"]
           tool_id: number
           version: string | null
         }
@@ -437,7 +437,7 @@ export type Database = {
           creation_id: string
           position?: number
           role?: string
-          source?: Database['public']['Enums']['content_source']
+          source?: Database["public"]["Enums"]["content_source"]
           tool_id: number
           version?: string | null
         }
@@ -445,24 +445,24 @@ export type Database = {
           creation_id?: string
           position?: number
           role?: string
-          source?: Database['public']['Enums']['content_source']
+          source?: Database["public"]["Enums"]["content_source"]
           tool_id?: number
           version?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'creation_tools_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "creation_tools_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creation_tools_tool_id_fkey'
-            columns: ['tool_id']
+            foreignKeyName: "creation_tools_tool_id_fkey"
+            columns: ["tool_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -486,7 +486,7 @@ export type Database = {
           search: unknown
           share_count: number
           slug: string
-          status: Database['public']['Enums']['creation_status']
+          status: Database["public"]["Enums"]["creation_status"]
           summary: string | null
           title: string
           trending_score: number
@@ -512,7 +512,7 @@ export type Database = {
           search?: unknown
           share_count?: number
           slug: string
-          status?: Database['public']['Enums']['creation_status']
+          status?: Database["public"]["Enums"]["creation_status"]
           summary?: string | null
           title: string
           trending_score?: number
@@ -538,7 +538,7 @@ export type Database = {
           search?: unknown
           share_count?: number
           slug?: string
-          status?: Database['public']['Enums']['creation_status']
+          status?: Database["public"]["Enums"]["creation_status"]
           summary?: string | null
           title?: string
           trending_score?: number
@@ -547,25 +547,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'creations_category_id_fkey'
-            columns: ['category_id']
+            foreignKeyName: "creations_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creations_cover_fk'
-            columns: ['cover_media_id']
+            foreignKeyName: "creations_cover_fk"
+            columns: ["cover_media_id"]
             isOneToOne: false
-            referencedRelation: 'creation_media'
-            referencedColumns: ['id']
+            referencedRelation: "creation_media"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'creations_creator_id_fkey'
-            columns: ['creator_id']
+            foreignKeyName: "creations_creator_id_fkey"
+            columns: ["creator_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -573,28 +573,28 @@ export type Database = {
         Row: {
           created_at: string
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
           user_id: string
         }
         Insert: {
           created_at?: string
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
           user_id: string
         }
         Update: {
           created_at?: string
           target_id?: string
-          target_type?: Database['public']['Enums']['engagement_target']
+          target_type?: Database["public"]["Enums"]["engagement_target"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'likes_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -625,11 +625,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'process_steps_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "process_steps_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -642,6 +642,7 @@ export type Database = {
           headline: string | null
           id: string
           is_admin: boolean
+          onboarded_at: string | null
           social_links: Json
           updated_at: string
           username: string
@@ -655,6 +656,7 @@ export type Database = {
           headline?: string | null
           id: string
           is_admin?: boolean
+          onboarded_at?: string | null
           social_links?: Json
           updated_at?: string
           username: string
@@ -668,6 +670,7 @@ export type Database = {
           headline?: string | null
           id?: string
           is_admin?: boolean
+          onboarded_at?: string | null
           social_links?: Json
           updated_at?: string
           username?: string
@@ -685,7 +688,7 @@ export type Database = {
           fork_of_id: string | null
           id: string
           is_public: boolean
-          kind: Database['public']['Enums']['prompt_kind']
+          kind: Database["public"]["Enums"]["prompt_kind"]
           like_count: number
           model_tool_id: number | null
           save_count: number
@@ -702,7 +705,7 @@ export type Database = {
           fork_of_id?: string | null
           id?: string
           is_public?: boolean
-          kind?: Database['public']['Enums']['prompt_kind']
+          kind?: Database["public"]["Enums"]["prompt_kind"]
           like_count?: number
           model_tool_id?: number | null
           save_count?: number
@@ -719,7 +722,7 @@ export type Database = {
           fork_of_id?: string | null
           id?: string
           is_public?: boolean
-          kind?: Database['public']['Enums']['prompt_kind']
+          kind?: Database["public"]["Enums"]["prompt_kind"]
           like_count?: number
           model_tool_id?: number | null
           save_count?: number
@@ -729,25 +732,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'prompts_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "prompts_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_fork_of_id_fkey'
-            columns: ['fork_of_id']
+            foreignKeyName: "prompts_fork_of_id_fkey"
+            columns: ["fork_of_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_model_tool_id_fkey'
-            columns: ['model_tool_id']
+            foreignKeyName: "prompts_model_tool_id_fkey"
+            columns: ["model_tool_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -757,7 +760,7 @@ export type Database = {
           id: string
           reason: string
           reporter_id: string
-          status: Database['public']['Enums']['report_status']
+          status: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: string
         }
@@ -766,7 +769,7 @@ export type Database = {
           id?: string
           reason: string
           reporter_id: string
-          status?: Database['public']['Enums']['report_status']
+          status?: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: string
         }
@@ -775,17 +778,17 @@ export type Database = {
           id?: string
           reason?: string
           reporter_id?: string
-          status?: Database['public']['Enums']['report_status']
+          status?: Database["public"]["Enums"]["report_status"]
           target_id?: string
           target_type?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'reports_reporter_id_fkey'
-            columns: ['reporter_id']
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -798,7 +801,7 @@ export type Database = {
           description: string | null
           id: string
           is_public: boolean
-          kind: Database['public']['Enums']['resource_kind']
+          kind: Database["public"]["Enums"]["resource_kind"]
           like_count: number
           save_count: number
           search: unknown
@@ -816,7 +819,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
-          kind?: Database['public']['Enums']['resource_kind']
+          kind?: Database["public"]["Enums"]["resource_kind"]
           like_count?: number
           save_count?: number
           search?: unknown
@@ -834,7 +837,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
-          kind?: Database['public']['Enums']['resource_kind']
+          kind?: Database["public"]["Enums"]["resource_kind"]
           like_count?: number
           save_count?: number
           search?: unknown
@@ -846,18 +849,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'resources_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "resources_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'resources_tool_id_fkey'
-            columns: ['tool_id']
+            foreignKeyName: "resources_tool_id_fkey"
+            columns: ["tool_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -865,28 +868,28 @@ export type Database = {
         Row: {
           created_at: string
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
           user_id: string
         }
         Insert: {
           created_at?: string
           target_id: string
-          target_type: Database['public']['Enums']['engagement_target']
+          target_type: Database["public"]["Enums"]["engagement_target"]
           user_id: string
         }
         Update: {
           created_at?: string
           target_id?: string
-          target_type?: Database['public']['Enums']['engagement_target']
+          target_type?: Database["public"]["Enums"]["engagement_target"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'saves_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "saves_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -914,18 +917,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'share_events_creation_id_fkey'
-            columns: ['creation_id']
+            foreignKeyName: "share_events_creation_id_fkey"
+            columns: ["creation_id"]
             isOneToOne: false
-            referencedRelation: 'creations'
-            referencedColumns: ['id']
+            referencedRelation: "creations"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'share_events_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "share_events_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -965,18 +968,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'tool_relations_related_tool_id_fkey'
-            columns: ['related_tool_id']
+            foreignKeyName: "tool_relations_related_tool_id_fkey"
+            columns: ["related_tool_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'tool_relations_tool_id_fkey'
-            columns: ['tool_id']
+            foreignKeyName: "tool_relations_tool_id_fkey"
+            columns: ["tool_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -986,7 +989,7 @@ export type Database = {
           created_by: string | null
           id: number
           is_verified: boolean
-          kind: Database['public']['Enums']['tool_kind']
+          kind: Database["public"]["Enums"]["tool_kind"]
           logo_url: string | null
           name: string
           parent_id: number | null
@@ -999,7 +1002,7 @@ export type Database = {
           created_by?: string | null
           id?: never
           is_verified?: boolean
-          kind?: Database['public']['Enums']['tool_kind']
+          kind?: Database["public"]["Enums"]["tool_kind"]
           logo_url?: string | null
           name: string
           parent_id?: number | null
@@ -1012,7 +1015,7 @@ export type Database = {
           created_by?: string | null
           id?: never
           is_verified?: boolean
-          kind?: Database['public']['Enums']['tool_kind']
+          kind?: Database["public"]["Enums"]["tool_kind"]
           logo_url?: string | null
           name?: string
           parent_id?: number | null
@@ -1022,18 +1025,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'tools_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "tools_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'tools_parent_id_fkey'
-            columns: ['parent_id']
+            foreignKeyName: "tools_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: 'tools'
-            referencedColumns: ['id']
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1082,7 +1085,7 @@ export type Database = {
           search: unknown
           share_count: number
           slug: string
-          status: Database['public']['Enums']['creation_status']
+          status: Database["public"]["Enums"]["creation_status"]
           summary: string | null
           title: string
           trending_score: number
@@ -1090,8 +1093,8 @@ export type Database = {
           view_count: number
         }[]
         SetofOptions: {
-          from: '*'
-          to: 'creations'
+          from: "*"
+          to: "creations"
           isOneToOne: false
           isSetofReturn: true
         }
@@ -1107,7 +1110,7 @@ export type Database = {
           fork_of_id: string | null
           id: string
           is_public: boolean
-          kind: Database['public']['Enums']['prompt_kind']
+          kind: Database["public"]["Enums"]["prompt_kind"]
           like_count: number
           model_tool_id: number | null
           save_count: number
@@ -1116,15 +1119,15 @@ export type Database = {
           updated_at: string
         }[]
         SetofOptions: {
-          from: '*'
-          to: 'prompts'
+          from: "*"
+          to: "prompts"
           isOneToOne: false
           isSetofReturn: true
         }
       }
       search_resources: {
         Args: {
-          p_kind?: Database['public']['Enums']['resource_kind']
+          p_kind?: Database["public"]["Enums"]["resource_kind"]
           p_limit?: number
           q?: string
         }
@@ -1136,7 +1139,7 @@ export type Database = {
           description: string | null
           id: string
           is_public: boolean
-          kind: Database['public']['Enums']['resource_kind']
+          kind: Database["public"]["Enums"]["resource_kind"]
           like_count: number
           save_count: number
           search: unknown
@@ -1147,47 +1150,56 @@ export type Database = {
           url: string | null
         }[]
         SetofOptions: {
-          from: '*'
-          to: 'resources'
+          from: "*"
+          to: "resources"
           isOneToOne: false
           isSetofReturn: true
         }
       }
       show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { '': string }; Returns: string[] }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       ai_job_kind:
-        'metadata_extraction' | 'tagging' | 'embedding' | 'similar_creations'
-      ai_job_status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled'
-      content_source: 'user' | 'ai_suggested' | 'ai_confirmed'
-      creation_status: 'draft' | 'published' | 'archived'
-      engagement_target: 'creation' | 'prompt' | 'resource'
-      media_kind: 'image' | 'video' | 'audio' | 'file' | 'embed'
-      media_role: 'gallery' | 'thumbnail' | 'before' | 'after'
+        | "metadata_extraction"
+        | "tagging"
+        | "embedding"
+        | "similar_creations"
+      ai_job_status: "queued" | "running" | "succeeded" | "failed" | "cancelled"
+      content_source: "user" | "ai_suggested" | "ai_confirmed"
+      creation_status: "draft" | "published" | "archived"
+      engagement_target: "creation" | "prompt" | "resource"
+      media_kind: "image" | "video" | "audio" | "file" | "embed"
+      media_role: "gallery" | "thumbnail" | "before" | "after"
       prompt_kind:
-        'text' | 'system' | 'image' | 'video' | 'audio' | 'agent' | 'other'
-      report_status: 'open' | 'reviewing' | 'actioned' | 'dismissed'
+        | "text"
+        | "system"
+        | "image"
+        | "video"
+        | "audio"
+        | "agent"
+        | "other"
+      report_status: "open" | "reviewing" | "actioned" | "dismissed"
       resource_kind:
-        | 'skill'
-        | 'template'
-        | 'ui_kit'
-        | 'workflow'
-        | 'agent'
-        | 'mcp_server'
-        | 'reference'
-        | 'tutorial'
-        | 'dataset'
-        | 'asset'
-        | 'other'
+        | "skill"
+        | "template"
+        | "ui_kit"
+        | "workflow"
+        | "agent"
+        | "mcp_server"
+        | "reference"
+        | "tutorial"
+        | "dataset"
+        | "asset"
+        | "other"
       tool_kind:
-        | 'ai_model'
-        | 'ai_app'
-        | 'framework'
-        | 'library'
-        | 'platform'
-        | 'design'
-        | 'other'
+        | "ai_model"
+        | "ai_app"
+        | "framework"
+        | "library"
+        | "platform"
+        | "design"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1195,33 +1207,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1230,22 +1242,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1254,22 +1267,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1278,83 +1292,84 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
     Enums: {
       ai_job_kind: [
-        'metadata_extraction',
-        'tagging',
-        'embedding',
-        'similar_creations',
+        "metadata_extraction",
+        "tagging",
+        "embedding",
+        "similar_creations",
       ],
-      ai_job_status: ['queued', 'running', 'succeeded', 'failed', 'cancelled'],
-      content_source: ['user', 'ai_suggested', 'ai_confirmed'],
-      creation_status: ['draft', 'published', 'archived'],
-      engagement_target: ['creation', 'prompt', 'resource'],
-      media_kind: ['image', 'video', 'audio', 'file', 'embed'],
-      media_role: ['gallery', 'thumbnail', 'before', 'after'],
+      ai_job_status: ["queued", "running", "succeeded", "failed", "cancelled"],
+      content_source: ["user", "ai_suggested", "ai_confirmed"],
+      creation_status: ["draft", "published", "archived"],
+      engagement_target: ["creation", "prompt", "resource"],
+      media_kind: ["image", "video", "audio", "file", "embed"],
+      media_role: ["gallery", "thumbnail", "before", "after"],
       prompt_kind: [
-        'text',
-        'system',
-        'image',
-        'video',
-        'audio',
-        'agent',
-        'other',
+        "text",
+        "system",
+        "image",
+        "video",
+        "audio",
+        "agent",
+        "other",
       ],
-      report_status: ['open', 'reviewing', 'actioned', 'dismissed'],
+      report_status: ["open", "reviewing", "actioned", "dismissed"],
       resource_kind: [
-        'skill',
-        'template',
-        'ui_kit',
-        'workflow',
-        'agent',
-        'mcp_server',
-        'reference',
-        'tutorial',
-        'dataset',
-        'asset',
-        'other',
+        "skill",
+        "template",
+        "ui_kit",
+        "workflow",
+        "agent",
+        "mcp_server",
+        "reference",
+        "tutorial",
+        "dataset",
+        "asset",
+        "other",
       ],
       tool_kind: [
-        'ai_model',
-        'ai_app',
-        'framework',
-        'library',
-        'platform',
-        'design',
-        'other',
+        "ai_model",
+        "ai_app",
+        "framework",
+        "library",
+        "platform",
+        "design",
+        "other",
       ],
     },
   },
