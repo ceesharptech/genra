@@ -73,7 +73,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .split(' ')
     .map((n) => n[0])
     .join('')
-    .slice(0, 2)
+    .slice(0, 1)
     .toUpperCase()
 
   const socialLinks = (profile.social_links as Record<string, string>) || {}

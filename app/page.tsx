@@ -20,7 +20,7 @@ export default async function HomePage() {
           Phase 00 Foundation Active
         </div>
         <h1 className="font-bricolage text-foreground text-3xl leading-tight font-semibold tracking-tight sm:text-5xl">
-          Discover what creators build with AI — and exactly how it was made.
+          Discover what creators build with AI and exactly how it was made.
         </h1>
         <p className="text-subtle max-w-2xl text-base leading-relaxed sm:text-lg">
           Genra connects outputs with their creative process: prompts, tools,

@@ -68,7 +68,7 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
       >
         <DialogContent className="p-6 sm:max-w-md">
           <DialogHeader className="mb-2 text-left">
-            <DialogTitle className="text-lg font-medium tracking-tight">
+            <DialogTitle className="text-lg font-semibold tracking-tight">
               Sign in to Genra
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs">

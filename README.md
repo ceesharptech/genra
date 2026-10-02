@@ -20,20 +20,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Email sign-in modes
 
-To learn more about Next.js, take a look at the following resources:
+Genra supports two passwordless email sign-in modes controlled by `NEXT_PUBLIC_EMAIL_AUTH_MODE`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **`magic_link` (Default)**:
+   - **How it works:** Supabase sends a confirmation email containing a magic link. Clicking the link completes the PKCE auth exchange at `/auth/callback?code=...` and establishes the user session.
+   - **Why it is default:** Supabase default email templates cannot be edited without custom SMTP configured. Since default templates include `{{ .ConfirmationURL }}` rather than `{{ .Token }}`, magic links work out of the box without requiring custom email infrastructure.
+   - **Same-browser requirement:** PKCE requires the code verifier cookie stored in the browser that initiated the sign-in request. If the link is opened in a different browser, incognito mode, or an isolated mobile app webview, the exchange fails gracefully and informs the user to open the link in the requesting browser.
+2. **`otp` (6-digit one-time code)**:
+   - **How it works:** Supabase emails a 6-digit verification code (`{{ .Token }}`) that the user types directly into the login form. Works across different browsers and devices.
+   - **How to enable:**
+     1. Configure custom SMTP in the Supabase Dashboard (under Project Settings > Authentication > SMTP Settings).
+     2. Edit the email templates ("Confirm signup" and "Magic Link") to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+     3. Set `NEXT_PUBLIC_EMAIL_AUTH_MODE=otp` in your environment variables.
 
 ## Regenerating Database Types
 

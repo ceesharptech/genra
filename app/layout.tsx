@@ -12,6 +12,7 @@ import { getCurrentUser, getCurrentProfile } from '@/lib/auth/server'
 import { AuthProvider } from '@/components/auth/auth-provider'
 import { AuthModalProvider } from '@/components/auth/auth-modal-provider'
 import { IntentReplay } from '@/components/auth/intent-replay'
+import { AuthHashHandler } from '@/components/auth/auth-hash-handler'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -79,6 +80,7 @@ export default async function RootLayout({
         'antialiased',
         geistSans.variable,
         geistMono.variable,
+        bricolage.variable,
         'font-sans'
       )}
     >
@@ -88,6 +90,7 @@ export default async function RootLayout({
             <AuthModalProvider>
               <TooltipProvider>
                 <IntentReplay />
+                <AuthHashHandler />
                 <Header />
                 <main className="flex flex-1 flex-col">{children}</main>
                 <Footer />

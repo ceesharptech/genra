@@ -16,7 +16,7 @@ export function Header() {
             className="group flex items-center gap-2 transition-opacity hover:opacity-90"
             aria-label="Genra Home"
           >
-            <span className="text-foreground text-base font-normal tracking-tight">
+            <span className="text-foreground text-base font-semibold tracking-tight">
               Genra
             </span>
           </Link>
