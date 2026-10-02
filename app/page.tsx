@@ -19,7 +19,7 @@ export default async function HomePage() {
           <span className="bg-brand size-2 animate-pulse rounded-full" />
           Phase 00 Foundation Active
         </div>
-        <h1 className="text-foreground text-3xl leading-tight font-semibold tracking-tight sm:text-5xl">
+        <h1 className="font-bricolage text-foreground text-3xl leading-tight font-semibold tracking-tight sm:text-5xl">
           Discover what creators build with AI — and exactly how it was made.
         </h1>
         <p className="text-subtle max-w-2xl text-base leading-relaxed sm:text-lg">

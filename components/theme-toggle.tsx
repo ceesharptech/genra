@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useTheme } from 'next-themes'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Sun01Icon, Moon01Icon } from '@hugeicons/core-free-icons'
+import { Sun01Icon, Moon02Icon } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 
 const emptySubscribe = () => () => {}
@@ -48,7 +48,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         />
       ) : (
         <HugeiconsIcon
-          icon={Moon01Icon}
+          icon={Moon02Icon}
           className="size-4 transition-transform duration-200"
         />
       )}

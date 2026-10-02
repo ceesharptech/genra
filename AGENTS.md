@@ -53,7 +53,7 @@ The Supabase project already exists online and is connected to you through the *
 
 How to work with the database:
 
-- **Schema changes are migrations.** Write the SQL as a numbered file in `supabase/migrations/` (for example `0003_save_creation.sql`) **and** apply the same SQL to the hosted project with the MCP's migration tool (`apply_migration`) using the same name. The files in the repo must always match what has been applied. Check applied migrations with the MCP's migration listing before adding new ones.
+- **Schema changes are migrations.** Write the SQL as a numbered file in `supabase/migrations/` (for example `0005_save_creation.sql`) **and** apply the same SQL to the hosted project with the MCP's migration tool (`apply_migration`) using the same name. The files in the repo must always match what has been applied. Check applied migrations with the MCP's migration listing before adding new ones.
 - Use the MCP's SQL tool (`execute_sql`) for **reading, inspection, seed data and RLS testing**, not for schema changes.
 - **After every schema change:** run the MCP security and performance advisors, fix any findings that relate to your change, and regenerate the TypeScript types into `types/database.ts` using the MCP's type generation tool.
 - **RLS is mandatory** on every table in `public`. Every new table ships with policies in the same migration. Test policies as anonymous, as the owner and as a different authenticated user (use role impersonation inside a transaction, for example `set local role authenticated` with `request.jwt.claims` set, then roll back).
@@ -129,7 +129,7 @@ Do **not** build AI features or add AI SDK dependencies in V1. Maintain and use 
 ## 9. Working style
 
 - Before coding a phase, restate the plan briefly: the tasks you will do and anything you need from the owner.
-- Make small, focused commits with conventional messages (`feat:`, `fix:`, `chore:`, `docs:`). Never commit `.env*` files or secrets. Do not force-push or rewrite history unless asked.
+- **Git is handled by the owner.** Do not run `git add`, `git commit` or `git push`. In your final report, suggest logical groupings and conventional commit messages (`feat:`, `fix:`, `chore:`, `docs:`). Never put secrets in tracked files; `.env*` files stay git-ignored.
 - Do not leave the app broken between steps. Keep the app running and deployable.
 - When finished, summarise: what changed, migrations applied, new env vars, manual steps for the owner, and any open questions or follow-ups.
 - Be honest about what is untested or incomplete. Do not mark work done that you have not verified.
@@ -138,7 +138,9 @@ Do **not** build AI features or add AI SDK dependencies in V1. Maintain and use 
 ## 10. Known gaps in the initial schema (handled in phases)
 
 - `avatars` storage bucket and policies: migration `0002_avatars.sql` (Phase 01).
-- Atomic `save_creation(payload jsonb)` function: migration `0003_save_creation.sql` (Phase 02).
+- `profiles.onboarded_at` column to track username onboarding: migration `0003_profile_onboarding.sql` (Phase 01).
+- Function hardening (pinned `search_path`, revoked execute on internal functions): migration `0004_function_hardening.sql` (Phase 01).
+- Atomic `save_creation(payload jsonb)` function: migration `0005_save_creation.sql` (Phase 02).
 
 ---
 
@@ -149,13 +151,8 @@ _Append new instructions below with a date. Later entries override earlier ones.
 - **2026-10-01** Supabase: use the hosted project through the Supabase MCP only; no local CLI or Docker (see section 4).
 - **2026-10-01** Frontend: always load and follow the `.agents/` skills `design-taste-frontend`, `frontend-design` and `emil-design-eng`; `DESIGN.md` wins on palette and typography (see section 5).
 - **2026-10-01** Design: monochrome soft black and white interface, lavender purple `#774CFF` used sparingly, light theme default with dark mode, Geist font (see `DESIGN.md`).
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+- **2026-10-02** Git: the owner stages, commits and pushes. The agent never runs git write commands (see section 9).
+- **2026-10-02** Browser testing is done manually by the owner. Write Playwright specs, but do not download browser binaries or run browser tests; give the owner a manual test checklist instead.
+- **2026-10-02** Icons: use Hugeicons (`@hugeicons/react` with `@hugeicons/core-free-icons`), not `lucide-react`.
+- **2026-10-02** Stack notes from Phase 00: Next.js 16 (session refresh lives in `proxy.ts`, not `middleware.ts`), React 19, Tailwind v4, shadcn/ui built on Base UI primitives (do not use Radix `asChild` patterns), npm, no `src/` directory.
+- **2026-10-02** The live database must always match `genra-docs/genra_schema.sql` plus the numbered follow-up migrations. If they ever diverge, stop and report instead of building on top.

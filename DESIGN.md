@@ -299,7 +299,7 @@ Motion is small, quick and purposeful. For detailed animation craft and patterns
 
 ## 9. Iconography and imagery
 
-- **Icons:** `lucide-react`, 16px (inline), 20px (controls), stroke width 1.75, colour inherits the text colour. Filled purple is used only for an active liked/saved state.
+- **Icons:** Hugeicons (`@hugeicons/react` with `@hugeicons/core-free-icons`), 16px (inline), 20px (controls), a consistent stroke width of about 1.5 to 1.75 where the icon supports it, colour inherits the text colour. Do not mix icon sets. Filled purple is used only for an active liked/saved state.
 - **Imagery:** media is shown at its natural aspect ratio where possible; creation cards use a fixed ratio (4:3) with `object-cover`, `radius-lg`, and a 1px inner border so light images don't bleed into a white page.
 - **Avatars:** circular, 24/32/40/64px, initials fallback on `surface-2`.
 - **Empty states:** simple monochrome line illustration or icon plus one sentence and one action. No stock illustrations.
@@ -361,9 +361,9 @@ Heights 32 / 36 / 40 / 44px, radius-md, 500 weight, 14px text.
 
 ## 13. Phase 00 implementation checklist
 
-- [x] Add the CSS variables above to `app/globals.css` and map them in the Tailwind theme.
-- [x] Load Geist Sans and Geist Mono with `next/font` and apply the variables on `<html>`.
-- [x] Configure the theme provider (light default, `class` strategy, no system override) and add the theme toggle.
-- [x] Align shadcn/ui component styles with the tokens (buttons, inputs, cards, dialogs, tabs, badges).
-- [x] Create a hidden `/design` page (development only) showing the palette, type scale, buttons, inputs, cards, chips and states in both themes.
-- [x] Verify contrast for text, links and focus rings in both themes.
+- [ ] Add the CSS variables above to `app/globals.css` and map them in the Tailwind theme.
+- [ ] Load Geist Sans and Geist Mono with `next/font` and apply the variables on `<html>`.
+- [ ] Configure the theme provider (light default, `class` strategy, no system override) and add the theme toggle.
+- [ ] Align shadcn/ui component styles with the tokens (buttons, inputs, cards, dialogs, tabs, badges).
+- [ ] Create a hidden `/design` page (development only) showing the palette, type scale, buttons, inputs, cards, chips and states in both themes.
+- [ ] Verify contrast for text, links and focus rings in both themes.
