@@ -1,26 +1,203 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-strong: var(--border-strong);
+  --color-text-subtle: var(--text-subtle);
+  --color-subtle: var(--text-subtle);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-foreground: var(--brand-soft-foreground);
+  --color-brand-text: var(--brand-text);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive-soft: var(--destructive-soft);
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Neutrals */
+  --background: #ffffff;
+  --foreground: #111113;
+  --card: #ffffff;
+  --card-foreground: #111113;
+  --popover: #ffffff;
+  --popover-foreground: #111113;
+
+  /* Default action colour is soft black */
+  --primary: #111113;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #111113;
+  --muted: #f4f4f5;
+  --muted-foreground: #5f5f68;
+  --accent: #f4f4f5;
+  --accent-foreground: #111113;
+
+  --border: #e8e8eb;
+  --input: #e8e8eb;
+  --ring: #774cff;
+
+  /* Genra surfaces and text */
+  --surface: #fafafa;
+  --surface-2: #f4f4f5;
+  --border-strong: #d4d4d8;
+  --text-subtle: #72727c;
+
+  /* Brand */
+  --brand: #774cff;
+  --brand-foreground: #ffffff;
+  --brand-hover: #6236e6;
+  --brand-soft: #f4f0ff;
+  --brand-soft-foreground: #4f28bf;
+  --brand-text: #6236e6;
+
+  /* Brand Scale */
+  --brand-50: #f4f0ff;
+  --brand-100: #eae3ff;
+  --brand-200: #d8cbff;
+  --brand-300: #bda6ff;
+  --brand-400: #9d7bff;
+  --brand-500: #774cff;
+  --brand-600: #6236e6;
+  --brand-700: #4f28bf;
+  --brand-800: #3f2296;
+  --brand-900: #2f1a70;
+  --brand-950: #1d1048;
+
+  /* Semantic */
+  --destructive: #d92d20;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fef3f2;
+  --success: #067647;
+  --success-soft: #ecfdf3;
+  --warning: #b54708;
+  --warning-soft: #fffaeb;
+
+  /* Shape */
+  --radius: 0.75rem;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgb(17 17 19 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(17 17 19 / 0.06), 0 1px 2px rgb(17 17 19 / 0.04);
+  --shadow-md: 0 8px 24px -8px rgb(17 17 19 / 0.12);
+  --shadow-lg: 0 24px 48px -16px rgb(17 17 19 / 0.18);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.dark {
+  --background: #0b0b0d;
+  --foreground: #f4f4f5;
+  --card: #111114;
+  --card-foreground: #f4f4f5;
+  --popover: #141417;
+  --popover-foreground: #f4f4f5;
+
+  --primary: #f4f4f5;
+  --primary-foreground: #111113;
+  --secondary: #1a1a1e;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1a1a1e;
+  --muted-foreground: #a1a1aa;
+  --accent: #1f1f24;
+  --accent-foreground: #f4f4f5;
+
+  --border: #26262b;
+  --input: #2a2a30;
+  --ring: #9d7bff;
+
+  --surface: #0f0f12;
+  --surface-2: #1a1a1e;
+  --border-strong: #35353c;
+  --text-subtle: #8a8a93;
+
+  --brand: #774cff;
+  --brand-foreground: #ffffff;
+  --brand-hover: #8a66ff;
+  --brand-soft: #1c1633;
+  --brand-soft-foreground: #bda6ff;
+  --brand-text: #9d7bff;
+
+  --destructive: #f97066;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #2a1514;
+  --success: #47cd89;
+  --success-soft: #0f2418;
+  --warning: #fec84b;
+  --warning-soft: #2a2008;
+
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.6);
+}
+
+@layer base {
+  * {
+    @apply border-border;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground selection:bg-brand-soft selection:text-brand-soft-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  html {
+    @apply font-sans;
+  }
 }

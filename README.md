@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Regenerating Database Types
+
+Database types in `types/database.ts` are generated from the hosted Supabase schema. After applying schema migrations via the Supabase MCP, regenerate the TypeScript types using the MCP `generate_typescript_types` tool:
+
+```typescript
+// Via Supabase MCP:
+// Call generate_typescript_types with project_id: 'ngofkoeclkrxgpefkbuv'
+// Output is written to types/database.ts
+```
