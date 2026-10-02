@@ -168,7 +168,7 @@ export function SettingsForm({ userId, profile }: SettingsFormProps) {
 
       {/* Avatar Section */}
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        <h2 className="font-bricolage text-sm font-semibold tracking-tight text-foreground">
           Profile Photo
         </h2>
         <AvatarUpload
@@ -183,7 +183,7 @@ export function SettingsForm({ userId, profile }: SettingsFormProps) {
 
       {/* Basic Info Section */}
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        <h2 className="font-bricolage text-sm font-semibold tracking-tight text-foreground">
           Public Profile
         </h2>
 
@@ -353,7 +353,7 @@ export function SettingsForm({ userId, profile }: SettingsFormProps) {
       {/* Social Links Section */}
       <section className="space-y-4">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight text-foreground">
+          <h2 className="font-bricolage text-sm font-semibold tracking-tight text-foreground">
             Social Links
           </h2>
           <p className="text-xs text-muted-foreground">
@@ -397,14 +397,14 @@ export function SettingsForm({ userId, profile }: SettingsFormProps) {
         <Button
           type="submit"
           variant="brand"
+          loading={isPending}
           disabled={
-            isPending ||
             isCheckingUsername ||
             (usernameStatus !== null && !usernameStatus.available)
           }
           className="font-medium"
         >
-          {isPending ? "Saving changes..." : "Save changes"}
+          Save changes
         </Button>
       </div>
     </form>

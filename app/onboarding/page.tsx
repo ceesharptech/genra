@@ -49,7 +49,7 @@ export default async function OnboardingPage({
           <span className="bg-foreground text-background inline-flex size-7 items-center justify-center rounded-lg font-mono text-sm font-bold">
             G
           </span>
-          <h1 className="mt-3 text-xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-bricolage mt-3 text-xl font-semibold tracking-tight text-foreground">
             Welcome to Genra
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">

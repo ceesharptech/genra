@@ -254,8 +254,11 @@ export default function DesignPage() {
       {/* 4. Buttons */}
       <section className="space-y-4">
         <h2 className="text-foreground text-lg font-semibold tracking-tight">
-          Buttons (Variants & Sizes)
+          Buttons (Variants, Rounded Pills &amp; Loading States)
         </h2>
+        <p className="text-subtle text-xs">
+          All buttons use pill geometry (rounded-full) with inline loading spinners replacing action text when busy.
+        </p>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="default">Primary Soft-Black</Button>
           <Button variant="brand">Brand Action (Publish)</Button>
@@ -274,6 +277,16 @@ export default function DesignPage() {
           <Button size="icon" aria-label="Icon button">
             G
           </Button>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <p className="text-foreground text-xs font-medium">Loading Spinner States (spinner replaces busy text)</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button loading variant="default">Primary Loading</Button>
+            <Button loading variant="brand">Brand Loading</Button>
+            <Button loading variant="secondary">Secondary Loading</Button>
+            <Button loading variant="outline">Outline Loading</Button>
+          </div>
         </div>
       </section>
 

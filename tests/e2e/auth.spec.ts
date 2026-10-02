@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Phase 01 & 01b — Auth and Profiles Smoke Tests', () => {
-  test('gate demo opens the login modal when signed out', async ({ page }) => {
+  test('gate demo redirects to /login when signed out', async ({ page }) => {
     await page.goto('/design')
 
     // Click the gated action demo button
@@ -11,10 +11,9 @@ test.describe('Phase 01 & 01b — Auth and Profiles Smoke Tests', () => {
     await expect(demoButton).toBeVisible()
     await demoButton.click()
 
-    // Login modal dialog should open
-    const modal = page.getByRole('dialog')
-    await expect(modal).toBeVisible()
-    await expect(page.getByText('Sign in to Genra')).toBeVisible()
+    // Should direct to /login page with next, intent, and message params
+    await expect(page).toHaveURL(/\/login\?next=.*&intent=.*&message=.*/)
+    await expect(page.getByText('Welcome back')).toBeVisible()
     await expect(
       page.getByText('Sign in to test the action gating primitive')
     ).toBeVisible()
@@ -25,7 +24,7 @@ test.describe('Phase 01 & 01b — Auth and Profiles Smoke Tests', () => {
 
     // Expect the page to remain on /login and form to render
     await expect(page).toHaveURL(/\/login/)
-    await expect(page.getByText('Sign in to your account')).toBeVisible()
+    await expect(page.getByText('Welcome back')).toBeVisible()
   })
 
   test('/login displays friendly error on link_expired', async ({ page }) => {

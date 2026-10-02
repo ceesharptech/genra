@@ -1,6 +1,14 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export function Footer() {
+  const pathname = usePathname()
+  if (pathname === '/login' || pathname === '/signup') {
+    return null
+  }
+
   return (
     <footer className="border-border bg-background mt-auto w-full border-t transition-colors">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6 lg:px-8">

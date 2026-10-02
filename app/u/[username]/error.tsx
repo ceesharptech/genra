@@ -16,7 +16,7 @@ export default function ProfileError({
 
   return (
     <div className="mx-auto flex min-h-[50vh] w-full max-w-md flex-col items-center justify-center px-4 text-center">
-      <h2 className="text-lg font-semibold tracking-tight text-foreground">
+      <h2 className="font-bricolage text-lg font-semibold tracking-tight text-foreground">
         Could not load profile
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">

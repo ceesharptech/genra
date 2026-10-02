@@ -85,9 +85,21 @@ export function AuthProvider({
   const signOut = async () => {
     setIsLoading(true);
     try {
+      // 1. Sign out on the browser client to clear localStorage/storage and notify listeners
+      await supabase.auth.signOut();
+      // 2. Sign out on the server to clear auth cookies
       await signOutAction();
+      // 3. Immediately clear React auth state
       setUser(null);
       setProfile(null);
+      // 4. Navigate to home and flush Server Components cache
+      router.replace("/");
+      router.refresh();
+    } catch {
+      setUser(null);
+      setProfile(null);
+      router.replace("/");
+      router.refresh();
     } finally {
       setIsLoading(false);
     }

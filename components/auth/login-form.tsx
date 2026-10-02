@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { safeRedirectPath } from '@/lib/auth/redirect'
 import { getEmailAuthMode } from '@/lib/auth/config'
-import {
-  buildAuthCallbackUrl,
-  getAuthErrorMessage,
-} from '@/lib/auth/errors'
+import { buildAuthCallbackUrl, getAuthErrorMessage } from '@/lib/auth/errors'
 import { emailSchema, otpCodeSchema } from '@/lib/validation/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +15,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
 
 interface LoginFormProps {
+  mode?: 'login' | 'signup'
   message?: string
   next?: string
   intent?: string
@@ -26,6 +25,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({
+  mode = 'login',
   message,
   next = '/',
   intent,
@@ -42,7 +42,9 @@ export function LoginForm({
   const [otpCode, setOtpCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
-  const [dismissedErrorParam, setDismissedErrorParam] = useState<string | null>(null)
+  const [dismissedErrorParam, setDismissedErrorParam] = useState<string | null>(
+    null
+  )
   const [cooldown, setCooldown] = useState(0)
 
   const errorMessage =
@@ -67,6 +69,11 @@ export function LoginForm({
       ? `${baseSafeNext}&intent=${encodeURIComponent(intent)}`
       : `${baseSafeNext}?intent=${encodeURIComponent(intent)}`
     : baseSafeNext
+
+  const queryParams = new URLSearchParams()
+  if (next && next !== '/') queryParams.set('next', next)
+  if (intent) queryParams.set('intent', intent)
+  const baseQuery = queryParams.toString() ? `?${queryParams.toString()}` : ''
 
   // Handle resend countdown timer
   useEffect(() => {
@@ -368,7 +375,7 @@ export function LoginForm({
   return (
     <div className={className}>
       {message && (
-        <div className="border-border bg-surface-2 text-muted-foreground mb-4 rounded-md border p-3 text-xs">
+        <div className="border-border bg-surface-2 text-muted-foreground mb-4 rounded-xl border p-3 text-xs">
           {message}
         </div>
       )}
@@ -376,23 +383,51 @@ export function LoginForm({
       {errorMessage && (
         <div
           role="alert"
-          className="border-destructive/30 bg-destructive/10 text-destructive mb-4 rounded-md border p-3 text-xs leading-relaxed"
+          className="border-destructive/30 bg-destructive/10 text-destructive mb-4 rounded-xl border p-3 text-xs leading-relaxed"
         >
           {errorMessage}
         </div>
       )}
 
       {step === 'email' && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
+          {/* Header Brand Badge & Title */}
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-brand/10 text-brand mb-4 flex size-12 items-center justify-center rounded-full shadow-xs">
+              <svg
+                className="size-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a14.5 14.5 0 0 0 0 20M2 12h20M4.93 4.93a10 10 0 0 1 14.14 0" />
+              </svg>
+            </div>
+            <h1 className="font-bricolage text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
+              {mode === 'signup' ? 'Welcome to Genra' : 'Welcome back'}
+            </h1>
+            <p className="text-muted-foreground mt-2 max-w-xs text-xs sm:text-sm">
+              {mode === 'signup'
+                ? 'Create your account and discover world-class AI creations, prompts, and tools.'
+                : 'Enter your details to sign in to your Genra account.'}
+            </p>
+          </div>
+
+          {/* Google Button (Pill shaped) */}
           <Button
             type="button"
             variant="outline"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="h-10 w-full justify-center gap-2 font-medium"
+            className="border-border bg-card hover:bg-surface-2 text-foreground h-11 w-full justify-center gap-2.5 rounded-full text-xs font-medium shadow-2xs sm:text-sm"
           >
             <svg
-              className="h-4 w-4"
+              className="size-4 shrink-0"
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
@@ -413,80 +448,121 @@ export function LoginForm({
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            <span>Continue with Google</span>
           </Button>
 
-          <div className="relative my-1 flex items-center justify-center">
+          {/* Divider */}
+          <div className="relative my-0.5 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
               <div className="border-border w-full border-t" />
             </div>
-            <span className="text-muted-foreground bg-card relative px-2 text-xs tracking-wider uppercase">
-              or continue with email
+            <span className="text-muted-foreground bg-background relative px-3 text-xs font-normal">
+              or
             </span>
           </div>
 
-          <form onSubmit={handleSendEmail} className="flex flex-col gap-3">
+          {/* Email form */}
+          <form onSubmit={handleSendEmail} className="flex flex-col gap-3.5">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email" className="text-xs font-medium">
+              <Label htmlFor="email" className="sr-only">
                 Email address
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="Enter email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
                 required
                 autoComplete="email"
-                className="h-10"
+                className="border-border bg-card placeholder:text-muted-foreground/60 h-11 rounded-full px-5 text-xs sm:text-sm"
               />
             </div>
 
             <Button
               type="submit"
-              variant="brand"
-              disabled={isLoading || !email.trim()}
-              className="mt-1 h-10 w-full font-medium"
+              loading={isLoading}
+              disabled={!email.trim()}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-11 w-full rounded-full text-xs font-medium transition-opacity sm:text-sm"
             >
-              {isLoading
-                ? authMode === 'magic_link'
-                  ? 'Sending link...'
-                  : 'Sending code...'
-                : authMode === 'magic_link'
-                  ? 'Send magic link'
-                  : 'Send code'}
+              Continue
             </Button>
           </form>
 
-          <p className="text-muted-foreground text-center text-xs">
-            {authMode === 'magic_link'
-              ? 'We will email you a secure sign-in link. No password required.'
-              : 'We will email you a 6-digit one-time code. No password required.'}
+          {/* Legal statement */}
+          <p className="text-muted-foreground text-center text-[11px] leading-normal">
+            By continuing, you agree to our{' '}
+            <Link
+              href="/"
+              className="hover:text-foreground underline underline-offset-2"
+            >
+              Terms
+            </Link>{' '}
+            and{' '}
+            <Link
+              href="/"
+              className="hover:text-foreground underline underline-offset-2"
+            >
+              Privacy Policy
+            </Link>
+            .
           </p>
+
+          {/* Login/Signup Switcher */}
+          <div className="text-muted-foreground pt-1 text-center text-xs">
+            {mode === 'signup' ? (
+              <>
+                Already have an account?{' '}
+                <Link
+                  href={`/login${baseQuery}`}
+                  className="text-foreground hover:text-brand font-medium underline underline-offset-3 transition-colors"
+                >
+                  Sign in
+                </Link>
+              </>
+            ) : (
+              <>
+                Don&apos;t have an account?{' '}
+                <Link
+                  href={`/signup${baseQuery}`}
+                  className="text-foreground hover:text-brand font-medium underline underline-offset-3 transition-colors"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       )}
 
       {step === 'magic_link_sent' && (
         <div className="flex flex-col gap-4 text-center">
-          <div className="bg-brand/10 text-brand mx-auto flex h-12 w-12 items-center justify-center rounded-full">
-            <HugeiconsIcon icon={Mail01Icon} strokeWidth={1.5} className="h-6 w-6" />
+          <div className="bg-brand/10 text-brand mx-auto flex size-12 items-center justify-center rounded-full">
+            <HugeiconsIcon
+              icon={Mail01Icon}
+              strokeWidth={1.5}
+              className="size-6"
+            />
           </div>
 
           <div>
-            <h3 className="text-foreground text-sm font-semibold tracking-tight">
+            <h3 className="font-bricolage text-foreground text-xl font-bold tracking-tight">
               Check your email
             </h3>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            <p className="text-muted-foreground mt-1 text-xs leading-relaxed sm:text-sm">
               We sent a sign-in link to{' '}
-              <span className="text-foreground font-medium">{email}</span>
+              <span className="text-foreground font-semibold">{email}</span>
             </p>
           </div>
 
-          <div className="border-border/70 bg-surface-2 rounded-lg border p-3 text-left">
+          <div className="border-border/70 bg-surface-2 rounded-2xl border p-4 text-left">
             <p className="text-muted-foreground text-xs leading-relaxed">
               Click the link in your email to sign in. Please open it in{' '}
-              <strong className="text-foreground font-semibold">this same browser</strong>.
+              <strong className="text-foreground font-semibold">
+                this same browser
+              </strong>
+              .
             </p>
           </div>
 
@@ -494,10 +570,11 @@ export function LoginForm({
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
+              loading={isLoading}
               onClick={handleResendMagicLink}
-              disabled={cooldown > 0 || isLoading}
-              className="w-full text-xs"
+              disabled={cooldown > 0}
+              className="w-full rounded-full text-xs font-medium"
             >
               {cooldown > 0 ? `Resend link (${cooldown}s)` : 'Resend link'}
             </Button>
@@ -505,13 +582,13 @@ export function LoginForm({
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              size="default"
               onClick={() => {
                 setStep('email')
                 setErrorMessage(null)
               }}
               disabled={isLoading}
-              className="text-muted-foreground hover:text-foreground w-full text-xs"
+              className="text-muted-foreground hover:text-foreground w-full rounded-full text-xs"
             >
               Use a different email
             </Button>
@@ -521,7 +598,7 @@ export function LoginForm({
             <div className="absolute inset-0 flex items-center">
               <div className="border-border w-full border-t" />
             </div>
-            <span className="text-muted-foreground bg-card relative px-2 text-[10px] tracking-wider uppercase">
+            <span className="text-muted-foreground bg-background relative px-2 text-[10px] tracking-wider uppercase">
               or
             </span>
           </div>
@@ -529,12 +606,12 @@ export function LoginForm({
           <Button
             type="button"
             variant="ghost"
-            size="sm"
+            size="default"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full justify-center gap-2 text-xs"
+            className="w-full justify-center gap-2 rounded-full text-xs"
           >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="size-3.5" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -560,7 +637,9 @@ export function LoginForm({
       {step === 'otp' && (
         <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
           <div>
-            <h3 className="text-sm font-semibold">Enter your 6-digit code</h3>
+            <h3 className="font-bricolage text-base font-semibold">
+              Enter your 6-digit code
+            </h3>
             <p className="text-muted-foreground mt-1 text-xs">
               Sent to{' '}
               <span className="text-foreground font-medium">{email}</span>
@@ -588,17 +667,18 @@ export function LoginForm({
               onPaste={handleOtpPaste}
               disabled={isLoading}
               required
-              className="h-11 text-center font-mono text-lg tracking-widest"
+              className="h-11 rounded-full text-center font-mono text-lg tracking-widest"
             />
           </div>
 
           <Button
             type="submit"
-            variant="brand"
-            disabled={isLoading || otpCode.length !== 6}
-            className="h-10 w-full font-medium"
+            variant="default"
+            loading={isLoading}
+            disabled={otpCode.length !== 6}
+            className="h-11 w-full rounded-full font-medium"
           >
-            {isLoading ? 'Verifying...' : 'Verify and continue'}
+            Verify and continue
           </Button>
 
           <div className="flex items-center justify-between pt-1 text-xs">

@@ -23,7 +23,7 @@ export default function ErrorPage({
         <p className="text-destructive font-mono text-xs font-semibold tracking-wider uppercase">
           Error
         </p>
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h1 className="font-bricolage text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
           Something went wrong
         </h1>
         <p className="text-subtle text-sm">

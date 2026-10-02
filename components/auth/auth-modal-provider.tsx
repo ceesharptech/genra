@@ -1,16 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
+import React, { createContext, useContext, useCallback } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from './auth-provider'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { LoginForm } from './login-form'
 import { formatIntent } from '@/lib/auth/intents'
 
 interface OpenModalOptions {
@@ -30,24 +22,30 @@ const AuthModalContext = createContext<AuthModalContextType | undefined>(
 )
 
 export function AuthModalProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [modalOptions, setModalOptions] = useState<OpenModalOptions>({})
   const pathname = usePathname()
+  const router = useRouter()
 
   const openLoginModal = useCallback(
     (options?: OpenModalOptions) => {
-      setModalOptions({
-        message: options?.message,
-        intent: options?.intent,
-        next: options?.next || pathname || '/',
-      })
-      setIsOpen(true)
+      const targetNext = options?.next || pathname || '/'
+      const params = new URLSearchParams()
+      if (targetNext && targetNext !== '/') {
+        params.set('next', targetNext)
+      }
+      if (options?.intent) {
+        params.set('intent', options.intent)
+      }
+      if (options?.message) {
+        params.set('message', options.message)
+      }
+      const search = params.toString()
+      router.push(`/login${search ? `?${search}` : ''}`)
     },
-    [pathname]
+    [pathname, router]
   )
 
   const closeLoginModal = useCallback(() => {
-    setIsOpen(false)
+    // Dedicated page navigation replaces modal popup
   }, [])
 
   return (
@@ -55,35 +53,10 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
       value={{
         openLoginModal,
         closeLoginModal,
-        isModalOpen: isOpen,
+        isModalOpen: false,
       }}
     >
       {children}
-
-      <Dialog
-        open={isOpen}
-        onOpenChange={(open) => {
-          if (!open) closeLoginModal()
-        }}
-      >
-        <DialogContent className="p-6 sm:max-w-md">
-          <DialogHeader className="mb-2 text-left">
-            <DialogTitle className="text-lg font-semibold tracking-tight">
-              Sign in to Genra
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-xs">
-              Discover and share what people create with AI.
-            </DialogDescription>
-          </DialogHeader>
-
-          <LoginForm
-            message={modalOptions.message}
-            next={modalOptions.next}
-            intent={modalOptions.intent}
-            onSuccess={closeLoginModal}
-          />
-        </DialogContent>
-      </Dialog>
     </AuthModalContext.Provider>
   )
 }

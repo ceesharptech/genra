@@ -238,15 +238,15 @@ export function OnboardingForm({
       <Button
         type="submit"
         variant="brand"
+        loading={isPending}
         disabled={
-          isPending ||
           isCheckingUsername ||
           (usernameStatus !== null && !usernameStatus.available) ||
           !username.trim()
         }
         className="mt-2 h-10 w-full font-medium"
       >
-        {isPending ? "Setting up your profile..." : "Complete Setup"}
+        Complete Setup
       </Button>
     </form>
   );

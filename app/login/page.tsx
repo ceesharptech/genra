@@ -1,13 +1,16 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getCurrentUser, getCurrentProfile } from '@/lib/auth/server'
 import { safeRedirectPath } from '@/lib/auth/redirect'
 import { LoginForm } from '@/components/auth/login-form'
+import { ThemeToggle } from '@/components/theme-toggle'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sign in to Genra',
-  description: 'Sign in to Genra to like, save, comment, and publish creations.',
+  title: 'Sign in',
+  description:
+    'Sign in to Genra to like, save, comment, and publish creations.',
 }
 
 export default async function LoginPage({
@@ -39,28 +42,56 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center px-4 py-12">
-      <div className="border-border bg-card w-full max-w-sm rounded-xl border p-6 shadow-xs sm:p-8">
-        <div className="mb-6 text-center">
+    <div className="grid min-h-screen w-full lg:grid-cols-2">
+      {/* Left side: Navigation + Auth form */}
+      <div className="bg-background flex flex-col justify-between p-6 sm:p-10 lg:p-12">
+        {/* Top bar with Logo and Theme toggle */}
+        <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-foreground inline-block text-xl font-semibold tracking-tight"
+            className="font-bricolage text-foreground text-2xl font-bold tracking-tight transition-opacity hover:opacity-90"
+            aria-label="Genra Home"
           >
             Genra
           </Link>
-          <h1 className="text-foreground mt-2 text-lg font-semibold tracking-tight">
-            Sign in to your account
-          </h1>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Discover, learn from, and share AI creations
-          </p>
+          <ThemeToggle />
         </div>
 
-        <LoginForm
-          next={safeNext}
-          intent={intent}
-          errorParam={error}
+        {/* Center: Auth Form Container */}
+        <div className="mx-auto w-full max-w-sm py-10">
+          <LoginForm
+            mode="login"
+            next={safeNext}
+            intent={intent}
+            errorParam={error}
+          />
+        </div>
+
+        {/* Bottom spacer / subtle text */}
+        <div className="text-muted-foreground/60 hidden text-center text-xs sm:block">
+          Genra &middot; The discovery and learning platform for AI-made work
+        </div>
+      </div>
+
+      {/* Right side: Visual Artwork Showcase */}
+      <div className="relative hidden h-full w-full overflow-hidden bg-neutral-950 lg:block">
+        <Image
+          src="/images/auth-bg.jpg"
+          alt="AI Digital Art Creation Showcase"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-top"
         />
+        {/* Subtle vignette/gradient */}
+        <div className="from-background/60 pointer-events-none absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-40" />
+
+        {/* Creator Credit Badge in bottom right */}
+        <div className="absolute right-6 bottom-6 z-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3.5 py-1.5 font-sans text-xs font-medium text-white/90 shadow-lg backdrop-blur-md">
+            @magnifik
+          </span>
+        </div>
       </div>
     </div>
   )
