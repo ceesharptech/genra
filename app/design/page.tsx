@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { GateDemo } from '@/components/auth/gate-demo'
 import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
@@ -388,6 +389,14 @@ export default function DesignPage() {
             </div>
           </DialogContent>
         </Dialog>
+      </section>
+
+      {/* 10. Auth Gating & Intent Replay Demo */}
+      <section className="space-y-4">
+        <h2 className="text-foreground text-lg font-semibold tracking-tight">
+          Auth Gating & Action Replay
+        </h2>
+        <GateDemo />
       </section>
     </div>
   )

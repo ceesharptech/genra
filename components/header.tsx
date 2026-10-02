@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { UserMenu } from '@/components/auth/user-menu'
 
 export function Header() {
   return (
@@ -16,16 +16,9 @@ export function Header() {
             className="group flex items-center gap-2 transition-opacity hover:opacity-90"
             aria-label="Genra Home"
           >
-            <span className="bg-foreground text-background flex size-5 items-center justify-center rounded-md font-mono text-xs leading-none font-bold">
-              G
-            </span>
-            <span className="text-foreground text-base font-semibold tracking-tight">
+            <span className="text-foreground text-base font-normal tracking-tight">
               Genra
             </span>
-            <span
-              className="bg-brand size-1.5 rounded-full"
-              aria-hidden="true"
-            />
           </Link>
 
           {/* Search input placeholder (non-functional in Phase 00) */}
@@ -47,15 +40,7 @@ export function Header() {
         {/* Right actions */}
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button
-            variant="default"
-            size="sm"
-            disabled
-            title="Authentication is introduced in Phase 01"
-            className="h-8 cursor-not-allowed px-3 text-xs font-medium"
-          >
-            Log in
-          </Button>
+          <UserMenu />
         </div>
       </div>
     </header>
