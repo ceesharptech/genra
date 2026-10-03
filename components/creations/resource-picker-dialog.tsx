@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import type { ResourceKind, Tool } from "@/lib/data/creations";
 import {
-  searchResources,
-  type ResourceKind,
-  type Tool,
-} from "@/lib/data/creations";
-import { quickCreateResourceAction } from "@/lib/creations/actions";
+  quickCreateResourceAction,
+  searchResourcesAction,
+} from "@/lib/creations/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -76,7 +75,7 @@ export function ResourcePickerDialog({
   tools,
   onAddResource,
 }: ResourcePickerDialogProps) {
-  type SearchedResource = Awaited<ReturnType<typeof searchResources>>[number];
+  type SearchedResource = Awaited<ReturnType<typeof searchResourcesAction>>[number];
   const [activeTab, setActiveTab] = useState<"search" | "create">("search");
   const [query, setQuery] = useState("");
   const [kindFilter, setKindFilter] = useState<ResourceKind | "all">("all");
@@ -99,7 +98,7 @@ export function ResourcePickerDialog({
       setIsLoading(true);
       try {
         const filter = kindFilter === "all" ? undefined : kindFilter;
-        const resources = await searchResources(query, filter, 20);
+        const resources = await searchResourcesAction(query, filter, 20);
         if (active) setResults(resources);
       } catch (err) {
         console.error("Error searching resources:", err);
@@ -134,8 +133,8 @@ export function ResourcePickerDialog({
         id: resource.id,
         title: resource.title,
         kind: resource.kind,
-        url: resource.url,
-        description: resource.description,
+        url: resource.url || null,
+        description: resource.description || null,
       },
     });
 

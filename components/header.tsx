@@ -19,7 +19,7 @@ export function Header() {
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
+            className="group flex items-center gap-1.5 transition-opacity hover:opacity-90"
             aria-label="Genra Home"
           >
             <Image
@@ -27,7 +27,7 @@ export function Header() {
               alt="Genra Logo"
               width={28}
               height={28}
-              className="size-7 shrink-0 rounded-full"
+              className="size-5 shrink-0 rounded-full"
               priority
             />
             <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">

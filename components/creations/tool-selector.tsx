@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { searchTools, type Tool } from "@/lib/data/creations";
-import { proposeToolAction } from "@/lib/creations/actions";
+import type { Tool } from "@/lib/data/creations";
+import { proposeToolAction, searchToolsAction } from "@/lib/creations/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +66,7 @@ export function ToolSelector({
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const tools = await searchTools(query);
+        const tools = await searchToolsAction(query);
         if (active) {
           setResults(tools);
         }

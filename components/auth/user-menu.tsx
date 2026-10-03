@@ -64,7 +64,7 @@ export function UserMenu() {
       <Link
         href="/new"
         className={cn(
-          buttonVariants({ variant: 'brand', size: 'sm' }),
+          buttonVariants({ variant: 'default', size: 'sm' }),
           'hidden h-8 gap-1.5 rounded-full px-3.5 text-xs font-semibold sm:inline-flex'
         )}
       >

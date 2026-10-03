@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { searchPrompts, type Tool } from "@/lib/data/creations";
-import { quickCreatePromptAction } from "@/lib/creations/actions";
+import type { Tool } from "@/lib/data/creations";
+import {
+  quickCreatePromptAction,
+  searchPromptsAction,
+} from "@/lib/creations/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,7 +63,7 @@ export function PromptPickerDialog({
   tools,
   onAddPrompt,
 }: PromptPickerDialogProps) {
-  type SearchedPrompt = Awaited<ReturnType<typeof searchPrompts>>[number];
+  type SearchedPrompt = Awaited<ReturnType<typeof searchPromptsAction>>[number];
   const [activeTab, setActiveTab] = useState<"search" | "create">("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchedPrompt[]>([]);
@@ -80,7 +83,7 @@ export function PromptPickerDialog({
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const prompts = await searchPrompts(query, 20);
+        const prompts = await searchPromptsAction(query, 20);
         if (active) setResults(prompts);
       } catch (err) {
         console.error("Error searching prompts:", err);
@@ -315,7 +318,18 @@ export function PromptPickerDialog({
                 <select
                   id="prompt-kind"
                   value={newKind}
-                  onChange={(e) => setNewKind(e.target.value)}
+                  onChange={(e) =>
+                    setNewKind(
+                      e.target.value as
+                        | "text"
+                        | "system"
+                        | "image"
+                        | "video"
+                        | "audio"
+                        | "agent"
+                        | "other"
+                    )
+                  }
                   className="w-full rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="text">Text / Chat Prompt</option>
