@@ -1046,17 +1046,91 @@ export type Database = {
     }
     Functions: {
       can_view_creation: { Args: { cid: string }; Returns: boolean }
+      category_counts: {
+        Args: never
+        Returns: {
+          creation_count: number
+          name: string
+          parent_slug: string
+          slug: string
+        }[]
+      }
+      discover_cards: {
+        Args: {
+          p_category?: string
+          p_creator_username?: string
+          p_limit?: number
+          p_offset?: number
+          p_sort?: string
+          p_tool_slugs?: string[]
+          q?: string
+        }
+        Returns: {
+          category_name: string
+          category_slug: string
+          comment_count: number
+          cover_alt: string
+          cover_height: number
+          cover_storage_path: string
+          cover_width: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_username: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          summary: string
+          title: string
+          tool_count: number
+          tools: Json
+          view_count: number
+        }[]
+      }
       increment_prompt_copy: {
         Args: { p_prompt_id: string }
         Returns: undefined
       }
       increment_view: { Args: { p_creation_id: string }; Returns: undefined }
       owns_creation: { Args: { cid: string }; Returns: boolean }
+      popular_tools: {
+        Args: { p_limit?: number }
+        Returns: {
+          creation_count: number
+          kind: string
+          name: string
+          slug: string
+        }[]
+      }
       record_share: {
         Args: { p_channel: string; p_creation_id: string }
         Returns: undefined
       }
       refresh_trending: { Args: never; Returns: undefined }
+      related_creations: {
+        Args: { p_creation_id: string; p_limit?: number }
+        Returns: {
+          category_name: string
+          category_slug: string
+          comment_count: number
+          cover_alt: string
+          cover_height: number
+          cover_storage_path: string
+          cover_width: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_username: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          summary: string
+          title: string
+          tool_count: number
+          tools: Json
+          view_count: number
+        }[]
+      }
       save_creation: { Args: { payload: Json }; Returns: Json }
       search_creations: {
         Args: {
