@@ -1,4 +1,6 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { perfLog } from '@/lib/perf'
 import type { Database } from '@/types/database'
 
 export type Category = Database['public']['Tables']['categories']['Row']
@@ -254,131 +256,156 @@ export async function getCreationForEdit(slug: string): Promise<CreationWithDeta
 /**
  * Loads a published creation (or owner draft) for public / visitor viewing.
  */
-export async function getPublishedCreationBySlug(
-  slug: string
-): Promise<CreationWithDetails | null> {
-  const supabase = await createClient()
+export const getPublishedCreationBySlug = cache(
+  async (slug: string): Promise<CreationWithDetails | null> => {
+    const supabase = await createClient()
 
-  const { data: creation, error } = await supabase
-    .from('creations')
-    .select(
-      `
-      *,
-      creator:profiles!creations_creator_id_fkey(id, username, display_name, avatar_url),
-      category:categories(*),
-      tools:creation_tools(
-        tool_id,
-        role,
-        version,
-        position,
-        tool:tools(*)
-      ),
-      tags:creation_tags(
-        tag_id,
-        source,
-        tag:tags(*)
-      ),
-      steps:process_steps(
-        id,
-        creation_id,
-        position,
-        title,
-        body,
-        created_at
-      ),
-      media:creation_media!creation_media_creation_id_fkey(
-        id,
-        creation_id,
-        kind,
-        role,
-        storage_path,
-        external_url,
-        mime_type,
-        width,
-        height,
-        duration_ms,
-        alt_text,
-        caption,
-        position,
-        step_id,
-        created_at
-      ),
-      prompts:creation_prompts(
-        prompt_id,
-        step_id,
-        position,
-        note,
-        prompt:prompts(
+    const start = performance.now()
+    const { data: creation, error } = await supabase
+      .from('creations')
+      .select(
+        `
+        *,
+        creator:profiles!creations_creator_id_fkey(id, username, display_name, avatar_url),
+        category:categories(*),
+        tools:creation_tools(
+          tool_id,
+          role,
+          version,
+          position,
+          tool:tools(*)
+        ),
+        tags:creation_tags(
+          tag_id,
+          source,
+          tag:tags(*)
+        ),
+        steps:process_steps(
           id,
+          creation_id,
+          position,
           title,
           body,
-          kind,
-          copy_count,
-          author:profiles!prompts_author_id_fkey(id, username, display_name)
-        )
-      ),
-      resources:creation_resources(
-        resource_id,
-        position,
-        note,
-        resource:resources(
+          created_at
+        ),
+        media:creation_media!creation_media_creation_id_fkey(
           id,
-          title,
+          creation_id,
           kind,
-          url,
-          description,
-          author:profiles!resources_author_id_fkey(id, username, display_name)
+          role,
+          storage_path,
+          external_url,
+          mime_type,
+          width,
+          height,
+          duration_ms,
+          alt_text,
+          caption,
+          position,
+          step_id,
+          created_at
+        ),
+        prompts:creation_prompts(
+          prompt_id,
+          step_id,
+          position,
+          note,
+          prompt:prompts(
+            id,
+            title,
+            body,
+            kind,
+            copy_count,
+            author:profiles!prompts_author_id_fkey(id, username, display_name)
+          )
+        ),
+        resources:creation_resources(
+          resource_id,
+          position,
+          note,
+          resource:resources(
+            id,
+            title,
+            kind,
+            url,
+            description,
+            author:profiles!resources_author_id_fkey(id, username, display_name)
+          )
         )
+      `
       )
-    `
+      .eq('slug', slug)
+      .is('deleted_at', null)
+      .maybeSingle()
+    perfLog('getPublishedCreationBySlug', performance.now() - start)
+
+    if (error || !creation) {
+      if (error) console.error('Error fetching published creation:', error)
+      return null
+    }
+
+    // Sort sub-items by position
+    const steps = (creation.steps || []).sort(
+      (a: ProcessStep, b: ProcessStep) => a.position - b.position
     )
-    .eq('slug', slug)
-    .is('deleted_at', null)
-    .maybeSingle()
+    const mediaList = Array.isArray(creation.media)
+      ? (creation.media as CreationMedia[])
+      : []
+    const media = mediaList.sort(
+      (a: CreationMedia, b: CreationMedia) => a.position - b.position
+    )
+    const tools = (creation.tools || []).sort(
+      (a: { position: number }, b: { position: number }) => a.position - b.position
+    )
+    const prompts = (creation.prompts || []).sort(
+      (a: { position: number }, b: { position: number }) => a.position - b.position
+    )
+    const resources = (creation.resources || []).sort(
+      (a: { position: number }, b: { position: number }) => a.position - b.position
+    )
 
-  if (error || !creation) {
-    if (error) console.error('Error fetching published creation:', error)
-    return null
+    return {
+      ...creation,
+      attributes: (creation.attributes as Record<string, unknown>) || {},
+      steps,
+      media,
+      tools,
+      tags: creation.tags || [],
+      prompts,
+      resources,
+    } as unknown as CreationWithDetails
   }
+)
 
-  // Sort sub-items by position
-  const steps = (creation.steps || []).sort(
-    (a: ProcessStep, b: ProcessStep) => a.position - b.position
-  )
-  const mediaList = Array.isArray(creation.media)
-    ? (creation.media as CreationMedia[])
-    : []
-  const media = mediaList.sort(
-    (a: CreationMedia, b: CreationMedia) => a.position - b.position
-  )
-  const tools = (creation.tools || []).sort(
-    (a: { position: number }, b: { position: number }) => a.position - b.position
-  )
-  const prompts = (creation.prompts || []).sort(
-    (a: { position: number }, b: { position: number }) => a.position - b.position
-  )
-  const resources = (creation.resources || []).sort(
-    (a: { position: number }, b: { position: number }) => a.position - b.position
-  )
+export interface DashboardCreationItem {
+  id: string
+  slug: string
+  title: string
+  summary: string | null
+  status: CreationStatus
+  created_at: string
+  updated_at: string
+  published_at: string | null
+  categoryName: string
+  coverStoragePath: string | null
+  toolCount: number
+  stepCount: number
+}
 
-  return {
-    ...creation,
-    attributes: (creation.attributes as Record<string, unknown>) || {},
-    steps,
-    media,
-    tools,
-    tags: creation.tags || [],
-    prompts,
-    resources,
-  } as unknown as CreationWithDetails
+export interface ListMyCreationsResult {
+  data: DashboardCreationItem[]
+  error: string | null
 }
 
 /**
  * Returns creations owned by the creator for the /creations dashboard.
  */
-export async function listMyCreations(creatorId: string) {
+export async function listMyCreations(
+  creatorId: string
+): Promise<ListMyCreationsResult> {
   const supabase = await createClient()
 
+  const start = performance.now()
   const { data, error } = await supabase
     .from('creations')
     .select(
@@ -393,7 +420,7 @@ export async function listMyCreations(creatorId: string) {
       published_at,
       cover_media_id,
       category:categories(name, slug),
-      cover_media:creation_media!cover_fk(id, storage_path, external_url, kind),
+      cover_media:creation_media!creations_cover_fk(id, storage_path, external_url, kind),
       tools:creation_tools(tool_id),
       steps:process_steps(id)
     `
@@ -401,10 +428,11 @@ export async function listMyCreations(creatorId: string) {
     .eq('creator_id', creatorId)
     .is('deleted_at', null)
     .order('updated_at', { ascending: false })
+  perfLog('listMyCreations', performance.now() - start)
 
   if (error) {
     console.error('Error fetching my creations:', error)
-    return []
+    return { data: [], error: error.message || 'Failed to fetch creations' }
   }
 
   interface RawDashboardRow {
@@ -417,12 +445,17 @@ export async function listMyCreations(creatorId: string) {
     updated_at: string
     published_at: string | null
     category?: { name: string; slug: string } | null
-    cover_media?: { id: string; storage_path: string | null; external_url: string | null; kind: string } | null
+    cover_media?: {
+      id: string
+      storage_path: string | null
+      external_url: string | null
+      kind: string
+    } | null
     tools?: { tool_id: number }[] | null
     steps?: { id: string }[] | null
   }
 
-  return ((data as unknown as RawDashboardRow[]) || []).map((c) => ({
+  const items = ((data as unknown as RawDashboardRow[]) || []).map((c) => ({
     id: c.id,
     slug: c.slug,
     title: c.title,
@@ -436,6 +469,8 @@ export async function listMyCreations(creatorId: string) {
     toolCount: c.tools?.length || 0,
     stepCount: c.steps?.length || 0,
   }))
+
+  return { data: items, error: null }
 }
 
 /**
