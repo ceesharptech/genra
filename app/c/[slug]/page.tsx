@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/server";
 import { getPublishedCreationBySlug } from "@/lib/data/creations";
 import { CreationView } from "@/components/creations/creation-view";
+import { MarkdownView } from "@/components/ui/markdown-view";
 import type { Metadata } from "next";
 
 interface CreationPageProps {
@@ -32,13 +33,17 @@ export async function generateMetadata({
 
 export default async function CreationPage({ params }: CreationPageProps) {
   const { slug } = await params;
-  const creation = await getPublishedCreationBySlug(slug);
+
+  // Run data fetch and user check in parallel
+  const [creation, currentUser] = await Promise.all([
+    getPublishedCreationBySlug(slug),
+    getCurrentUser(),
+  ]);
 
   if (!creation) {
     notFound();
   }
 
-  const currentUser = await getCurrentUser();
   const isOwner = currentUser?.id === creation.creator_id;
 
   // Non-published creations are only visible to their creator
@@ -46,5 +51,24 @@ export default async function CreationPage({ params }: CreationPageProps) {
     notFound();
   }
 
-  return <CreationView creation={creation} isOwner={isOwner} />;
+  // Pre-render markdown on the server so client bundle never includes react-markdown
+  const descriptionNode = creation.description ? (
+    <MarkdownView content={creation.description} />
+  ) : null;
+
+  const stepBodyNodes: Record<string, React.ReactNode> = {};
+  for (const step of creation.steps) {
+    if (step.body) {
+      stepBodyNodes[step.id] = <MarkdownView content={step.body} />;
+    }
+  }
+
+  return (
+    <CreationView
+      creation={creation}
+      isOwner={isOwner}
+      descriptionNode={descriptionNode}
+      stepBodyNodes={stepBodyNodes}
+    />
+  );
 }

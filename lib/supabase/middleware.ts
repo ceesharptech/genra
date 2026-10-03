@@ -35,7 +35,11 @@ export async function updateSession(request: NextRequest) {
   // issues with users being randomly logged out.
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
+  const authStart = performance.now()
   await supabase.auth.getUser()
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug(`[Perf] proxy auth.getUser: ${(performance.now() - authStart).toFixed(1)}ms`)
+  }
 
   return supabaseResponse
 }

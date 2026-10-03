@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
           ]),
     ],
   },
+  experimental: {
+    optimizePackageImports: [
+      '@hugeicons/react',
+      '@hugeicons/core-free-icons',
+    ],
+  },
 }
 
 export default nextConfig

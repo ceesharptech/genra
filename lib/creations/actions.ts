@@ -18,6 +18,13 @@ import {
   type ActionResult,
 } from "@/lib/auth/types";
 import type { Database } from "@/types/database";
+import {
+  searchTools,
+  searchPrompts,
+  searchResources,
+  type ResourceKind,
+} from "@/lib/data/creations";
+import { perfLog } from "@/lib/perf";
 
 export type Tool = Database["public"]["Tables"]["tools"]["Row"];
 export type Prompt = Database["public"]["Tables"]["prompts"]["Row"];
@@ -29,6 +36,38 @@ export interface SaveCreationResult {
   status: "draft" | "published" | "archived";
   published_at: string | null;
   updated_at: string;
+}
+
+function mapDatabaseError(error: { code?: string; message?: string }): string {
+  const code = error.code;
+  const msg = error.message || "";
+
+  if (code === "23514" || msg.includes("creation_media_check")) {
+    return "One or more media items have not finished uploading or are missing a valid link.";
+  }
+  if (
+    code === "42501" ||
+    msg.includes("Authentication required") ||
+    msg.includes("not own")
+  ) {
+    return "You do not have permission to modify this creation.";
+  }
+  if (code === "P0002" || msg.includes("title of at least 3 characters")) {
+    return "A title of at least 3 characters is required to publish.";
+  }
+  if (code === "P0003" || msg.includes("valid category")) {
+    return "A valid category is required to publish.";
+  }
+  if (code === "P0004" || msg.includes("valid cover image")) {
+    return "A valid cover image is required to publish.";
+  }
+  if (code === "P0005" || msg.includes("At least one tool")) {
+    return "At least one tool is required to publish.";
+  }
+  if (code === "23503") {
+    return "One or more referenced tools, prompts, or resources could not be found.";
+  }
+  return error.message || "Failed to save creation";
 }
 
 /**
@@ -82,13 +121,15 @@ export async function saveCreationAction(
 
     // 3. Call atomic save_creation RPC on Supabase
     const supabase = await createClient();
+    const rpcStart = performance.now();
     const { data, error } = await supabase.rpc("save_creation", {
       payload: payload as unknown as Database["public"]["Tables"]["creations"]["Row"]["attributes"],
     });
+    perfLog("save_creation RPC", performance.now() - rpcStart);
 
     if (error) {
       console.error("RPC save_creation failed:", error);
-      return actionError(error.message || "Failed to save creation");
+      return actionError(mapDatabaseError(error));
     }
 
     const result = data as unknown as SaveCreationResult;
@@ -380,3 +421,29 @@ export async function deleteMediaFromStorageAction(
     return actionError(error?.message || "Failed to delete storage media");
   }
 }
+
+/**
+ * Searches tools for the tool selector combobox.
+ */
+export async function searchToolsAction(query = ""): Promise<Tool[]> {
+  return await searchTools(query);
+}
+
+/**
+ * Searches prompts for the prompt picker dialog.
+ */
+export async function searchPromptsAction(query = "", limit = 20) {
+  return await searchPrompts(query, limit);
+}
+
+/**
+ * Searches resources for the resource picker dialog.
+ */
+export async function searchResourcesAction(
+  query = "",
+  kind?: ResourceKind,
+  limit = 20
+) {
+  return await searchResources(query, kind, limit);
+}
+

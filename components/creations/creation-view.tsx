@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CreationWithDetails } from "@/lib/data/creations";
-import { MarkdownView } from "@/components/ui/markdown-view";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -26,9 +25,16 @@ import { createClient } from "@/lib/supabase/client";
 interface CreationViewProps {
   creation: CreationWithDetails;
   isOwner?: boolean;
+  descriptionNode?: React.ReactNode;
+  stepBodyNodes?: Record<string, React.ReactNode>;
 }
 
-export function CreationView({ creation, isOwner = false }: CreationViewProps) {
+export function CreationView({
+  creation,
+  isOwner = false,
+  descriptionNode,
+  stepBodyNodes,
+}: CreationViewProps) {
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
 
@@ -314,9 +320,9 @@ export function CreationView({ creation, isOwner = false }: CreationViewProps) {
               </p>
             )}
 
-            {creation.description && (
+            {creation.description && descriptionNode && (
               <div className="pt-2 border-t border-border/60">
-                <MarkdownView content={creation.description} />
+                {descriptionNode}
               </div>
             )}
           </section>
@@ -346,9 +352,9 @@ export function CreationView({ creation, isOwner = false }: CreationViewProps) {
                     </h3>
                   </div>
 
-                  {step.body && (
+                  {step.body && stepBodyNodes?.[step.id] && (
                     <div className="pl-10">
-                      <MarkdownView content={step.body} />
+                      {stepBodyNodes[step.id]}
                     </div>
                   )}
                 </div>
