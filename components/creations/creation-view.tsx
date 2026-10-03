@@ -1,32 +1,35 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import type { CreationWithDetails } from "@/lib/data/creations";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { HugeiconsIcon } from "@hugeicons/react";
+import React, { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import type { CreationWithDetails } from '@/lib/data/creations'
+import { getMediaUrl } from '@/lib/data/media'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Lightbox } from './lightbox'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
   GlobeIcon,
   GithubIcon,
-  Copy01Icon,
-  CheckmarkCircle02Icon,
   AiSettingIcon,
   Edit02Icon,
   Share01Icon,
   Tag01Icon,
   PlayIcon,
-} from "@hugeicons/core-free-icons";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+  FavouriteIcon,
+  Comment01Icon,
+  EyeIcon,
+  Maximize02Icon,
+} from '@hugeicons/core-free-icons'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface CreationViewProps {
-  creation: CreationWithDetails;
-  isOwner?: boolean;
-  descriptionNode?: React.ReactNode;
-  stepBodyNodes?: Record<string, React.ReactNode>;
+  creation: CreationWithDetails
+  isOwner?: boolean
+  descriptionNode?: React.ReactNode
+  stepBodyNodes?: Record<string, React.ReactNode>
 }
 
 export function CreationView({
@@ -35,65 +38,95 @@ export function CreationView({
   descriptionNode,
   stepBodyNodes,
 }: CreationViewProps) {
-  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
-
-  const supabase = createClient();
-
-  const getMediaUrl = (item: {
-    external_url?: string | null;
-    storage_path?: string | null;
-  }) => {
-    if (item.external_url) return item.external_url;
-    if (item.storage_path) {
-      const { data } = supabase.storage
-        .from("creation-media")
-        .getPublicUrl(item.storage_path);
-      return data.publicUrl;
-    }
-    return "";
-  };
-
-  const handleCopyPrompt = (promptId: string, body: string) => {
-    navigator.clipboard.writeText(body);
-    setCopiedPromptId(promptId);
-    toast.success("Prompt copied to clipboard!");
-    setTimeout(() => {
-      setCopiedPromptId(null);
-    }, 2000);
-  };
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: creation.title,
-        text: creation.summary || creation.title,
-        url: window.location.href,
-      });
+      navigator
+        .share({
+          title: creation.title,
+          text: creation.summary || creation.title,
+          url: window.location.href,
+        })
+        .catch(() => {})
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied to clipboard!");
+      navigator.clipboard.writeText(window.location.href)
+      toast.success('Link copied to clipboard')
     }
-  };
+  }
 
-  const currentMedia = creation.media[activeMediaIndex] || creation.media[0];
+  const currentMedia = creation.media[activeMediaIndex] || creation.media[0]
+  const currentMediaUrl = currentMedia
+    ? getMediaUrl(currentMedia.storage_path || currentMedia.external_url)
+    : null
+
+  const creatorName =
+    creation.creator?.display_name || creation.creator?.username || 'Creator'
+  const creatorInitials = (creatorName.charAt(0) || 'C').toUpperCase()
+
+  const formattedDate = creation.published_at
+    ? new Date(creation.published_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
-      {/* Top Banner / Breadcrumb */}
-      <div className="border-b border-border bg-card/40">
+    <div className="bg-background text-foreground min-h-screen pb-20">
+      {/* Lightbox for full-screen media inspection */}
+      {creation.media.length > 0 && (
+        <Lightbox
+          media={creation.media}
+          currentIndex={activeMediaIndex}
+          isOpen={isLightboxOpen}
+          onClose={() => setIsLightboxOpen(false)}
+          onNavigate={(newIdx) => setActiveMediaIndex(newIdx)}
+        />
+      )}
+
+      {/* Owner preview alert for non-published creations */}
+      {creation.status !== 'published' && isOwner && (
+        <div className="border-warning/30 bg-warning-soft text-warning border-b px-4 py-2.5 text-center text-xs">
+          <div className="mx-auto flex max-w-5xl items-center justify-between">
+            <span>
+              You are viewing a <strong>{creation.status}</strong> creation.
+              Only you can see this page.
+            </span>
+            <Link href={`/c/${creation.slug}/edit`}>
+              <Button variant="secondary" size="sm" className="h-7 text-xs">
+                Edit creation
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Breadcrumb Navigation Bar */}
+      <div className="border-border bg-card/40">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <Link href="/" className="hover:text-foreground transition-colors">
               Home
             </Link>
             <span>/</span>
-            {creation.category ? (
-              <span className="text-foreground font-medium">
-                {creation.category.name}
-              </span>
-            ) : (
-              <span>Creations</span>
+            <Link
+              href="/discover"
+              className="hover:text-foreground transition-colors"
+            >
+              Discover
+            </Link>
+            {creation.category && (
+              <>
+                <span>/</span>
+                <Link
+                  href={`/discover?category=${creation.category.slug}`}
+                  className="text-foreground font-medium transition-colors hover:underline"
+                >
+                  {creation.category.name}
+                </Link>
+              </>
             )}
           </div>
 
@@ -103,16 +136,21 @@ export function CreationView({
               variant="outline"
               size="sm"
               onClick={handleShare}
+              className="h-8 gap-1.5 rounded-full text-xs"
             >
               <HugeiconsIcon icon={Share01Icon} className="size-3.5" />
-              Share
+              <span>Share</span>
             </Button>
 
             {isOwner && (
               <Link href={`/c/${creation.slug}/edit`}>
-                <Button variant="secondary" size="sm">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 gap-1.5 rounded-full text-xs"
+                >
                   <HugeiconsIcon icon={Edit02Icon} className="size-3.5" />
-                  Edit creation
+                  <span>Edit</span>
                 </Button>
               </Link>
             )}
@@ -120,51 +158,54 @@ export function CreationView({
         </div>
       </div>
 
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-10">
+      <main className="mx-auto max-w-5xl space-y-10 px-4 py-8 sm:px-6">
         {/* ============================================================= */}
         {/* HEADER: Title, Creator, Category, Links                       */}
         {/* ============================================================= */}
         <section className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             {creation.category && (
-              <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
+              <Link
+                href={`/discover?category=${creation.category.slug}`}
+                className="bg-secondary text-foreground hover:bg-surface-2 border-border rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+              >
                 {creation.category.name}
-              </span>
+              </Link>
             )}
 
-            {creation.status !== "published" && (
-              <span className="rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+            {creation.status !== 'published' && (
+              <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
                 {creation.status}
               </span>
             )}
           </div>
 
-          <h1 className="font-bricolage text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          <h1 className="font-bricolage text-foreground text-3xl font-semibold tracking-tight text-balance sm:text-4xl md:text-5xl">
             {creation.title}
           </h1>
 
-          {/* Creator Profile & Metadata */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-border">
+          {/* Creator Profile, Metrics & External Links */}
+          <div className="border-border flex flex-wrap items-center justify-between gap-4 pt-4">
             <div className="flex items-center gap-3">
               {creation.creator && (
                 <Link
-                  href={`/@${creation.creator.username}`}
-                  className="flex items-center gap-3 group"
+                  href={`/u/${creation.creator.username}`}
+                  className="group flex items-center gap-3"
                 >
-                  <Avatar className="size-10 border border-border">
+                  <Avatar className="border-border size-10 border">
                     <AvatarImage
-                      src={creation.creator.avatar_url || ""}
-                      alt={creation.creator.username}
+                      src={creation.creator.avatar_url || ''}
+                      alt={creatorName}
                     />
-                    <AvatarFallback className="font-bold text-xs">
-                      {creation.creator.username.slice(0, 2).toUpperCase()}
+                    <AvatarFallback className="bg-surface-2 text-xs font-semibold">
+                      {creatorInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-semibold text-foreground group-hover:text-brand transition-colors">
-                      {creation.creator.display_name || creation.creator.username}
+                    <p className="text-foreground group-hover:text-brand text-sm font-medium transition-colors">
+                      {creatorName}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-text-subtle text-xs">
                       @{creation.creator.username}
                     </p>
                   </div>
@@ -172,31 +213,72 @@ export function CreationView({
               )}
             </div>
 
-            {/* Live / GitHub Links */}
-            <div className="flex items-center gap-2">
-              {creation.live_url && (
-                <a
-                  href={creation.live_url}
-                  target="_blank"
-                  rel="nofollow ugc noopener"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+            {/* Read-only Metrics Row & External Buttons */}
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="text-text-subtle border-border flex items-center gap-3 border-r pr-4 text-xs tabular-nums">
+                <span
+                  className="inline-flex items-center gap-1"
+                  title={`${creation.like_count} likes`}
                 >
-                  <HugeiconsIcon icon={GlobeIcon} className="size-3.5" />
-                  Live Preview
-                </a>
-              )}
+                  <HugeiconsIcon
+                    icon={FavouriteIcon}
+                    className="text-muted-foreground size-3.5"
+                  />
+                  <span>{creation.like_count}</span>
+                </span>
+                <span
+                  className="inline-flex items-center gap-1"
+                  title={`${creation.comment_count} comments`}
+                >
+                  <HugeiconsIcon
+                    icon={Comment01Icon}
+                    className="text-muted-foreground size-3.5"
+                  />
+                  <span>{creation.comment_count}</span>
+                </span>
+                <span
+                  className="inline-flex items-center gap-1"
+                  title={`${creation.view_count} views`}
+                >
+                  <HugeiconsIcon
+                    icon={EyeIcon}
+                    className="text-muted-foreground size-3.5"
+                  />
+                  <span>{creation.view_count}</span>
+                </span>
+                {formattedDate && (
+                  <span className="text-muted-foreground/80 pl-1 text-[11px]">
+                    {formattedDate}
+                  </span>
+                )}
+              </div>
 
-              {creation.repo_url && (
-                <a
-                  href={creation.repo_url}
-                  target="_blank"
-                  rel="nofollow ugc noopener"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-                >
-                  <HugeiconsIcon icon={GithubIcon} className="size-3.5" />
-                  Source Code
-                </a>
-              )}
+              {/* Live / GitHub Links */}
+              <div className="flex items-center gap-2">
+                {creation.live_url && (
+                  <a
+                    href={creation.live_url}
+                    target="_blank"
+                    rel="nofollow ugc noopener"
+                    className="border-border bg-card text-foreground hover:bg-secondary inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    <HugeiconsIcon icon={GlobeIcon} className="size-3.5" />
+                    <span>Live site</span>
+                  </a>
+                )}
+
+                {creation.repo_url && (
+                  <a
+                    href={creation.repo_url}
+                    target="_blank"
+                    rel="nofollow ugc noopener"
+                    className="border-border bg-card text-foreground hover:bg-secondary inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    <HugeiconsIcon icon={GithubIcon} className="size-3.5" />
+                    <span>Source</span>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -205,29 +287,36 @@ export function CreationView({
         {/* MEDIA VIEWER: Hero Player / Image & Thumbnail Carousel        */}
         {/* ============================================================= */}
         {creation.media.length > 0 && (
-          <section className="space-y-4">
-            <div className="relative aspect-video w-full rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
-              {currentMedia?.kind === "embed" && currentMedia.external_url ? (
+          <section className="space-y-3">
+            <div
+              onClick={() => setIsLightboxOpen(true)}
+              className="group border-border bg-surface-2 hover:border-border-strong relative aspect-video w-full cursor-zoom-in overflow-hidden rounded-xl border shadow-xs transition-colors"
+            >
+              {currentMedia?.kind === 'embed' && currentMedia.external_url ? (
                 <iframe
                   src={currentMedia.external_url}
                   title={currentMedia.alt_text || creation.title}
-                  className="w-full h-full border-0"
+                  className="pointer-events-none size-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
                 />
-              ) : currentMedia ? (
+              ) : currentMediaUrl ? (
                 <Image
-                  src={getMediaUrl(currentMedia)}
+                  src={currentMediaUrl}
                   alt={currentMedia.alt_text || creation.title}
                   fill
                   sizes="(max-width: 1200px) 100vw, 1024px"
-                  className="object-contain bg-black/90"
+                  className="object-contain transition-transform duration-200 ease-out group-hover:scale-[1.01]"
                   priority
                 />
               ) : null}
 
+              {/* Overlay with expand icon */}
+              <div className="absolute top-3 right-3 rounded-full bg-black/50 p-2 text-white/80 opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100">
+                <HugeiconsIcon icon={Maximize02Icon} className="size-4" />
+              </div>
+
               {currentMedia?.caption && (
-                <div className="absolute bottom-0 inset-x-0 bg-background/80 backdrop-blur-md px-4 py-2 text-xs text-foreground/90 border-t border-border/60">
+                <div className="border-border/40 bg-background/80 text-foreground/90 absolute inset-x-0 bottom-0 border-t px-4 py-2 text-xs backdrop-blur-md">
                   {currentMedia.caption}
                 </div>
               )}
@@ -235,36 +324,42 @@ export function CreationView({
 
             {/* Thumbnail Strip */}
             {creation.media.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="no-scrollbar flex gap-2.5 overflow-x-auto pb-1">
                 {creation.media.map((item, idx) => {
-                  const isActive = idx === activeMediaIndex;
+                  const isActive = idx === activeMediaIndex
+                  const itemUrl = getMediaUrl(
+                    item.storage_path || item.external_url
+                  )
                   return (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setActiveMediaIndex(idx)}
                       className={cn(
-                        "relative size-20 shrink-0 rounded-2xl border overflow-hidden transition-all cursor-pointer",
+                        'relative size-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border transition-all',
                         isActive
-                          ? "ring-2 ring-brand border-transparent shadow-xs scale-105"
-                          : "border-border opacity-70 hover:opacity-100"
+                          ? 'ring-brand border-transparent shadow-xs ring-2'
+                          : 'border-border opacity-70 hover:opacity-100'
                       )}
                     >
-                      {item.kind === "embed" ? (
-                        <div className="flex size-full items-center justify-center bg-muted text-muted-foreground">
-                          <HugeiconsIcon icon={PlayIcon} className="size-6 text-foreground" />
+                      {item.kind === 'embed' ? (
+                        <div className="bg-muted text-muted-foreground flex size-full items-center justify-center">
+                          <HugeiconsIcon
+                            icon={PlayIcon}
+                            className="text-foreground size-5"
+                          />
                         </div>
-                      ) : (
+                      ) : itemUrl ? (
                         <Image
-                          src={getMediaUrl(item)}
-                          alt={item.alt_text || "Thumbnail"}
+                          src={itemUrl}
+                          alt={item.alt_text || 'Thumbnail'}
                           fill
-                          sizes="80px"
+                          sizes="64px"
                           className="object-cover"
                         />
-                      )}
+                      ) : null}
                     </button>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -276,36 +371,41 @@ export function CreationView({
         {/* ============================================================= */}
         <section className="flex flex-wrap items-center gap-2">
           {creation.tools.map((t) => {
-            const isPrimary = t.role === "primary";
+            const isPrimary = t.role === 'primary'
             return (
-              <span
+              <Link
                 key={t.tool_id}
+                href={`/discover?tools=${encodeURIComponent(t.tool.slug)}`}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border",
+                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-normal transition-colors',
                   isPrimary
-                    ? "border-brand/40 bg-brand/10 text-brand"
-                    : "border-border bg-card text-foreground"
+                    ? 'border-brand/40 bg-brand-soft text-brand-text hover:bg-brand-soft/80'
+                    : 'border-border bg-card text-foreground hover:bg-secondary'
                 )}
               >
-                <HugeiconsIcon icon={AiSettingIcon} className="size-3.5" />
-                {t.tool.name}
+                <HugeiconsIcon
+                  icon={AiSettingIcon}
+                  className="text-muted-foreground size-3.5"
+                />
+                <span className="font-medium">{t.tool.name}</span>
                 {t.version && (
-                  <span className="text-[10px] opacity-75 font-normal">
+                  <span className="text-text-subtle font-mono text-[10px]">
                     {t.version}
                   </span>
                 )}
-              </span>
-            );
+              </Link>
+            )
           })}
 
           {creation.tags.map((tg) => (
-            <span
+            <Link
               key={tg.tag_id}
-              className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-3 py-1 text-xs text-muted-foreground"
+              href={`/discover?q=${encodeURIComponent(tg.tag.name)}`}
+              className="bg-surface-2 text-muted-foreground hover:text-foreground border-border/40 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition-colors"
             >
               <HugeiconsIcon icon={Tag01Icon} className="size-3" />
-              #{tg.tag.name}
-            </span>
+              <span>#{tg.tag.name}</span>
+            </Link>
           ))}
         </section>
 
@@ -313,15 +413,15 @@ export function CreationView({
         {/* SUMMARY & DESCRIPTION                                         */}
         {/* ============================================================= */}
         {(creation.summary || creation.description) && (
-          <section className="rounded-3xl border border-border bg-card p-6 sm:p-8 space-y-4">
+          <section className="border-border bg-card space-y-4 rounded-xl border p-6 sm:p-8">
             {creation.summary && (
-              <p className="text-base sm:text-lg font-medium text-foreground leading-relaxed">
+              <p className="text-foreground text-base leading-relaxed font-normal sm:text-lg">
                 {creation.summary}
               </p>
             )}
 
             {creation.description && descriptionNode && (
-              <div className="pt-2 border-t border-border/60">
+              <div className="border-border border-t pt-4">
                 {descriptionNode}
               </div>
             )}
@@ -329,34 +429,35 @@ export function CreationView({
         )}
 
         {/* ============================================================= */}
-        {/* PROCESS STEPS                                                 */}
+        {/* PROCESS STEPS TIMELINE                                        */}
         {/* ============================================================= */}
         {creation.steps.length > 0 && (
-          <section className="space-y-6">
-            <h2 className="font-bricolage text-2xl font-bold tracking-tight text-foreground">
-              How It Was Made (Process)
+          <section className="space-y-6" aria-labelledby="steps-heading">
+            <h2
+              id="steps-heading"
+              className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
+            >
+              Process and steps
             </h2>
 
-            <div className="space-y-4">
+            <div className="before:bg-border relative space-y-8 pl-6 before:absolute before:top-3 before:bottom-3 before:left-2.5 before:w-px sm:pl-8 sm:before:left-3.5">
               {creation.steps.map((step, idx) => (
-                <div
-                  key={step.id}
-                  className="rounded-3xl border border-border bg-card p-6 space-y-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-foreground text-background text-xs font-bold">
-                      {idx + 1}
-                    </span>
-                    <h3 className="font-bricolage text-lg font-semibold text-foreground">
+                <div key={step.id} className="relative space-y-2">
+                  {/* Node Marker */}
+                  <span className="bg-foreground text-background ring-background absolute top-1 -left-6 flex size-5 items-center justify-center rounded-full text-[10px] font-semibold ring-4 sm:-left-8 sm:size-7 sm:text-xs">
+                    {idx + 1}
+                  </span>
+
+                  <div className="border-border bg-card space-y-3 rounded-xl border p-5">
+                    <h3 className="font-bricolage text-foreground text-base font-semibold sm:text-lg">
                       {step.title}
                     </h3>
+                    {step.body && stepBodyNodes?.[step.id] && (
+                      <div className="text-foreground/90 text-sm leading-relaxed">
+                        {stepBodyNodes[step.id]}
+                      </div>
+                    )}
                   </div>
-
-                  {step.body && stepBodyNodes?.[step.id] && (
-                    <div className="pl-10">
-                      {stepBodyNodes[step.id]}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -364,59 +465,41 @@ export function CreationView({
         )}
 
         {/* ============================================================= */}
-        {/* PROMPTS USED                                                  */}
+        {/* PROMPTS USED (Read-Only in Phase 03)                          */}
         {/* ============================================================= */}
         {creation.prompts.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="font-bricolage text-2xl font-bold tracking-tight text-foreground">
-              Prompts Used ({creation.prompts.length})
+          <section className="space-y-4" aria-labelledby="prompts-heading">
+            <h2
+              id="prompts-heading"
+              className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
+            >
+              Prompts used ({creation.prompts.length})
             </h2>
 
             <div className="space-y-4">
               {creation.prompts.map((item) => (
                 <div
                   key={item.prompt_id}
-                  className="rounded-3xl border border-border bg-card p-6 space-y-3"
+                  className="border-border bg-card space-y-3 rounded-xl border p-5"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm text-foreground">
+                      <h3 className="text-foreground text-sm font-medium">
                         {item.prompt.title}
                       </h3>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                      <span className="bg-secondary text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
                         {item.prompt.kind}
                       </span>
                     </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        handleCopyPrompt(item.prompt_id, item.prompt.body)
-                      }
-                    >
-                      {copiedPromptId === item.prompt_id ? (
-                        <>
-                          <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5 text-emerald-500" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <HugeiconsIcon icon={Copy01Icon} className="size-3.5" />
-                          Copy prompt
-                        </>
-                      )}
-                    </Button>
                   </div>
 
                   {item.note && (
-                    <p className="text-xs text-muted-foreground italic">
+                    <p className="text-text-subtle text-xs italic">
                       Note: {item.note}
                     </p>
                   )}
 
-                  <pre className="rounded-2xl border border-border bg-muted/50 p-4 font-mono text-xs text-foreground overflow-x-auto whitespace-pre-wrap break-words">
+                  <pre className="border-border bg-surface text-foreground overflow-x-auto rounded-lg border p-4 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap">
                     {item.prompt.body}
                   </pre>
                 </div>
@@ -429,50 +512,56 @@ export function CreationView({
         {/* RESOURCES USED                                                */}
         {/* ============================================================= */}
         {creation.resources.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="font-bricolage text-2xl font-bold tracking-tight text-foreground">
-              Resources & Skills ({creation.resources.length})
+          <section className="space-y-4" aria-labelledby="resources-heading">
+            <h2
+              id="resources-heading"
+              className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
+            >
+              Resources and skills ({creation.resources.length})
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {creation.resources.map((item) => (
                 <div
                   key={item.resource_id}
-                  className="rounded-2xl border border-border bg-card p-5 space-y-2 flex flex-col justify-between"
+                  className="border-border bg-card flex flex-col justify-between space-y-3 rounded-xl border p-5"
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-semibold text-sm text-foreground truncate">
+                      <h3 className="text-foreground truncate text-sm font-medium">
                         {item.resource.title}
                       </h3>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground shrink-0">
-                        {item.resource.kind.replace("_", " ")}
+                      <span className="bg-secondary text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
+                        {item.resource.kind.replace('_', ' ')}
                       </span>
                     </div>
 
                     {item.resource.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                      <p className="text-muted-foreground line-clamp-2 text-xs">
                         {item.resource.description}
                       </p>
                     )}
 
                     {item.note && (
-                      <p className="text-xs text-brand font-medium">
+                      <p className="text-brand-text text-xs font-medium">
                         Usage: {item.note}
                       </p>
                     )}
                   </div>
 
                   {item.resource.url && (
-                    <div className="pt-2 border-t border-border/60">
+                    <div className="border-border/60 border-t pt-2">
                       <a
                         href={item.resource.url}
                         target="_blank"
                         rel="nofollow ugc noopener"
-                        className="text-xs text-brand hover:underline font-semibold flex items-center gap-1 truncate"
+                        className="text-brand-text flex items-center gap-1 truncate text-xs font-medium hover:underline"
                       >
-                        <HugeiconsIcon icon={GlobeIcon} className="size-3 shrink-0" />
-                        {item.resource.url}
+                        <HugeiconsIcon
+                          icon={GlobeIcon}
+                          className="size-3 shrink-0"
+                        />
+                        <span>{item.resource.url}</span>
                       </a>
                     </div>
                   )}
@@ -483,5 +572,5 @@ export function CreationView({
         )}
       </main>
     </div>
-  );
+  )
 }
