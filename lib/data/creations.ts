@@ -1,7 +1,10 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { perfLog } from '@/lib/perf'
 import type { Database } from '@/types/database'
+
+export { getMediaUrl } from '@/lib/data/media'
 
 export type Category = Database['public']['Tables']['categories']['Row']
 export type Tool = Database['public']['Tables']['tools']['Row']
@@ -253,129 +256,348 @@ export async function getCreationForEdit(slug: string): Promise<CreationWithDeta
   } as unknown as CreationWithDetails
 }
 
+export interface CreationCardItem {
+  id: string
+  slug: string
+  title: string
+  summary: string | null
+  published_at: string
+  like_count: number
+  comment_count: number
+  view_count: number
+  category_slug: string | null
+  category_name: string | null
+  cover_storage_path: string | null
+  cover_width: number | null
+  cover_height: number | null
+  cover_alt: string | null
+  creator_username: string
+  creator_display_name: string | null
+  creator_avatar_url: string | null
+  tools: Array<{
+    name: string
+    slug: string
+  }>
+  tool_count: number
+}
+
+export interface PopularToolItem {
+  slug: string
+  name: string
+  kind: string
+  creation_count: number
+}
+
+export interface CategoryCountItem {
+  slug: string
+  name: string
+  parent_slug: string | null
+  creation_count: number
+}
+
+export interface DiscoverCardsParams {
+  q?: string | null
+  category?: string | null
+  tool_slugs?: string[] | null
+  sort?: 'trending' | 'new' | 'popular'
+  creator_username?: string | null
+  limit?: number
+  offset?: number
+}
+
+/**
+ * Fetches discovery cards via the optimized discover_cards RPC.
+ * Uses the cookie-less public client for cache-eligibility and minimal latency.
+ */
+export const discoverCards = cache(
+  async (
+    params: DiscoverCardsParams = {}
+  ): Promise<{ data: CreationCardItem[]; hasMore: boolean; error: string | null }> => {
+    const supabase = createPublicClient()
+    const limit = Math.min(Math.max(params.limit ?? 24, 1), 60)
+    const offset = Math.max(params.offset ?? 0, 0)
+
+    const start = performance.now()
+    const { data, error } = await supabase.rpc('discover_cards', {
+      q: params.q?.trim() || undefined,
+      p_category: params.category?.trim() || undefined,
+      p_tool_slugs:
+        params.tool_slugs && params.tool_slugs.length > 0
+          ? params.tool_slugs
+          : undefined,
+      p_sort: params.sort || 'trending',
+      p_creator_username: params.creator_username?.trim() || undefined,
+      p_limit: limit + 1,
+      p_offset: offset,
+    })
+    perfLog('discoverCards', performance.now() - start)
+
+    if (error) {
+      console.error('Error fetching discover cards:', error)
+      return {
+        data: [],
+        hasMore: false,
+        error: error.message || 'Failed to fetch creations',
+      }
+    }
+
+    const rows = (data || []) as unknown as CreationCardItem[]
+    const hasMore = rows.length > limit
+    const items = hasMore ? rows.slice(0, limit) : rows
+
+    const formatted = items.map((item) => ({
+      ...item,
+      tools: Array.isArray(item.tools) ? item.tools : [],
+    }))
+
+    return { data: formatted, hasMore, error: null }
+  }
+)
+
+/**
+ * Fetches related creations for a given creation ID.
+ */
+export const relatedCreations = cache(
+  async (
+    creationId: string,
+    limit = 6
+  ): Promise<{ data: CreationCardItem[]; error: string | null }> => {
+    const supabase = createPublicClient()
+    const start = performance.now()
+    const { data, error } = await supabase.rpc('related_creations', {
+      p_creation_id: creationId,
+      p_limit: limit,
+    })
+    perfLog('relatedCreations', performance.now() - start)
+
+    if (error) {
+      console.error('Error fetching related creations:', error)
+      return {
+        data: [],
+        error: error.message || 'Failed to fetch related creations',
+      }
+    }
+
+    const rows = (data || []) as unknown as CreationCardItem[]
+    const formatted = rows.map((item) => ({
+      ...item,
+      tools: Array.isArray(item.tools) ? item.tools : [],
+    }))
+
+    return { data: formatted, error: null }
+  }
+)
+
+/**
+ * Fetches popular tools used by published creations.
+ */
+export const popularTools = cache(
+  async (
+    limit = 30
+  ): Promise<{ data: PopularToolItem[]; error: string | null }> => {
+    const supabase = createPublicClient()
+    const start = performance.now()
+    const { data, error } = await supabase.rpc('popular_tools', {
+      p_limit: limit,
+    })
+    perfLog('popularTools', performance.now() - start)
+
+    if (error) {
+      console.error('Error fetching popular tools:', error)
+      return {
+        data: [],
+        error: error.message || 'Failed to fetch popular tools',
+      }
+    }
+
+    return { data: (data || []) as PopularToolItem[], error: null }
+  }
+)
+
+/**
+ * Fetches published creation counts grouped by category.
+ */
+export const categoryCounts = cache(
+  async (): Promise<{ data: CategoryCountItem[]; error: string | null }> => {
+    const supabase = createPublicClient()
+    const start = performance.now()
+    const { data, error } = await supabase.rpc('category_counts')
+    perfLog('categoryCounts', performance.now() - start)
+
+    if (error) {
+      console.error('Error fetching category counts:', error)
+      return {
+        data: [],
+        error: error.message || 'Failed to fetch category counts',
+      }
+    }
+
+    return { data: (data || []) as CategoryCountItem[], error: null }
+  }
+)
+
+const DETAIL_SELECT = `
+  *,
+  creator:profiles!creations_creator_id_fkey(id, username, display_name, avatar_url, bio, headline),
+  category:categories(*),
+  tools:creation_tools(
+    tool_id,
+    role,
+    version,
+    position,
+    tool:tools(*)
+  ),
+  tags:creation_tags(
+    tag_id,
+    source,
+    tag:tags(*)
+  ),
+  steps:process_steps(
+    id,
+    creation_id,
+    position,
+    title,
+    body,
+    created_at
+  ),
+  media:creation_media!creation_media_creation_id_fkey(
+    id,
+    creation_id,
+    kind,
+    role,
+    storage_path,
+    external_url,
+    mime_type,
+    width,
+    height,
+    duration_ms,
+    alt_text,
+    caption,
+    position,
+    step_id,
+    created_at
+  ),
+  cover:creation_media!creations_cover_fk(
+    id,
+    kind,
+    role,
+    storage_path,
+    external_url,
+    mime_type,
+    width,
+    height,
+    alt_text,
+    caption
+  ),
+  prompts:creation_prompts(
+    prompt_id,
+    step_id,
+    position,
+    note,
+    prompt:prompts(
+      id,
+      title,
+      body,
+      kind,
+      copy_count,
+      model_tool:tools!prompts_model_tool_id_fkey(id, name, slug)
+    )
+  ),
+  resources:creation_resources(
+    resource_id,
+    position,
+    note,
+    resource:resources(
+      id,
+      title,
+      kind,
+      url,
+      description,
+      storage_path,
+      tool:tools!resources_tool_id_fkey(id, name, slug)
+    )
+  )
+`
+
+// Helper to format raw joined creation into CreationWithDetails
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function formatCreationDetail(creation: any): CreationWithDetails {
+  const steps = (creation.steps || []).sort(
+    (a: ProcessStep, b: ProcessStep) => a.position - b.position
+  )
+  const mediaList = Array.isArray(creation.media)
+    ? (creation.media as CreationMedia[])
+    : []
+  const media = mediaList.sort(
+    (a: CreationMedia, b: CreationMedia) => a.position - b.position
+  )
+  const tools = (creation.tools || []).sort(
+    (a: { position: number }, b: { position: number }) => a.position - b.position
+  )
+  const prompts = (creation.prompts || []).sort(
+    (a: { position: number }, b: { position: number }) => a.position - b.position
+  )
+  const resources = (creation.resources || []).sort(
+    (a: { position: number }, b: { position: number }) => a.position - b.position
+  )
+
+  return {
+    ...creation,
+    attributes: (creation.attributes as Record<string, unknown>) || {},
+    steps,
+    media,
+    tools,
+    tags: creation.tags || [],
+    prompts,
+    resources,
+  } as unknown as CreationWithDetails
+}
+
 /**
  * Loads a published creation (or owner draft) for public / visitor viewing.
+ * First tries cookie-less public client; falls back to authenticated client
+ * if not found publicly to permit author preview of drafts/archived items.
  */
 export const getPublishedCreationBySlug = cache(
   async (slug: string): Promise<CreationWithDetails | null> => {
-    const supabase = await createClient()
-
+    const publicClient = createPublicClient()
     const start = performance.now()
-    const { data: creation, error } = await supabase
+    const { data: publicCreation, error: publicError } = await publicClient
       .from('creations')
-      .select(
-        `
-        *,
-        creator:profiles!creations_creator_id_fkey(id, username, display_name, avatar_url),
-        category:categories(*),
-        tools:creation_tools(
-          tool_id,
-          role,
-          version,
-          position,
-          tool:tools(*)
-        ),
-        tags:creation_tags(
-          tag_id,
-          source,
-          tag:tags(*)
-        ),
-        steps:process_steps(
-          id,
-          creation_id,
-          position,
-          title,
-          body,
-          created_at
-        ),
-        media:creation_media!creation_media_creation_id_fkey(
-          id,
-          creation_id,
-          kind,
-          role,
-          storage_path,
-          external_url,
-          mime_type,
-          width,
-          height,
-          duration_ms,
-          alt_text,
-          caption,
-          position,
-          step_id,
-          created_at
-        ),
-        prompts:creation_prompts(
-          prompt_id,
-          step_id,
-          position,
-          note,
-          prompt:prompts(
-            id,
-            title,
-            body,
-            kind,
-            copy_count,
-            author:profiles!prompts_author_id_fkey(id, username, display_name)
-          )
-        ),
-        resources:creation_resources(
-          resource_id,
-          position,
-          note,
-          resource:resources(
-            id,
-            title,
-            kind,
-            url,
-            description,
-            author:profiles!resources_author_id_fkey(id, username, display_name)
-          )
-        )
-      `
-      )
+      .select(DETAIL_SELECT)
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .is('deleted_at', null)
+      .maybeSingle()
+    perfLog('getPublishedCreationBySlug (public)', performance.now() - start)
+
+    if (publicCreation) {
+      return formatCreationDetail(publicCreation)
+    }
+
+    if (publicError) {
+      console.error('Error fetching published creation publicly:', publicError)
+    }
+
+    // Fallback: check if the visitor is the authenticated owner of a draft/archived creation
+    const authClient = await createClient()
+    const authStart = performance.now()
+    const { data: authCreation, error: authError } = await authClient
+      .from('creations')
+      .select(DETAIL_SELECT)
       .eq('slug', slug)
       .is('deleted_at', null)
       .maybeSingle()
-    perfLog('getPublishedCreationBySlug', performance.now() - start)
+    perfLog('getPublishedCreationBySlug (auth fallback)', performance.now() - authStart)
 
-    if (error || !creation) {
-      if (error) console.error('Error fetching published creation:', error)
+    if (authError || !authCreation) {
       return null
     }
 
-    // Sort sub-items by position
-    const steps = (creation.steps || []).sort(
-      (a: ProcessStep, b: ProcessStep) => a.position - b.position
-    )
-    const mediaList = Array.isArray(creation.media)
-      ? (creation.media as CreationMedia[])
-      : []
-    const media = mediaList.sort(
-      (a: CreationMedia, b: CreationMedia) => a.position - b.position
-    )
-    const tools = (creation.tools || []).sort(
-      (a: { position: number }, b: { position: number }) => a.position - b.position
-    )
-    const prompts = (creation.prompts || []).sort(
-      (a: { position: number }, b: { position: number }) => a.position - b.position
-    )
-    const resources = (creation.resources || []).sort(
-      (a: { position: number }, b: { position: number }) => a.position - b.position
-    )
-
-    return {
-      ...creation,
-      attributes: (creation.attributes as Record<string, unknown>) || {},
-      steps,
-      media,
-      tools,
-      tags: creation.tags || [],
-      prompts,
-      resources,
-    } as unknown as CreationWithDetails
+    return formatCreationDetail(authCreation)
   }
 )
+
 
 export interface DashboardCreationItem {
   id: string
