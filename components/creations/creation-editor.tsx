@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -43,6 +43,16 @@ import {
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import {
+  buildSavePayload,
+  serializeCreationSnapshot,
+  type CreationFormState,
+} from "@/lib/creations/payload";
+import {
+  AutosaveScheduler,
+  type AutosaveStatus,
+  type SaveReason,
+} from "@/lib/creations/autosave";
 
 export interface CreationEditorInitialData {
   id: string;
@@ -130,80 +140,63 @@ export function CreationEditor({
   const [openResourceDialog, setOpenResourceDialog] = useState(false);
 
   // Save & Sync state
-  const [isSaving, setIsSaving] = useState(false);
+  const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>("idle");
+  const [autosaveError, setAutosaveError] = useState<string | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [previewDescription, setPreviewDescription] = useState(false);
 
-  // Refs for debounced autosave
-  const saveQueueRef = useRef<boolean>(false);
-  const isExecutingSaveRef = useRef<boolean>(false);
-  const executeSaveRef = useRef<((isManual?: boolean) => Promise<void>) | null>(null);
-  const initialMountRef = useRef<boolean>(true);
+  // Compute current serialized snapshot from form state
+  const currentSnapshot = serializeCreationSnapshot({
+    creationId,
+    title,
+    summary,
+    description,
+    categoryId,
+    liveUrl,
+    repoUrl,
+    coverMediaId,
+    attributes: initialData.attributes,
+    tools,
+    tags,
+    steps,
+    media,
+    prompts,
+    resources,
+    status,
+  });
 
-  // Track changes
-  const markDirty = useCallback(() => {
-    setHasUnsavedChanges(true);
-  }, []);
+  // Track the snapshot of the last successfully saved state
+  const [lastSavedSnapshot, setLastSavedSnapshot] = useState(currentSnapshot);
 
-  // Form payload builder
-  const buildPayload = useCallback(
-    (action: "save" | "publish") => {
-      return {
-        action,
-        creation: {
-          id: creationId,
-          title: title.trim() || (status === "draft" ? "Untitled creation" : ""),
-          summary: summary.trim() || null,
-          description: description.trim() || null,
-          category_id: categoryId,
-          live_url: liveUrl.trim() || null,
-          repo_url: repoUrl.trim() || null,
-          cover_media_id: coverMediaId,
-          attributes: initialData.attributes || {},
-        },
-        tools: tools.map((t, idx) => ({
-          tool_id: t.tool_id,
-          role: t.role,
-          version: t.version,
-          position: idx,
-        })),
-        tags,
-        steps: steps.map((s, idx) => ({
-          id: s.id,
-          position: idx,
-          title: s.title.trim() || `Step ${idx + 1}`,
-          body: s.body?.trim() || null,
-        })),
-        media: media.map((m, idx) => ({
-          id: m.id,
-          kind: m.kind,
-          role: m.id === coverMediaId ? "thumbnail" : "gallery",
-          storage_path: m.storage_path,
-          external_url: m.external_url,
-          mime_type: m.mime_type,
-          width: m.width,
-          height: m.height,
-          duration_ms: m.duration_ms,
-          alt_text: m.alt_text,
-          caption: m.caption,
-          position: idx,
-          step_id: m.step_id,
-        })),
-        prompts: prompts.map((p, idx) => ({
-          prompt_id: p.prompt_id,
-          step_id: p.step_id,
-          position: idx,
-          note: p.note,
-        })),
-        resources: resources.map((r, idx) => ({
-          resource_id: r.resource_id,
-          position: idx,
-          note: r.note,
-        })),
-      };
-    },
-    [
+  // Dirty state is cleanly derived: true if current state differs from last saved state
+  const isDirty = currentSnapshot !== lastSavedSnapshot;
+
+  // Mutable ref for async callbacks / event handlers
+  const formStateRef = useRef<CreationFormState>({
+    creationId,
+    title,
+    summary,
+    description,
+    categoryId,
+    liveUrl,
+    repoUrl,
+    coverMediaId,
+    attributes: initialData.attributes,
+    tools,
+    tags,
+    steps,
+    media,
+    prompts,
+    resources,
+    status,
+  });
+
+  // Scheduler ref initialized once in useEffect (avoids ref access or setState cascading during render)
+  const schedulerRef = useRef<AutosaveScheduler | null>(null);
+
+  // Sync formStateRef in an effect so it is not updated during render
+  useEffect(() => {
+    formStateRef.current = {
       creationId,
       title,
       summary,
@@ -212,7 +205,7 @@ export function CreationEditor({
       liveUrl,
       repoUrl,
       coverMediaId,
-      initialData.attributes,
+      attributes: initialData.attributes,
       tools,
       tags,
       steps,
@@ -220,114 +213,110 @@ export function CreationEditor({
       prompts,
       resources,
       status,
-    ]
-  );
+    };
+  });
 
-  // Execute Save Action
-  const executeSave = useCallback(
-    async (isManual = false) => {
-      if (isExecutingSaveRef.current) {
-        saveQueueRef.current = true;
-        return;
-      }
-
-      isExecutingSaveRef.current = true;
-      setIsSaving(true);
-
-      try {
-        const payload = buildPayload("save");
+  // Initialize scheduler and event listeners on mount
+  useEffect(() => {
+    const scheduler = new AutosaveScheduler({
+      initialSnapshot: lastSavedSnapshot,
+      getSnapshot: () => serializeCreationSnapshot(formStateRef.current),
+      isDraft: () => formStateRef.current.status === "draft",
+      debounceMs: 3000,
+      retryDelays: [5000, 15000, 45000],
+      onStatusChange: (s, err) => {
+        setAutosaveStatus(s);
+        setAutosaveError(err || null);
+        if (s === "saved") {
+          setLastSavedSnapshot(serializeCreationSnapshot(formStateRef.current));
+        }
+      },
+      onSave: async (reason: SaveReason) => {
+        const payload = buildSavePayload(formStateRef.current, "save");
         const res = await saveCreationAction(payload);
-
         if (!res.ok) {
-          if (isManual) {
+          if (reason === "manual") {
             toast.error(res.error || "Failed to save draft");
           }
-          return;
+          return { ok: false, error: res.error };
         }
 
         setSlug(res.data.slug);
-        setHasUnsavedChanges(false);
 
-        // Update URL if slug was assigned
-        if (window.location.pathname.includes("/new") && res.data.slug) {
+        // Update URL if new draft slug was assigned
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname.includes("/new") &&
+          res.data.slug
+        ) {
           window.history.replaceState(null, "", `/c/${res.data.slug}/edit`);
         }
 
-        if (isManual) {
-          toast.success("Draft saved");
+        if (reason === "manual") {
+          toast.success(
+            formStateRef.current.status === "published"
+              ? "Changes saved"
+              : "Draft saved"
+          );
         }
-      } catch (err: unknown) {
-        const error = err as Error;
-        console.error("Save error:", error);
-      } finally {
-        isExecutingSaveRef.current = false;
-        setIsSaving(false);
+        return { ok: true };
+      },
+    });
 
-        // Process queued save if user typed during save
-        if (saveQueueRef.current) {
-          saveQueueRef.current = false;
-          executeSaveRef.current?.(false);
-        }
+    schedulerRef.current = scheduler;
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        void scheduler.flush();
       }
-    },
-    [buildPayload]
-  );
+    };
 
-  useEffect(() => {
-    executeSaveRef.current = executeSave;
-  }, [executeSave]);
-
-  // Autosave for drafts (debounced 1.5s)
-  useEffect(() => {
-    if (initialMountRef.current) {
-      initialMountRef.current = false;
-      return;
-    }
-
-    markDirty();
-
-    // Autosave ONLY applies to drafts
-    if (status !== "draft") return;
-
-    const timer = setTimeout(() => {
-      executeSave(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [
-    title,
-    summary,
-    description,
-    categoryId,
-    liveUrl,
-    repoUrl,
-    coverMediaId,
-    tools,
-    tags,
-    steps,
-    media,
-    prompts,
-    resources,
-    markDirty,
-    executeSave,
-    status,
-  ]);
-
-  // Unsaved changes beforeunload guard
-  useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
+      if (scheduler.isDirty()) {
+        void scheduler.flush();
         e.preventDefault();
         e.returnValue = "";
       }
     };
 
+    document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasUnsavedChanges]);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      scheduler.destroy();
+      schedulerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const isFirstRender = useRef(true);
+
+  // Edit effect: notify scheduler when snapshot changes
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    schedulerRef.current?.notifyEdit();
+  }, [currentSnapshot]);
+
+  const hasUploadingMedia = media.some((m) => m.isUploading);
+
+  // Manual save handler
+  const handleManualSave = async () => {
+    await schedulerRef.current?.manualSave();
+  };
 
   // Publish Handler
   const handlePublish = async () => {
+    if (hasUploadingMedia) {
+      toast.error("Waiting for uploads to finish before publishing");
+      return;
+    }
+
     // Basic client checks
     if (!title.trim() || title.trim() === "Untitled creation") {
       toast.error("Please enter a title for your creation");
@@ -337,7 +326,10 @@ export function CreationEditor({
       toast.error("Please select a category");
       return;
     }
-    if (!coverMediaId) {
+    const completedImages = media.filter(
+      (m) => !m.isUploading && m.kind === "image" && m.storage_path
+    );
+    if (!coverMediaId || !completedImages.some((m) => m.id === coverMediaId)) {
       toast.error("Please upload at least one image to serve as cover");
       return;
     }
@@ -346,27 +338,32 @@ export function CreationEditor({
       return;
     }
 
+    // 1. Block further autosaves immediately
+    schedulerRef.current?.block();
     setIsPublishing(true);
+
     try {
-      const payload = buildPayload("publish");
+      const payload = buildSavePayload(formStateRef.current, "publish");
       const res = await saveCreationAction(payload);
 
       if (!res.ok) {
         toast.error(res.error || "Failed to publish creation");
+        schedulerRef.current?.unblock();
+        setIsPublishing(false);
         return;
       }
 
       toast.success("Creation published successfully!");
       setStatus("published");
       setSlug(res.data.slug);
-      setHasUnsavedChanges(false);
+      setLastSavedSnapshot(currentSnapshot);
 
-      // Redirect to the public creation view
-      router.push(`/c/${res.data.slug}`);
+      // Stop all autosave and navigate immediately with replace
+      router.replace(`/c/${res.data.slug}`);
     } catch (err: unknown) {
       const error = err as Error;
       toast.error(error?.message || "Publishing failed");
-    } finally {
+      schedulerRef.current?.unblock();
       setIsPublishing(false);
     }
   };
@@ -446,19 +443,45 @@ export function CreationEditor({
 
               {/* Saved indicator */}
               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                {isSaving ? (
+                {isPublishing ? (
                   <>
-                    <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin text-brand" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="size-3 animate-spin text-brand"
+                    />
+                    <span>Publishing...</span>
+                  </>
+                ) : autosaveStatus === "saving" ? (
+                  <>
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="size-3 animate-spin text-brand"
+                    />
                     <span>Saving...</span>
                   </>
-                ) : hasUnsavedChanges ? (
+                ) : autosaveStatus === "error" ? (
+                  <div className="flex items-center gap-1.5 text-destructive">
+                    <span>{autosaveError || "Couldn't save"}</span>
+                    <span>·</span>
+                    <button
+                      type="button"
+                      onClick={handleManualSave}
+                      className="underline font-semibold hover:text-foreground cursor-pointer"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : isDirty ? (
                   <>
                     <span className="size-1.5 rounded-full bg-amber-500" />
                     <span>Unsaved changes</span>
                   </>
                 ) : (
                   <>
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3 text-emerald-500" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle02Icon}
+                      className="size-3 text-emerald-500"
+                    />
                     <span>Saved</span>
                   </>
                 )}
@@ -487,8 +510,9 @@ export function CreationEditor({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => executeSave(true)}
-                  loading={isSaving}
+                  onClick={handleManualSave}
+                  loading={autosaveStatus === "saving"}
+                  disabled={isPublishing}
                   className="hidden sm:inline-flex"
                 >
                   Save draft
@@ -500,8 +524,14 @@ export function CreationEditor({
                   size="sm"
                   onClick={handlePublish}
                   loading={isPublishing}
+                  disabled={isPublishing || hasUploadingMedia}
+                  title={
+                    hasUploadingMedia
+                      ? "Waiting for uploads to finish"
+                      : undefined
+                  }
                 >
-                  Publish
+                  {hasUploadingMedia ? "Waiting for uploads..." : "Publish"}
                 </Button>
               </>
             ) : (
@@ -510,8 +540,9 @@ export function CreationEditor({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => executeSave(true)}
-                  loading={isSaving}
+                  onClick={handleManualSave}
+                  loading={autosaveStatus === "saving"}
+                  disabled={isPublishing || !isDirty}
                 >
                   Save changes
                 </Button>
@@ -521,6 +552,7 @@ export function CreationEditor({
                   variant="ghost"
                   size="icon-sm"
                   onClick={handleArchive}
+                  disabled={isPublishing}
                   title="Unpublish creation"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} className="size-4" />
@@ -533,6 +565,7 @@ export function CreationEditor({
               variant="ghost"
               size="icon-sm"
               onClick={handleDelete}
+              disabled={isPublishing}
               className="text-muted-foreground hover:text-destructive"
               title="Delete creation"
             >
@@ -543,11 +576,15 @@ export function CreationEditor({
       </header>
 
       {/* Main Form Body */}
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 space-y-10">
-        {/* ============================================================= */}
-        {/* REQUIRED SECTION: Media, Title, Category, Primary Tool       */}
-        {/* ============================================================= */}
-        <section className="space-y-6">
+      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <fieldset
+          disabled={isPublishing}
+          className="border-0 p-0 m-0 space-y-10 min-w-0 disabled:opacity-80"
+        >
+          {/* ============================================================= */}
+          {/* REQUIRED SECTION: Media, Title, Category, Primary Tool       */}
+          {/* ============================================================= */}
+          <section className="space-y-6">
           {/* Media & Cover Image */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -1181,6 +1218,7 @@ export function CreationEditor({
             </button>
           )}
         </section>
+        </fieldset>
       </main>
 
       {/* Dialogs */}

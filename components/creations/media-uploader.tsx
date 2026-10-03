@@ -59,6 +59,8 @@ export interface MediaItem {
   previewUrl?: string;
   isUploading?: boolean;
   uploadProgress?: number;
+  isFailed?: boolean;
+  file?: File;
 }
 
 interface MediaUploaderProps {
@@ -159,6 +161,8 @@ export function MediaUploader({
         step_id: null,
         previewUrl,
         isUploading: true,
+        isFailed: false,
+        file,
       };
 
       newItems.push(tempItem);
@@ -205,6 +209,7 @@ export function MediaUploader({
                   width: processed.width,
                   height: processed.height,
                   isUploading: false,
+                  isFailed: false,
                 }
               : m
           ),
@@ -214,12 +219,70 @@ export function MediaUploader({
         const error = err as Error;
         console.error("Image upload failed:", error);
         toast.error(`Failed to upload ${originalFile.name}: ${error?.message || "Storage error"}`);
-        // Remove failed item
+        // Keep failed item in local state so creator can retry or remove it
         onChange(
-          updatedMedia.filter((m) => m.id !== item.id),
+          updatedMedia.map((m) =>
+            m.id === item.id
+              ? { ...m, isUploading: false, isFailed: true }
+              : m
+          ),
           nextCover === item.id ? null : nextCover
         );
       }
+    }
+  };
+
+  const handleRetry = async (item: MediaItem) => {
+    if (!item.file) {
+      toast.error("Original file is no longer available. Please remove and re-add.");
+      return;
+    }
+
+    onChange(
+      media.map((m) =>
+        m.id === item.id ? { ...m, isUploading: true, isFailed: false } : m
+      ),
+      coverMediaId
+    );
+
+    try {
+      const processed = await processImageForUpload(item.file);
+      const storagePath = `${userId}/${creationId}/${item.id}.${processed.extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("creation-media")
+        .upload(storagePath, processed.file, {
+          contentType: processed.mimeType,
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      onChange(
+        media.map((m) =>
+          m.id === item.id
+            ? {
+                ...m,
+                storage_path: storagePath,
+                mime_type: processed.mimeType,
+                width: processed.width,
+                height: processed.height,
+                isUploading: false,
+                isFailed: false,
+              }
+            : m
+        ),
+        coverMediaId || item.id
+      );
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(`Failed to upload ${item.file.name}: ${error?.message || "Storage error"}`);
+      onChange(
+        media.map((m) =>
+          m.id === item.id ? { ...m, isUploading: false, isFailed: true } : m
+        ),
+        coverMediaId === item.id ? null : coverMediaId
+      );
     }
   };
 
@@ -462,6 +525,7 @@ export function MediaUploader({
                   isCover={coverMediaId === item.id}
                   onSetCover={() => handleSetCover(item.id)}
                   onRemove={() => handleRemove(item.id)}
+                  onRetry={() => handleRetry(item)}
                   onUpdateMetadata={(field, val) =>
                     handleUpdateMetadata(item.id, field, val)
                   }
@@ -485,6 +549,7 @@ interface SortableMediaCardProps {
   isCover: boolean;
   onSetCover: () => void;
   onRemove: () => void;
+  onRetry?: () => void;
   onUpdateMetadata: (field: "alt_text" | "caption", value: string) => void;
 }
 
@@ -494,6 +559,7 @@ function SortableMediaCard({
   isCover,
   onSetCover,
   onRemove,
+  onRetry,
   onUpdateMetadata,
 }: SortableMediaCardProps) {
   const {
@@ -543,6 +609,37 @@ function SortableMediaCard({
         ) : (
           <div className="flex flex-col items-center justify-center text-muted-foreground">
             <HugeiconsIcon icon={Image01Icon} className="size-8" />
+          </div>
+        )}
+
+        {/* Failed Upload Overlay */}
+        {item.isFailed && (
+          <div className="absolute inset-0 bg-background/85 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center gap-2 z-10">
+            <span className="text-xs font-semibold text-destructive">
+              Upload failed
+            </span>
+            <div className="flex items-center gap-2">
+              {onRetry && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs px-2.5"
+                  onClick={onRetry}
+                >
+                  Retry
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs px-2.5 text-muted-foreground hover:text-destructive"
+                onClick={onRemove}
+              >
+                Remove
+              </Button>
+            </div>
           </div>
         )}
 
