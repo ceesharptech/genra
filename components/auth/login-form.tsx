@@ -394,7 +394,7 @@ export function LoginForm({
         <div className="flex flex-col gap-5">
           {/* Header Brand Badge & Title */}
           <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex size-12 items-center justify-center">
+            {/* <div className="mb-4 flex size-12 items-center justify-center">
               <Image
                 src="/images/genra-logo.png"
                 alt="Genra Logo"
@@ -403,7 +403,7 @@ export function LoginForm({
                 className="size-12 rounded-full shadow-xs"
                 priority
               />
-            </div>
+            </div> */}
             <h1 className="font-bricolage text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
               {mode === 'signup' ? 'Welcome to Genra' : 'Welcome back'}
             </h1>
