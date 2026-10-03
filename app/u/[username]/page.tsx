@@ -2,7 +2,10 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth/server'
-import { buttonVariants } from '@/components/ui/button'
+import { discoverCards } from '@/lib/data/creations'
+import { CreationGrid } from '@/components/creations/creation-grid'
+import { LoadMore } from '@/components/creations/load-more'
+import { buttonVariants, Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -10,6 +13,8 @@ import {
   Globe02Icon,
   Settings01Icon,
   Link01Icon,
+  PlusSignIcon,
+  DashboardSquare01Icon,
 } from '@hugeicons/core-free-icons'
 import type { Metadata } from 'next'
 
@@ -33,7 +38,7 @@ export async function generateMetadata({
 
   if (!profile) {
     return {
-      title: 'User Not Found',
+      title: 'User Not Found — Genra',
     }
   }
 
@@ -42,7 +47,7 @@ export async function generateMetadata({
     : `@${profile.username}`
 
   return {
-    title: `${title} | Genra`,
+    title: `${title} — Genra`,
     description:
       profile.headline ||
       profile.bio ||
@@ -54,18 +59,26 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params
   const supabase = await createClient()
 
-  // Case-insensitive query via citext
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('username', username)
-    .maybeSingle()
+  // Concurrently load profile, user session, and creations
+  const [profileRes, currentUser, cardsRes] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('username', username)
+      .maybeSingle(),
+    getCurrentUser(),
+    discoverCards({
+      creator_username: username,
+      sort: 'new',
+      limit: 24,
+    }),
+  ])
 
-  if (error || !profile) {
+  const profile = profileRes.data
+  if (profileRes.error || !profile) {
     notFound()
   }
 
-  const currentUser = await getCurrentUser()
   const isOwnProfile = currentUser?.id === profile.id
 
   const displayName = profile.display_name || profile.username
@@ -81,10 +94,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     Boolean(url && url.startsWith('https://'))
   )
 
+  const creations = cardsRes.data || []
+  const hasMore = cardsRes.hasMore
+
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
       {/* Profile Header */}
-      <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex max-w-3xl flex-col gap-5 sm:gap-6">
         <Avatar className="border-border size-24 shrink-0 border sm:size-22 md:size-28">
           {profile.avatar_url && (
             <AvatarImage src={profile.avatar_url} alt={displayName} />
@@ -106,16 +122,31 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </div>
 
             {isOwnProfile && (
-              <Link
-                href="/settings"
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'sm' }),
-                  'h-8 gap-1.5 text-xs font-medium'
-                )}
-              >
-                <HugeiconsIcon icon={Settings01Icon} className="size-3.5" />
-                Edit profile
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/creations"
+                  className={cn(
+                    buttonVariants({ variant: 'secondary', size: 'sm' }),
+                    'h-8 gap-1.5 rounded-full text-xs font-medium'
+                  )}
+                >
+                  <HugeiconsIcon
+                    icon={DashboardSquare01Icon}
+                    className="size-3.5"
+                  />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/settings"
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'sm' }),
+                    'h-8 gap-1.5 rounded-full text-xs font-medium'
+                  )}
+                >
+                  <HugeiconsIcon icon={Settings01Icon} className="size-3.5" />
+                  Edit profile
+                </Link>
+              </div>
             )}
           </div>
 
@@ -168,28 +199,65 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
       <div className="bg-border my-8 h-px" />
 
-      {/* Creations / Empty state */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-bricolage text-foreground text-base font-semibold tracking-tight">
-            Creations
+      {/* Published Creations Grid */}
+      <section
+        className="space-y-6"
+        aria-labelledby="profile-creations-heading"
+      >
+        <div className="border-border flex items-center justify-between pb-3">
+          <h2
+            id="profile-creations-heading"
+            className="font-bricolage text-foreground text-xl font-semibold tracking-tight"
+          >
+            Published creations
           </h2>
-          <span className="text-muted-foreground text-xs">0 published</span>
+          <span className="text-muted-foreground text-xs tabular-nums">
+            {creations.length}{' '}
+            {creations.length === 1 ? 'creation' : 'creations'}
+          </span>
         </div>
 
-        <div className="border-border bg-surface-1/50 flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center">
-          <div className="bg-surface-2 text-muted-foreground mx-auto mb-3 flex size-10 items-center justify-center rounded-full">
-            <span className="font-mono text-sm font-bold">0</span>
+        {creations.length === 0 ? (
+          <div className="border-border flex flex-col items-center justify-center rounded-xl border border-dashed px-4 py-16 text-center">
+            <h3 className="text-foreground text-base font-medium">
+              No creations yet
+            </h3>
+            <p className="text-text-subtle mt-1.5 max-w-sm text-sm">
+              {isOwnProfile
+                ? "You haven't published any creations yet. Share your first AI-built project with the community."
+                : `${displayName} has not published any creations yet.`}
+            </p>
+            {isOwnProfile && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <Link href="/new">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="gap-1.5 rounded-full"
+                  >
+                    <HugeiconsIcon icon={PlusSignIcon} className="size-3.5" />
+                    Create something new
+                  </Button>
+                </Link>
+                <Link href="/creations">
+                  <Button variant="outline" size="sm" className="rounded-full">
+                    View drafts in dashboard
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
-          <h3 className="font-bricolage text-foreground text-sm font-medium">
-            No creations yet
-          </h3>
-          <p className="text-muted-foreground mt-1 max-w-sm text-xs">
-            {isOwnProfile
-              ? "You haven't published any AI creations yet. When creation authoring opens in Phase 02, your work will appear here."
-              : `${displayName} has not published any AI creations yet.`}
-          </p>
-        </div>
+        ) : (
+          <>
+            <CreationGrid creations={creations} priorityCount={4} />
+            <LoadMore
+              initialHasMore={hasMore}
+              initialOffset={creations.length}
+              params={{ creator_username: username, sort: 'new' }}
+              limit={24}
+            />
+          </>
+        )}
       </section>
     </div>
   )

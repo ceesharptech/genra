@@ -41,28 +41,22 @@ export function Header() {
             aria-label="Main Navigation"
           >
             <Link
-              href="/"
+              href="/discover"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               Explore
             </Link>
             <Link
-              href="/#categories-heading"
+              href="/discover?sort=new"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
-              Creations
+              Newest
             </Link>
             <Link
-              href="/#categories-heading"
+              href="/discover?sort=trending"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
-              Tools
-            </Link>
-            <Link
-              href="/#categories-heading"
-              className="text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Prompts
+              Trending
             </Link>
           </nav>
         </div>
