@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -141,6 +142,57 @@ export default function DesignPage() {
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Brand Identity / Logo Assets */}
+        <div className="border-border bg-card mt-4 flex flex-col gap-6 rounded-xl border p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="border-border bg-surface-2 flex size-16 items-center justify-center rounded-2xl border p-2 shadow-xs">
+              <Image
+                src="/images/genra-logo.png"
+                alt="Genra Logo Mark"
+                width={48}
+                height={48}
+                className="size-12 rounded-full"
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">
+                  Genra
+                </span>
+                <span className="border-border bg-surface-2 text-muted-foreground rounded-full border px-2 py-0.5 font-mono text-[10px]">
+                  Official Mark
+                </span>
+              </div>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Geometric lavender-purple &quot;G&quot; logomark rendered in vector geometry at <code className="font-mono text-[11px]">public/images/genra-logo.png</code>.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 shadow-2xs">
+              <Image
+                src="/images/genra-logo.png"
+                alt="Genra 20px"
+                width={20}
+                height={20}
+                className="size-5 rounded-full"
+              />
+              <span className="font-bricolage text-xs font-semibold">Header Size (28px)</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 shadow-2xs">
+              <Image
+                src="/images/genra-logo.png"
+                alt="Genra 16px"
+                width={16}
+                height={16}
+                className="size-4 rounded-full"
+              />
+              <span className="font-mono text-[11px] text-muted-foreground">Favicon (16/32px)</span>
+            </div>
+          </div>
         </div>
       </section>
 

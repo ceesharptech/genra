@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth/server";
 import { safeRedirectPath } from "@/lib/auth/redirect";
 import { OnboardingForm } from "@/components/profile/onboarding-form";
@@ -46,9 +47,14 @@ export default async function OnboardingPage({
     <div className="flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-xs sm:p-8">
         <div className="mb-6 text-center">
-          <span className="bg-foreground text-background inline-flex size-7 items-center justify-center rounded-lg font-mono text-sm font-bold">
-            G
-          </span>
+          <Image
+            src="/images/genra-logo.png"
+            alt="Genra Logo"
+            width={48}
+            height={48}
+            className="mx-auto size-12 rounded-full shadow-xs"
+            priority
+          />
           <h1 className="font-bricolage mt-3 text-xl font-semibold tracking-tight text-foreground">
             Welcome to Genra
           </h1>

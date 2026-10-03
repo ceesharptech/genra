@@ -21,6 +21,7 @@ import {
   Settings01Icon,
   Logout01Icon,
   PlusSignIcon,
+  DashboardSquare01Icon,
 } from '@hugeicons/core-free-icons'
 
 export function UserMenu() {
@@ -61,14 +62,14 @@ export function UserMenu() {
   return (
     <div className="flex items-center gap-2.5 sm:gap-3">
       <Link
-        href="/create"
+        href="/new"
         className={cn(
-          buttonVariants({ variant: 'default', size: 'sm' }),
-          'border-border/80 hidden h-8 gap-1.5 rounded-full px-3.5 text-xs font-medium sm:inline-flex'
+          buttonVariants({ variant: 'brand', size: 'sm' }),
+          'hidden h-8 gap-1.5 rounded-full px-3.5 text-xs font-semibold sm:inline-flex'
         )}
       >
         <HugeiconsIcon icon={PlusSignIcon} className="size-3.5" />
-        <span>Share creation</span>
+        <span>New creation</span>
       </Link>
 
       <DropdownMenu>
@@ -113,6 +114,14 @@ export function UserMenu() {
                 className="mr-2 h-4 w-4"
               />
               <span>My profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/creations" />}>
+              <HugeiconsIcon
+                icon={DashboardSquare01Icon}
+                strokeWidth={1.5}
+                className="mr-2 h-4 w-4"
+              />
+              <span>My creations</span>
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/settings" />}>
               <HugeiconsIcon

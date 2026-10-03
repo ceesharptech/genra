@@ -36,6 +36,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/images/genra-logo.png',
+  },
   title: {
     template: '%s | Genra',
     default: 'Genra — Discover & Learn What People Create with AI',

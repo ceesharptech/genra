@@ -1057,6 +1057,7 @@ export type Database = {
         Returns: undefined
       }
       refresh_trending: { Args: never; Returns: undefined }
+      save_creation: { Args: { payload: Json }; Returns: Json }
       search_creations: {
         Args: {
           p_category?: string

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { safeRedirectPath } from '@/lib/auth/redirect'
 import { getEmailAuthMode } from '@/lib/auth/config'
@@ -393,20 +394,15 @@ export function LoginForm({
         <div className="flex flex-col gap-5">
           {/* Header Brand Badge & Title */}
           <div className="flex flex-col items-center text-center">
-            <div className="bg-brand/10 text-brand mb-4 flex size-12 items-center justify-center rounded-full shadow-xs">
-              <svg
-                className="size-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a14.5 14.5 0 0 0 0 20M2 12h20M4.93 4.93a10 10 0 0 1 14.14 0" />
-              </svg>
+            <div className="mb-4 flex size-12 items-center justify-center">
+              <Image
+                src="/images/genra-logo.png"
+                alt="Genra Logo"
+                width={48}
+                height={48}
+                className="size-12 rounded-full shadow-xs"
+                priority
+              />
             </div>
             <h1 className="font-bricolage text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
               {mode === 'signup' ? 'Welcome to Genra' : 'Welcome back'}

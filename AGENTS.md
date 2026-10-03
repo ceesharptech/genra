@@ -141,6 +141,7 @@ Do **not** build AI features or add AI SDK dependencies in V1. Maintain and use 
 - `profiles.onboarded_at` column to track username onboarding: migration `0003_profile_onboarding.sql` (Phase 01).
 - Function hardening (pinned `search_path`, revoked execute on internal functions): migration `0004_function_hardening.sql` (Phase 01).
 - Atomic `save_creation(payload jsonb)` function: migration `0005_save_creation.sql` (Phase 02).
+- Size and MIME limits for the `creation-media` bucket: migration `0006_creation_media_limits.sql` (Phase 02).
 
 ---
 
@@ -157,3 +158,4 @@ _Append new instructions below with a date. Later entries override earlier ones.
 - **2026-10-02** Stack notes from Phase 00: Next.js 16 (session refresh lives in `proxy.ts`, not `middleware.ts`), React 19, Tailwind v4, shadcn/ui built on Base UI primitives (do not use Radix `asChild` patterns), npm, no `src/` directory.
 - **2026-10-02** The live database must always match `genra-docs/genra_schema.sql` plus the numbered follow-up migrations. If they ever diverge, stop and report instead of building on top.
 - **2026-10-02** Email sign-in uses Supabase's default **magic link** (PKCE, completed at `/auth/callback`) until custom SMTP is configured, because email templates cannot be edited without it. The 6-digit code flow stays in the codebase behind `NEXT_PUBLIC_EMAIL_AUTH_MODE` (`magic_link` default, `otp` later).
+- **2026-10-02** Auth UI: the login modal was replaced by dedicated login and sign-up pages. Gated actions send signed-out users to the login flow with `next` (and `intent` where used). Always read the current auth code (`lib/auth/*`, `components/auth/*`) before wiring a gated action; do not reintroduce a modal.

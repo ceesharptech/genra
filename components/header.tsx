@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { UserMenu } from '@/components/auth/user-menu'
@@ -18,9 +19,17 @@ export function Header() {
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="group flex items-center gap-2 transition-opacity hover:opacity-90"
+            className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
             aria-label="Genra Home"
           >
+            <Image
+              src="/images/genra-logo.png"
+              alt="Genra Logo"
+              width={28}
+              height={28}
+              className="size-7 shrink-0 rounded-full"
+              priority
+            />
             <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">
               Genra
             </span>

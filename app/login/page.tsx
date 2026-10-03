@@ -49,10 +49,20 @@ export default async function LoginPage({
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="font-bricolage text-foreground text-2xl font-bold tracking-tight transition-opacity hover:opacity-90"
+            className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
             aria-label="Genra Home"
           >
-            Genra
+            <Image
+              src="/images/genra-logo.png"
+              alt="Genra Logo"
+              width={28}
+              height={28}
+              className="size-7 shrink-0 rounded-full"
+              priority
+            />
+            <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">
+              Genra
+            </span>
           </Link>
           <ThemeToggle />
         </div>
