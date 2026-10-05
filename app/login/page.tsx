@@ -44,7 +44,7 @@ export default async function LoginPage({
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-2">
       {/* Left side: Navigation + Auth form */}
-      <div className="bg-background flex flex-col justify-between p-6 sm:p-10 lg:p-12">
+      <div className="bg-background flex min-h-screen flex-col justify-between p-6 sm:p-10 lg:p-12">
         {/* Top bar with Logo and Theme toggle */}
         <div className="flex items-center justify-between">
           <Link
@@ -67,8 +67,8 @@ export default async function LoginPage({
           <ThemeToggle />
         </div>
 
-        {/* Center: Auth Form Container */}
-        <div className="mx-auto w-full max-w-sm py-10">
+        {/* Center: Auth Form Container - vertically centered */}
+        <div className="mx-auto my-auto w-full max-w-sm py-8 sm:py-10">
           <LoginForm
             mode="login"
             next={safeNext}
@@ -77,9 +77,11 @@ export default async function LoginPage({
           />
         </div>
 
-        {/* Bottom spacer / subtle text */}
-        <div className="text-muted-foreground/60 hidden text-center text-xs sm:block">
-          Genra &middot; The discovery and learning platform for AI-made work
+        {/* Bottom footer text (keeps balance on all screen heights) */}
+        <div className="text-muted-foreground/60 text-center text-xs">
+          <span className="hidden sm:inline">
+            Genra &middot; The discovery and learning platform for AI-made work
+          </span>
         </div>
       </div>
 

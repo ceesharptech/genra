@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui/button'
 
 export function HeroSearch() {
   const [query, setQuery] = useState('')
@@ -27,35 +26,34 @@ export function HeroSearch() {
       role="search"
     >
       <div className="relative flex w-full items-center">
-        <div className="pointer-events-none absolute left-4 flex items-center text-muted-foreground">
-          <HugeiconsIcon icon={Search01Icon} className="size-5" />
-        </div>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search creations, prompts, tools, categories..."
-          className="h-13 w-full rounded-full border border-border bg-card pl-11 pr-24 text-base text-foreground shadow-xs placeholder:text-muted-foreground transition-all duration-150 focus-visible:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:border-border-strong focus-visible:ring-brand h-13 w-full rounded-full border pr-14 pl-5 text-sm shadow-xs transition-all duration-150 focus-visible:ring-2 focus-visible:outline-none sm:pl-6 sm:text-base"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery('')}
-            className="absolute right-24 text-muted-foreground hover:text-foreground transition-colors p-1"
+            className="text-muted-foreground hover:text-foreground absolute right-13 p-1 transition-colors"
             aria-label="Clear search"
           >
             <HugeiconsIcon icon={Cancel01Icon} className="size-4" />
           </button>
         )}
         <div className="absolute right-1.5">
-          <Button
+          <button
             type="submit"
-            variant="primary"
-            size="sm"
-            className="h-10 rounded-full px-5 text-xs font-semibold sm:text-sm"
+            aria-label="Search"
+            className="group bg-brand-500 hover:bg-brand-600 focus-visible:ring-brand dark:bg-brand-500 dark:hover:bg-brand-400 relative flex size-10 items-center justify-center rounded-full text-white transition-all duration-150 ease-out hover:cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
-            Search
-          </Button>
+            <HugeiconsIcon
+              icon={Search01Icon}
+              className="size-4.5 stroke-[2.2] transition-transform duration-150 group-hover:scale-110"
+            />
+          </button>
         </div>
       </div>
     </form>
