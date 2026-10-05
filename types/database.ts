@@ -55,7 +55,7 @@ export type Database = {
           error?: string | null
           id?: string
           input?: Json
-          kind?: Database["public"]["Enums"]["ai_job_kind"]
+          kind: Database["public"]["Enums"]["ai_job_kind"]
           model?: string | null
           output?: Json | null
           provider?: string | null
@@ -135,7 +135,7 @@ export type Database = {
           note?: string | null
           position?: number
           target_id?: string
-          target_type?: Database["public"]["Enums"]["engagement_target"]
+          target_type: Database["public"]["Enums"]["engagement_target"]
         }
         Relationships: [
           {
@@ -1132,6 +1132,30 @@ export type Database = {
         }[]
       }
       save_creation: { Args: { payload: Json }; Returns: Json }
+      saved_cards: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          category_name: string
+          category_slug: string
+          comment_count: number
+          cover_alt: string
+          cover_height: number
+          cover_storage_path: string
+          cover_width: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_username: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          summary: string
+          title: string
+          tool_count: number
+          tools: Json
+          view_count: number
+        }[]
+      }
       search_creations: {
         Args: {
           p_category?: string
