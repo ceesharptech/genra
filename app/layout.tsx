@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Bricolage_Grotesque } from 'next/font/google'
+import { Albert_Sans } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -32,6 +33,11 @@ const bricolage = Bricolage_Grotesque({
   display: 'swap',
 })
 
+const albertSans = Albert_Sans({
+  variable: '--font-albert',
+  subsets: ['latin'],
+  display: 'swap',
+})
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
@@ -85,6 +91,7 @@ export default async function RootLayout({
         geistSans.variable,
         geistMono.variable,
         bricolage.variable,
+        albertSans.variable,
         'font-sans'
       )}
     >

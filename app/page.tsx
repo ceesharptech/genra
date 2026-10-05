@@ -1,10 +1,7 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import {
-  discoverCards,
-  categoryCounts,
-} from '@/lib/data/creations'
+import { discoverCards, categoryCounts } from '@/lib/data/creations'
 import {
   CreationGrid,
   CreationGridSkeleton,
@@ -42,7 +39,7 @@ async function TrendingSection() {
 
   return (
     <section className="space-y-6" aria-labelledby="trending-heading">
-      <div className="flex items-center justify-between pb-1">
+      <div className="flex flex-col justify-start pb-1 md:flex-row md:items-center md:justify-between">
         <div>
           <h2
             id="trending-heading"
@@ -56,7 +53,7 @@ async function TrendingSection() {
         </div>
         <Link
           href="/discover?sort=trending"
-          className="group text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs font-medium transition-colors sm:text-sm"
+          className="group text-muted-foreground hover:text-foreground mt-3 inline-flex items-center gap-1 text-sm font-medium transition-colors sm:text-sm"
         >
           <span>View all</span>
           <HugeiconsIcon
@@ -85,7 +82,7 @@ async function CategoriesGridSection() {
 
   return (
     <section className="space-y-6" aria-labelledby="categories-heading">
-      <div className="flex items-center justify-between pb-1">
+      <div className="flex flex-col justify-start pb-1 md:flex-row md:items-center md:justify-between">
         <div>
           <h2
             id="categories-heading"
@@ -99,7 +96,7 @@ async function CategoriesGridSection() {
         </div>
         <Link
           href="/discover"
-          className="group text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs font-medium transition-colors sm:text-sm"
+          className="group text-muted-foreground hover:text-foreground mt-3 inline-flex items-center gap-1 text-sm font-medium transition-colors sm:text-sm"
         >
           <span>All categories</span>
           <HugeiconsIcon
@@ -109,7 +106,7 @@ async function CategoriesGridSection() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 sm:gap-3.5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-3.5 lg:grid-cols-4 xl:grid-cols-8">
         {featured.map((cat) => {
           const imageSrc = CATEGORY_IMAGE_MAP[cat.slug]
           return (
@@ -119,7 +116,7 @@ async function CategoriesGridSection() {
               className="group flex flex-col focus-visible:outline-none"
             >
               {/* Minimal High-Quality Preview Tile (Compact Size) */}
-              <div className="bg-surface-2 ring-border/50 shadow-2xs relative aspect-[4/3] w-full overflow-hidden rounded-lg ring-1 transition-all duration-300 ease-out group-hover:scale-[1.03] group-hover:shadow-xs group-focus-visible:ring-2 group-focus-visible:ring-brand">
+              <div className="bg-surface-2 ring-border/50 group-focus-visible:ring-brand relative aspect-[4/3] w-full overflow-hidden rounded-lg shadow-2xs ring-1 transition-all duration-300 ease-out group-hover:scale-[1.03] group-hover:shadow-xs group-focus-visible:ring-2">
                 {imageSrc && (
                   <Image
                     src={imageSrc}
@@ -167,43 +164,53 @@ function SectionSkeleton() {
 
 export default async function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="relative mx-auto w-full max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
+      {/* <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+        linear-gradient(to right, #f0f0f0 1px, transparent 1px),
+        linear-gradient(to bottom, #f0f0f0 1px, transparent 1px),
+        radial-gradient(circle 800px at 100% 200px, #d5c5ff, transparent)
+      `,
+          backgroundSize: '96px 64px, 96px 64px, 100% 100%',
+        }}
+      /> */}
+
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center pt-4 pb-6 text-center sm:pt-8 sm:pb-10">
-        {/* Eyebrow Pill with Overlapping 3D AI App Icons */}
-        <div className="border-border bg-surface-2 text-muted-foreground mb-6 inline-flex items-center gap-2.5 rounded-full border py-1 pr-3.5 pl-1.5 text-xs shadow-2xs transition-colors">
-          <div className="flex items-center -space-x-1.5">
+        {/* Eyebrow with Overlapping 3D AI App Icons */}
+        <div className="text-muted-foreground mb-6 inline-flex items-center gap-2 text-xs">
+          <div className="flex items-center -space-x-2">
             {[
               { src: '/images/ai-icons/claude-ai-logo.png', alt: 'Claude' },
               { src: '/images/ai-icons/chatgpt-ai-logo.png', alt: 'ChatGPT' },
               { src: '/images/ai-icons/gemini-ai-logo.png', alt: 'Gemini' },
               { src: '/images/ai-icons/grok-ai-logo.png', alt: 'Grok' },
-            ].map((tool, idx) => (
+            ].map((tool) => (
               <div
                 key={tool.alt}
-                className="border-border/80 bg-card shadow-2xs hover:border-brand relative size-5 overflow-hidden rounded-[5px] border p-0.5 transition-all duration-200 ease-out hover:z-30 hover:scale-135 hover:shadow-sm"
-                style={{ zIndex: 10 + idx }}
+                className="border-border/80 bg-card hover:border-border relative size-7 cursor-pointer overflow-hidden rounded-full border p-1 shadow-2xs transition-all duration-200 ease-out hover:z-30 hover:scale-125 hover:shadow-md"
                 title={tool.alt}
               >
                 <Image
                   src={tool.src}
                   alt={tool.alt}
-                  width={20}
-                  height={20}
+                  width={28}
+                  height={28}
                   className="size-full object-contain"
                 />
               </div>
             ))}
           </div>
 
-          <span className="text-foreground/90 font-medium">
+          <span className="text-foreground/70 text-xs font-medium md:text-sm">
             The open discovery platform for AI creations
           </span>
         </div>
 
         <h1 className="font-bricolage text-foreground max-w-4xl text-4xl font-semibold tracking-tighter text-balance sm:text-5xl lg:text-6xl">
-          Discover what creators are{' '}
-          <HeroDynamicText />
+          Discover what creators are <HeroDynamicText />
         </h1>
 
         <p className="text-text-subtle mt-4 max-w-2xl text-base text-pretty sm:text-lg">

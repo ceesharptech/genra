@@ -17,17 +17,20 @@ import {
   Share01Icon,
   Tag01Icon,
   PlayIcon,
-  FavouriteIcon,
-  Comment01Icon,
   EyeIcon,
   Maximize02Icon,
 } from '@hugeicons/core-free-icons'
+import { EngagementBar } from '@/components/engagement/engagement-bar'
+import { CopyPromptButton } from '@/components/engagement/copy-prompt-button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 interface CreationViewProps {
   creation: CreationWithDetails
   isOwner?: boolean
+  isSignedIn?: boolean
+  initialLiked?: boolean
+  initialSaved?: boolean
   descriptionNode?: React.ReactNode
   stepBodyNodes?: Record<string, React.ReactNode>
 }
@@ -35,6 +38,9 @@ interface CreationViewProps {
 export function CreationView({
   creation,
   isOwner = false,
+  isSignedIn = false,
+  initialLiked = false,
+  initialSaved = false,
   descriptionNode,
   stepBodyNodes,
 }: CreationViewProps) {
@@ -213,29 +219,19 @@ export function CreationView({
               )}
             </div>
 
-            {/* Read-only Metrics Row & External Buttons */}
+            {/* Actions & Metrics Row */}
             <div className="flex flex-wrap items-center gap-4">
+              {/* Engagement Bar (Like & Save) */}
+              <EngagementBar
+                targetId={creation.id}
+                targetType="creation"
+                initialLiked={initialLiked}
+                initialSaved={initialSaved}
+                likeCount={creation.like_count}
+                isSignedIn={isSignedIn}
+              />
+
               <div className="text-text-subtle border-border flex items-center gap-3 border-r pr-4 text-xs tabular-nums">
-                <span
-                  className="inline-flex items-center gap-1"
-                  title={`${creation.like_count} likes`}
-                >
-                  <HugeiconsIcon
-                    icon={FavouriteIcon}
-                    className="text-muted-foreground size-3.5"
-                  />
-                  <span>{creation.like_count}</span>
-                </span>
-                <span
-                  className="inline-flex items-center gap-1"
-                  title={`${creation.comment_count} comments`}
-                >
-                  <HugeiconsIcon
-                    icon={Comment01Icon}
-                    className="text-muted-foreground size-3.5"
-                  />
-                  <span>{creation.comment_count}</span>
-                </span>
                 <span
                   className="inline-flex items-center gap-1"
                   title={`${creation.view_count} views`}
@@ -480,7 +476,8 @@ export function CreationView({
               {creation.prompts.map((item) => (
                 <div
                   key={item.prompt_id}
-                  className="border-border bg-card space-y-3 rounded-xl border p-5"
+                  id={`prompt-${item.prompt_id}`}
+                  className="border-border bg-card space-y-3 rounded-xl border p-5 transition-colors"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
@@ -491,6 +488,12 @@ export function CreationView({
                         {item.prompt.kind}
                       </span>
                     </div>
+
+                    <CopyPromptButton
+                      promptId={item.prompt_id}
+                      promptBody={item.prompt.body}
+                      isSignedIn={isSignedIn}
+                    />
                   </div>
 
                   {item.note && (

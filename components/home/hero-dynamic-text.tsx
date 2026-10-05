@@ -45,7 +45,7 @@ export function HeroDynamicText() {
 
   return (
     <span
-      className={`inline-block bg-gradient-to-r from-brand-600 via-brand-500 to-brand-400 bg-clip-text text-transparent transition-all ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transform-none motion-reduce:filter-none motion-reduce:transition-none dark:from-brand-400 dark:via-brand-300 dark:to-brand-400 ${stageClasses}`}
+      className={`from-brand-600 via-brand-500 to-brand-400 dark:from-brand-400 dark:via-brand-300 dark:to-brand-400 inline-block bg-gradient-to-r bg-clip-text text-transparent transition-all ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transform-none motion-reduce:filter-none motion-reduce:transition-none ${stageClasses}`}
     >
       {PHRASES[index]}
     </span>

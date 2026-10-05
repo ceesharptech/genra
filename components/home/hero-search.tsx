@@ -44,10 +44,15 @@ export function HeroSearch() {
           </button>
         )}
         <div className="absolute right-1.5">
-          <button
+          {/* <button
             type="submit"
             aria-label="Search"
             className="group bg-brand-500 hover:bg-brand-600 focus-visible:ring-brand dark:bg-brand-500 dark:hover:bg-brand-400 relative flex size-10 items-center justify-center rounded-full text-white transition-all duration-150 ease-out hover:cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          ></button> */}
+          <button
+            type="submit"
+            aria-label="Search"
+            className="group from-brand-500 to-brand-400 border-brand-300 focus-visible:ring-brand dark:bg-brand-500 dark:hover:bg-brand-400 relative flex size-10 items-center justify-center rounded-full border bg-gradient-to-b text-white shadow-[inset_0_1px_0_rgba(119,76,255,0.4),0_4px_12px_rgba(157,123,255,0.35),0_1px_2px_rgba(0,0,0,0.15)] transition-all duration-150 ease-out hover:cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <HugeiconsIcon
               icon={Search01Icon}

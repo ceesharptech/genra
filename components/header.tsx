@@ -30,7 +30,7 @@ export function Header() {
               className="size-5 shrink-0 rounded-full"
               priority
             />
-            <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">
+            <span className="font-albert-sans text-foreground text-xl font-semibold tracking-tight">
               Genra
             </span>
           </Link>

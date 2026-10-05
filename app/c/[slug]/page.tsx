@@ -8,6 +8,7 @@ import {
   relatedCreations,
   discoverCards,
 } from '@/lib/data/creations'
+import { getEngagementState } from '@/lib/data/engagement'
 import { CreationView } from '@/components/creations/creation-view'
 import { ViewTracker } from '@/components/creations/view-tracker'
 import {
@@ -162,6 +163,15 @@ export default async function CreationPage({ params }: CreationPageProps) {
     }
   }
 
+  // Fetch viewer engagement state (runs likes + saves in parallel; 0 DB queries if signed out)
+  const engagementState = await getEngagementState(
+    'creation',
+    [creation.id],
+    currentUser?.id
+  )
+  const initialLiked = engagementState.likedIds.includes(creation.id)
+  const initialSaved = engagementState.savedIds.includes(creation.id)
+
   return (
     <>
       {/* View count tracker (only counts published creations, deduplicated by cookie) */}
@@ -172,6 +182,9 @@ export default async function CreationPage({ params }: CreationPageProps) {
       <CreationView
         creation={creation}
         isOwner={isOwner}
+        isSignedIn={Boolean(currentUser)}
+        initialLiked={initialLiked}
+        initialSaved={initialSaved}
         descriptionNode={descriptionNode}
         stepBodyNodes={stepBodyNodes}
       />

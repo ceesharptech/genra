@@ -8,7 +8,7 @@ Genra is a discovery and learning platform for things people create with AI. Cre
 
 Product rules that must always hold:
 
-- Published content is **publicly viewable without login**. Every **action** (like, save, comment, copy prompt, create, report) requires login, via the shared login-gating mechanism, with the action replayed after login.
+- Published content is **publicly viewable without login**. Every **action** (like, save, copy prompt, create, report) requires login, via the shared login-gating mechanism, with the action replayed after login.
 - **Sharing outside the platform** is a core feature (public URLs, rich social previews, share menu, share tracking).
 - Posting must stay **low friction**. Required to publish: title, category, one cover image, one tool. Prompts, resources, steps, tags and description are **optional**, added through "Add …" pickers that select existing items, with quick-create when nothing matches.
 - **AI features are not part of V1.** Only the extension points exist (section 8).
@@ -162,3 +162,6 @@ _Append new instructions below with a date. Later entries override earlier ones.
 - **2026-10-02** Autosave rule: a save is scheduled only when the serialized payload differs from the last saved snapshot (kept in a ref). UI state, save status and server-returned values must never trigger a save. Debounce 3 s after the last edit, one request in flight, bounded retries, and no saves after publishing starts. Only fully uploaded media may appear in a save payload.
 - **2026-10-02** PostgREST embeds: always use explicit relationship hints that were verified against the real constraint names (`pg_constraint`). `creations` and `creation_media` have two relationships (`creation_media_creation_id_fkey` and `creations_cover_fk`), so unhinted or guessed hints break. Data loaders must return errors to the UI instead of silently returning empty lists.
 - **2026-10-02** Performance: measure before and after any optimisation. Avoid redundant auth and profile calls within one request, run independent awaits in parallel, and render markdown on the server for public pages.
+- **2026-10-03** Scope: V1 engagement is **like and save only**. Do not build comments (no UI, actions or comment counts in the interface). The `comments` table, its trigger and `comment_count` columns stay in the schema for later and must not be dropped.
+- **2026-10-03** Gated actions that change state (like, save) must be **idempotent set operations** (set liked = true/false), never blind toggles, so replaying an intent after login cannot undo the user's existing state. Actions that need a browser user gesture (clipboard copy) must not auto-run on replay.
+- **2026-10-03** Latency: the Supabase project is in eu-west-1 (about 200 ms per round trip from Lagos). Count sequential round trips per page and per action, run independent queries in parallel, and report the numbers.

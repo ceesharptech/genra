@@ -65,5 +65,28 @@ describe("intents", () => {
       const success = await executeIntent("malformed");
       expect(success).toBe(false);
     });
+
+    it("registers and executes like, save, and copy intents", async () => {
+      const mockLike = vi.fn();
+      const mockSave = vi.fn();
+      const mockCopy = vi.fn();
+
+      const unregisterLike = registerIntent("like", mockLike);
+      const unregisterSave = registerIntent("save", mockSave);
+      const unregisterCopy = registerIntent("copy", mockCopy);
+
+      await executeIntent("like:creation:cid-1");
+      expect(mockLike).toHaveBeenCalledWith("creation", "cid-1");
+
+      await executeIntent("save:creation:cid-1");
+      expect(mockSave).toHaveBeenCalledWith("creation", "cid-1");
+
+      await executeIntent("copy:prompt:pid-1");
+      expect(mockCopy).toHaveBeenCalledWith("prompt", "pid-1");
+
+      unregisterLike();
+      unregisterSave();
+      unregisterCopy();
+    });
   });
 });
