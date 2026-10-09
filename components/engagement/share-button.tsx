@@ -17,6 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
@@ -155,82 +156,89 @@ export function ShareButton({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>Share Creation</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Share Creation</DropdownMenuLabel>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('copy_link')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon
-            icon={copied ? Tick02Icon : Copy01Icon}
-            className={cn('size-4', copied ? 'text-emerald-500' : 'text-muted-foreground')}
-          />
-          <span className="font-medium">{copied ? 'Link Copied!' : 'Copy link'}</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('copy_link')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon
+              icon={copied ? Tick02Icon : Copy01Icon}
+              className={cn('size-4', copied ? 'text-emerald-500' : 'text-muted-foreground')}
+            />
+            <span className="font-medium">{copied ? 'Link Copied!' : 'Copy link'}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('x')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={NewTwitterIcon} className="size-4 text-muted-foreground" />
-          <span>Post to X</span>
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('x')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={NewTwitterIcon} className="size-4 text-muted-foreground" />
+            <span>Post to X</span>
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('linkedin')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={Linkedin01Icon} className="size-4 text-muted-foreground" />
-          <span>Share to LinkedIn</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('linkedin')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={Linkedin01Icon} className="size-4 text-muted-foreground" />
+            <span>Share to LinkedIn</span>
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('whatsapp')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={WhatsappIcon} className="size-4 text-muted-foreground" />
-          <span>Send via WhatsApp</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('whatsapp')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={WhatsappIcon} className="size-4 text-muted-foreground" />
+            <span>Send via WhatsApp</span>
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('reddit')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={RedditIcon} className="size-4 text-muted-foreground" />
-          <span>Post to Reddit</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('reddit')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={RedditIcon} className="size-4 text-muted-foreground" />
+            <span>Post to Reddit</span>
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('facebook')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={Facebook01Icon} className="size-4 text-muted-foreground" />
-          <span>Share to Facebook</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('facebook')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={Facebook01Icon} className="size-4 text-muted-foreground" />
+            <span>Share to Facebook</span>
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => handleChannelShare('email')}
-          className="gap-2.5 cursor-pointer"
-        >
-          <HugeiconsIcon icon={Mail01Icon} className="size-4 text-muted-foreground" />
-          <span>Send via Email</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleChannelShare('email')}
+            className="gap-2.5 cursor-pointer"
+          >
+            <HugeiconsIcon icon={Mail01Icon} className="size-4 text-muted-foreground" />
+            <span>Send via Email</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
 
         {canNativeShare && !isTouchDevice && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleNativeShare}
-              className="gap-2.5 cursor-pointer"
-            >
-              <HugeiconsIcon icon={Share01Icon} className="size-4 text-muted-foreground" />
-              <span>More options…</span>
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={handleNativeShare}
+                className="gap-2.5 cursor-pointer"
+              >
+                <HugeiconsIcon icon={Share01Icon} className="size-4 text-muted-foreground" />
+                <span>More options…</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
