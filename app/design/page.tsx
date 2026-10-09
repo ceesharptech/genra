@@ -16,8 +16,16 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle'
 import { GateDemo } from '@/components/auth/gate-demo'
 import { cn } from '@/lib/utils'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default function DesignPage() {
   // In production, this dev-only showcase must return notFound()

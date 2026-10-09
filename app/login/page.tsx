@@ -8,9 +8,12 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sign in',
-  description:
-    'Sign in to Genra to like, save, comment, and publish creations.',
+  title: 'Sign in · Genra',
+  description: 'Sign in to Genra to like, save, and publish creations.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function LoginPage({

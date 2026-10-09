@@ -105,3 +105,6 @@ export class InMemoryRateLimiter {
 
 // Global default instance for engagement actions
 export const engagementRateLimiter = new InMemoryRateLimiter(60_000);
+
+// Global default instance for share actions
+export const shareRateLimiter = new InMemoryRateLimiter(60_000);

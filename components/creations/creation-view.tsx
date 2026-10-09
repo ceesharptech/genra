@@ -21,9 +21,10 @@ import {
   Maximize02Icon,
 } from '@hugeicons/core-free-icons'
 import { EngagementBar } from '@/components/engagement/engagement-bar'
+import { ShareButton } from '@/components/engagement/share-button'
 import { CopyPromptButton } from '@/components/engagement/copy-prompt-button'
+import { ShareRefTracker } from '@/components/analytics/ref-tracker'
 import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
 
 interface CreationViewProps {
   creation: CreationWithDetails
@@ -47,20 +48,6 @@ export function CreationView({
   const [activeMediaIndex, setActiveMediaIndex] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: creation.title,
-          text: creation.summary || creation.title,
-          url: window.location.href,
-        })
-        .catch(() => {})
-    } else {
-      navigator.clipboard.writeText(window.location.href)
-      toast.success('Link copied to clipboard')
-    }
-  }
 
   const currentMedia = creation.media[activeMediaIndex] || creation.media[0]
   const currentMediaUrl = currentMedia
@@ -81,6 +68,7 @@ export function CreationView({
 
   return (
     <div className="bg-background text-foreground min-h-screen pb-20">
+      <ShareRefTracker creationId={creation.id} />
       {/* Lightbox for full-screen media inspection */}
       {creation.media.length > 0 && (
         <Lightbox
@@ -137,16 +125,12 @@ export function CreationView({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="h-8 gap-1.5 rounded-full text-xs"
-            >
-              <HugeiconsIcon icon={Share01Icon} className="size-3.5" />
-              <span>Share</span>
-            </Button>
+            <ShareButton
+              creationId={creation.id}
+              title={creation.title}
+              summary={creation.summary || ''}
+              className="h-8 min-h-[32px] sm:min-h-[32px] px-3 py-1 text-xs"
+            />
 
             {isOwner && (
               <Link href={`/c/${creation.slug}/edit`}>
@@ -221,13 +205,16 @@ export function CreationView({
 
             {/* Actions & Metrics Row */}
             <div className="flex flex-wrap items-center gap-4">
-              {/* Engagement Bar (Like & Save) */}
+              {/* Engagement Bar (Like, Save & Share) */}
               <EngagementBar
                 targetId={creation.id}
                 targetType="creation"
                 initialLiked={initialLiked}
                 initialSaved={initialSaved}
                 likeCount={creation.like_count}
+                saveCount={creation.save_count}
+                title={creation.title}
+                summary={creation.summary || ''}
                 isSignedIn={isSignedIn}
               />
 
@@ -241,6 +228,16 @@ export function CreationView({
                     className="text-muted-foreground size-3.5"
                   />
                   <span>{creation.view_count}</span>
+                </span>
+                <span
+                  className="inline-flex items-center gap-1"
+                  title={`${creation.share_count} shares`}
+                >
+                  <HugeiconsIcon
+                    icon={Share01Icon}
+                    className="text-muted-foreground size-3.5"
+                  />
+                  <span>{creation.share_count}</span>
                 </span>
                 {formattedDate && (
                   <span className="text-muted-foreground/80 pl-1 text-[11px]">

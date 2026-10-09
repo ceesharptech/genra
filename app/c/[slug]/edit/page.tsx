@@ -19,8 +19,12 @@ export async function generateMetadata({
 }: EditCreationPageProps): Promise<Metadata> {
   const { slug } = await params;
   return {
-    title: `Edit Creation - ${slug}`,
+    title: `Edit Creation · ${slug}`,
     description: "Edit your Genra creation.",
+    robots: {
+      index: false,
+      follow: false,
+    },
   };
 }
 

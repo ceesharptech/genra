@@ -37,3 +37,23 @@ export const savedCardsQuerySchema = z.object({
 });
 
 export type SavedCardsQueryInput = z.infer<typeof savedCardsQuerySchema>;
+
+export const shareChannelSchema = z.enum([
+  'copy_link',
+  'native',
+  'x',
+  'linkedin',
+  'whatsapp',
+  'facebook',
+  'reddit',
+  'email',
+]);
+
+export type ShareChannel = z.infer<typeof shareChannelSchema>;
+
+export const recordShareSchema = z.object({
+  creationId: uuidSchema,
+  channel: shareChannelSchema,
+});
+
+export type RecordShareInput = z.infer<typeof recordShareSchema>;

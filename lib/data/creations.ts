@@ -34,6 +34,7 @@ export interface CreationWithDetails {
   published_at: string | null
   like_count: number
   save_count: number
+  share_count: number
   comment_count: number
   view_count: number
   creator?: {
@@ -595,6 +596,73 @@ export const getPublishedCreationBySlug = cache(
     }
 
     return formatCreationDetail(authCreation)
+  }
+)
+
+export interface CreationOgData {
+  title: string
+  updated_at: string
+  creator_display_name: string | null
+  creator_username: string
+  cover_storage_path: string | null
+  cover_external_url: string | null
+  tools: string[]
+}
+
+/**
+ * Lean single-query loader for OpenGraph preview images.
+ * Uses the cookie-less public client and only selects the essential
+ * fields needed to render the 1200x630 card.
+ */
+export const getCreationOgData = cache(
+  async (slug: string): Promise<CreationOgData | null> => {
+    const publicClient = createPublicClient()
+    const { data, error } = await publicClient
+      .from('creations')
+      .select(`
+        title,
+        updated_at,
+        creator:profiles!creations_creator_id_fkey(username, display_name),
+        cover:creation_media!creations_cover_fk(storage_path, external_url),
+        tools:creation_tools(
+          position,
+          source,
+          tool:tools(name)
+        )
+      `)
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .is('deleted_at', null)
+      .maybeSingle()
+
+    if (error || !data) {
+      return null
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawTools = ((data.tools as any[]) || [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((t: any) => t.source !== 'ai_suggested')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((t: any) => t.tool?.name)
+      .filter(Boolean) as string[]
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creator = (Array.isArray(data.creator) ? data.creator[0] : data.creator) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cover = (Array.isArray(data.cover) ? data.cover[0] : data.cover) as any
+
+    return {
+      title: data.title,
+      updated_at: data.updated_at,
+      creator_display_name: creator?.display_name || null,
+      creator_username: creator?.username || 'creator',
+      cover_storage_path: cover?.storage_path || null,
+      cover_external_url: cover?.external_url || null,
+      tools: rawTools.slice(0, 3),
+    }
   }
 )
 

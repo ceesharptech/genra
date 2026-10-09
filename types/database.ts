@@ -55,7 +55,7 @@ export type Database = {
           error?: string | null
           id?: string
           input?: Json
-          kind: Database["public"]["Enums"]["ai_job_kind"]
+          kind?: Database["public"]["Enums"]["ai_job_kind"]
           model?: string | null
           output?: Json | null
           provider?: string | null
@@ -135,7 +135,7 @@ export type Database = {
           note?: string | null
           position?: number
           target_id?: string
-          target_type: Database["public"]["Enums"]["engagement_target"]
+          target_type?: Database["public"]["Enums"]["engagement_target"]
         }
         Relationships: [
           {

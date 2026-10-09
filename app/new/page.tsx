@@ -5,8 +5,12 @@ import { CreationEditor } from "@/components/creations/creation-editor";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "New Creation",
+  title: "New Creation · Genra",
   description: "Publish your AI-created project on Genra.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function NewCreationPage() {

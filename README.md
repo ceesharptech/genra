@@ -44,3 +44,15 @@ Database types in `types/database.ts` are generated from the hosted Supabase sch
 // Call generate_typescript_types with project_id: 'ngofkoeclkrxgpefkbuv'
 // Output is written to types/database.ts
 ```
+
+## Sharing and SEO Architecture (Phase 05)
+
+- **Site Base URL:** Resolved via `lib/site.ts` (`NEXT_PUBLIC_SITE_URL` -> `VERCEL_PROJECT_PRODUCTION_URL` -> `VERCEL_URL` -> `http://localhost:3000`). Used for all `metadataBase`, canonical URLs, Open Graph images, sitemaps, and share intent URLs.
+- **Dynamic Social Preview Images:** Generated via Next.js `ImageResponse` at `/c/[slug]/og` (creations) and `/u/[username]/og` (profiles), styled to 1200x630 with dark theme aesthetic and fallback mechanisms. Draft or non-existent items return 404.
+- **Social Sharing & Deduplication:** The ungated `ShareButton` supports native share sheets on touch devices, falling back to desktop popover menus (Copy Link, X, LinkedIn, WhatsApp, Facebook, Reddit, Email). Authenticated shares are deduplicated in PostgreSQL within a 10-minute sliding window (migration `0010_share_dedupe.sql`). Anonymous shares are protected via an in-memory sliding window rate limiter and a 10-minute client cookie.
+- **Indexing Rules & Sitemaps:**
+  - `/discover` is indexable ONLY when query parameters are empty or contain only `category`. All search, tool, and sort filter queries emit `robots: { index: false, follow: true }` with canonical pointing to the clean base or category URL.
+  - Private routes (`/login`, `/signup`, `/saved`, `/settings`, `/creations`, `/new`, `/c/[slug]/edit`, `/design`) emit `robots: { index: false, follow: false }`.
+  - Preview image routes (`/c/*/og`, `/u/*/og`) remain fully crawlable in `robots.ts`.
+  - `sitemap.xml` dynamically queries published creations and active creator profiles using a cookie-less public client.
+- **Search Ranking Order:** The `discover_cards` PostgreSQL function ranks full-text search vector matches (`match_type = 1`) strictly ahead of fallback title pattern matches (`match_type = 0`).

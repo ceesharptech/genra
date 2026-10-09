@@ -11,16 +11,59 @@ import { CreationGrid } from '@/components/creations/creation-grid'
 import { LoadMore } from '@/components/creations/load-more'
 import { Button } from '@/components/ui/button'
 
-export const revalidate = 60
+import { getSiteUrl } from '@/lib/site'
 
-export const metadata: Metadata = {
-  title: 'Discover AI Creations — Genra',
-  description:
-    'Explore creations made with AI tools, models, and workflows. Inspect real prompts and techniques.',
-}
+export const revalidate = 60
 
 interface DiscoverPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export async function generateMetadata({
+  searchParams,
+}: DiscoverPageProps): Promise<Metadata> {
+  const resolved = await searchParams
+  const siteUrl = getSiteUrl()
+
+  // Filter keys with actual non-empty values
+  const activeKeys = Object.keys(resolved).filter((k) => {
+    const val = resolved[k]
+    return (
+      val !== undefined &&
+      val !== '' &&
+      !(Array.isArray(val) && val.length === 0)
+    )
+  })
+
+  const category =
+    typeof resolved.category === 'string' && resolved.category.trim() !== ''
+      ? resolved.category.trim()
+      : undefined
+
+  // Indexable only with no parameters OR only 'category'
+  const isIndexable =
+    activeKeys.length === 0 ||
+    (activeKeys.length === 1 && activeKeys[0] === 'category')
+
+  const canonicalUrl = category
+    ? `${siteUrl}/discover?category=${encodeURIComponent(category)}`
+    : `${siteUrl}/discover`
+
+  const title = category
+    ? `Discover ${category.charAt(0).toUpperCase() + category.slice(1)} AI Creations · Genra`
+    : 'Discover AI Creations · Genra'
+
+  return {
+    title,
+    description:
+      'Explore creations made with AI tools, models, and workflows. Inspect real prompts and techniques.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: isIndexable
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
+  }
 }
 
 export default async function DiscoverPage({ searchParams }: DiscoverPageProps) {

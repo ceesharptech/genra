@@ -5,8 +5,12 @@ import { CreationsDashboard } from '@/components/creations/creations-dashboard'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'My Creations - Genra',
+  title: 'My Creations · Genra',
   description: 'Manage your AI-created projects and drafts on Genra.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function MyCreationsPage() {

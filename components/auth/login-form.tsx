@@ -8,6 +8,7 @@ import { safeRedirectPath } from '@/lib/auth/redirect'
 import { getEmailAuthMode } from '@/lib/auth/config'
 import { buildAuthCallbackUrl, getAuthErrorMessage } from '@/lib/auth/errors'
 import { emailSchema, otpCodeSchema } from '@/lib/validation/auth'
+import { getIntentContextMessage } from '@/lib/auth/intents'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -406,11 +407,17 @@ export function LoginForm({
             <h1 className="font-bricolage text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
               {mode === 'signup' ? 'Welcome to Genra' : 'Welcome back'}
             </h1>
-            <p className="text-muted-foreground mt-2 max-w-xs text-xs sm:text-sm">
-              {mode === 'signup'
-                ? 'Create your account and discover world-class AI creations, prompts, and tools.'
-                : 'Enter your details to sign in to your Genra account.'}
-            </p>
+            {message || getIntentContextMessage(intent) ? (
+              <div className="mt-2.5 inline-flex max-w-sm items-center justify-center rounded-full border border-brand/20 bg-brand/10 px-3.5 py-1 text-xs font-medium text-brand dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
+                <span>{message || getIntentContextMessage(intent)}</span>
+              </div>
+            ) : (
+              <p className="text-muted-foreground mt-2 max-w-xs text-xs sm:text-sm">
+                {mode === 'signup'
+                  ? 'Create your account and discover world-class AI creations, prompts, and tools.'
+                  : 'Enter your details to sign in to your Genra account.'}
+              </p>
+            )}
           </div>
 
           {/* Google Button (Pill shaped) */}

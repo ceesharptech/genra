@@ -96,3 +96,27 @@ export async function executeIntent(intentString: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Returns a user-friendly, one-line contextual explanation for auth pages
+ * when a user was redirected from a gated action.
+ */
+export function getIntentContextMessage(
+  rawIntent: string | null | undefined
+): string | null {
+  const parsed = parseIntent(rawIntent);
+  if (!parsed) return null;
+
+  switch (parsed.action) {
+    case 'like':
+      return 'Sign in to like this creation and track your favorites.';
+    case 'save':
+      return 'Sign in to save this creation to your collection.';
+    case 'copy':
+      return 'Sign in to copy prompts and workflow recipes.';
+    case 'create':
+      return 'Sign in to publish your AI creation.';
+    default:
+      return 'Sign in to continue your action.';
+  }
+}

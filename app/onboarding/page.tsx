@@ -8,6 +8,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Welcome to Genra — Set Up Your Profile",
   description: "Choose your Genra username and customize your profile.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function OnboardingPage({

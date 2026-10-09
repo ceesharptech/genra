@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth/server'
 import { discoverCards } from '@/lib/data/creations'
+import { getProfileByUsername } from '@/lib/data/profile'
+import { getSiteUrl } from '@/lib/site'
+import { buildProfileJsonLd, safeJsonLdReplacer } from '@/lib/seo/json-ld'
 import { CreationGrid } from '@/components/creations/creation-grid'
 import { LoadMore } from '@/components/creations/load-more'
 import { buttonVariants, Button } from '@/components/ui/button'
@@ -28,44 +30,61 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const { username } = await params
-  const supabase = await createClient()
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username, display_name, headline, bio')
-    .eq('username', username)
-    .maybeSingle()
+  const profile = await getProfileByUsername(username)
 
   if (!profile) {
     return {
-      title: 'User Not Found — Genra',
+      title: 'User Not Found · Genra',
+      robots: { index: false, follow: false },
     }
   }
 
-  const title = profile.display_name
-    ? `${profile.display_name} (@${profile.username})`
-    : `@${profile.username}`
+  const displayName = profile.display_name || profile.username
+  const title = `${displayName} (@${profile.username})`
+  const description =
+    profile.headline ||
+    profile.bio ||
+    `Explore AI creations, prompts, and tools by ${displayName} on Genra.`
+  const siteUrl = getSiteUrl()
+  const canonicalUrl = `${siteUrl}/u/${profile.username}`
+  const ogImageUrl = `${siteUrl}/u/${profile.username}/og`
 
   return {
-    title: `${title} — Genra`,
-    description:
-      profile.headline ||
-      profile.bio ||
-      `Explore AI creations, prompts, and tools by ${title} on Genra.`,
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${title} · Genra`,
+      description,
+      url: canonicalUrl,
+      siteName: 'Genra',
+      type: 'profile',
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${displayName}'s profile on Genra`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} · Genra`,
+      description,
+      images: [ogImageUrl],
+    },
   }
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params
-  const supabase = await createClient()
 
   // Concurrently load profile, user session, and creations
-  const [profileRes, currentUser, cardsRes] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('username', username)
-      .maybeSingle(),
+  const [profile, currentUser, cardsRes] = await Promise.all([
+    getProfileByUsername(username),
     getCurrentUser(),
     discoverCards({
       creator_username: username,
@@ -74,10 +93,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     }),
   ])
 
-  const profile = profileRes.data
-  if (profileRes.error || !profile) {
+  if (!profile) {
     notFound()
   }
+
+  const jsonLd = buildProfileJsonLd(profile)
 
   const isOwnProfile = currentUser?.id === profile.id
 
@@ -99,6 +119,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+      {/* Structured Data (Schema.org JSON-LD) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd, safeJsonLdReplacer),
+        }}
+      />
+
       {/* Profile Header */}
       <div className="flex max-w-7xl flex-col gap-5 sm:gap-6">
         <Avatar className="border-border size-24 shrink-0 border sm:size-22 md:size-28">

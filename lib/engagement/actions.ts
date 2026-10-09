@@ -1,15 +1,18 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { requireUser } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
-import { engagementRateLimiter } from '@/lib/rate-limit';
+import { engagementRateLimiter, shareRateLimiter } from '@/lib/rate-limit';
 import {
   setLikeSchema,
   setSaveSchema,
   copyPromptSchema,
   savedCardsQuerySchema,
+  recordShareSchema,
   type EngagementTargetType,
+  type ShareChannel,
 } from '@/lib/validation/engagement';
 import { savedCards, type SavedCardsResult } from '@/lib/data/engagement';
 import { perfLog } from '@/lib/perf';
@@ -325,4 +328,74 @@ export async function loadMoreSavedAction(
     offset: validOffset,
     limit: 24,
   });
+}
+
+/**
+ * Records a share event for a creation.
+ * Works for both authenticated and anonymous users.
+ * Validates channel via allowlist, applies an in-memory sliding-window rate limit,
+ * checks and sets a 10-minute client dedupe cookie, and calls the record_share RPC.
+ */
+export async function recordShareAction(
+  creationId: string,
+  channel: ShareChannel
+): Promise<ActionResult<{ recorded: boolean; deduplicated?: boolean }>> {
+  const start = performance.now();
+  try {
+    const parsed = recordShareSchema.safeParse({ creationId, channel });
+    if (!parsed.success) {
+      return { ok: false, error: 'Invalid share channel or creation ID' };
+    }
+
+    const cookieStore = await cookies();
+    const dedupeCookieName = `genra_shared_${creationId}_${channel}`;
+
+    // 1. Check client dedupe cookie (10 minute window)
+    if (cookieStore.get(dedupeCookieName)) {
+      return { ok: true, data: { recorded: false, deduplicated: true } };
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // 2. Rate limiting check (per-instance sliding window)
+    const rateLimitKey = user
+      ? `share:${user.id}`
+      : `share:anon:${creationId}:${channel}`;
+    const rateCheck = shareRateLimiter.check(rateLimitKey, 30);
+    if (!rateCheck.allowed) {
+      return {
+        ok: false,
+        error: 'Too many share requests. Please wait a moment.',
+      };
+    }
+
+    // 3. Call database function (which also checks 10-minute dedupe for auth users)
+    const { error: rpcError } = await supabase.rpc('record_share', {
+      p_creation_id: creationId,
+      p_channel: channel,
+    });
+
+    if (rpcError) {
+      console.error('Failed to record share event:', rpcError);
+      return { ok: false, error: rpcError.message };
+    }
+
+    // 4. Set dedupe cookie for 10 minutes (600 seconds)
+    cookieStore.set(dedupeCookieName, '1', {
+      maxAge: 600,
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return { ok: true, data: { recorded: true } };
+  } catch (err: unknown) {
+    console.error('Unexpected error in recordShareAction:', err);
+    return { ok: false, error: 'Failed to record share event' };
+  } finally {
+    perfLog('recordShareAction', performance.now() - start);
+  }
 }

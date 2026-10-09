@@ -4,8 +4,12 @@ import { SettingsForm } from "@/components/profile/settings-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Profile Settings",
+  title: "Profile Settings · Genra",
   description: "Manage your Genra profile, social links, and account settings.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function SettingsPage() {

@@ -8,9 +8,13 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sign up',
+  title: 'Sign up · Genra',
   description:
     'Create your Genra account to discover, learn from, and share AI creations.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function SignUpPage({

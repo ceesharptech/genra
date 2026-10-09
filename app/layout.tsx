@@ -14,6 +14,7 @@ import { AuthProvider } from '@/components/auth/auth-provider'
 import { AuthModalProvider } from '@/components/auth/auth-modal-provider'
 import { IntentReplay } from '@/components/auth/intent-replay'
 import { AuthHashHandler } from '@/components/auth/auth-hash-handler'
+import { getSiteUrl } from '@/lib/site'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -38,7 +39,8 @@ const albertSans = Albert_Sans({
   subsets: ['latin'],
   display: 'swap',
 })
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+const siteUrl = getSiteUrl()
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -47,11 +49,11 @@ export const metadata: Metadata = {
     apple: '/images/genra-logo.png',
   },
   title: {
-    template: '%s | Genra',
-    default: 'Genra — Discover & Learn What People Create with AI',
+    template: '%s · Genra',
+    default: 'Genra — Discover and share AI creations',
   },
   description:
-    'Discovery and learning platform for things people create with AI: websites, apps, images, video, prompts, and workflows.',
+    'The open discovery platform for things people build with AI. Browse creations, learn from prompts and processes, and share your work.',
   keywords: [
     'AI creations',
     'AI prompts',
@@ -67,9 +69,15 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: siteUrl,
     siteName: 'Genra',
-    title: 'Genra — Discover & Learn What People Create with AI',
+    title: 'Genra — Discover and share AI creations',
     description:
-      'Discovery and learning platform for things people create with AI: websites, apps, images, video, prompts, and workflows.',
+      'The open discovery platform for things people build with AI. Browse creations, learn from prompts and processes, and share your work.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Genra — Discover and share AI creations',
+    description:
+      'The open discovery platform for things people build with AI. Browse creations, learn from prompts and processes, and share your work.',
   },
 }
 
