@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { requireUser } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
-import { engagementRateLimiter, shareRateLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit';
 import {
   setLikeSchema,
   setSaveSchema,
@@ -44,8 +44,8 @@ export async function setLikeAction(
     }
 
     // Rate limiting: 60 actions per minute per user
-    const rateCheck = engagementRateLimiter.check(`${user.id}:like`, 60);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('like', user.id);
+    if (!rateCheck.success) {
       return {
         ok: false,
         error: 'Too many requests. Please wait a moment before trying again.',
@@ -168,8 +168,8 @@ export async function setSaveAction(
     }
 
     // Rate limiting: 60 actions per minute per user
-    const rateCheck = engagementRateLimiter.check(`${user.id}:save`, 60);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('save', user.id);
+    if (!rateCheck.success) {
       return {
         ok: false,
         error: 'Too many requests. Please wait a moment before trying again.',
@@ -287,8 +287,8 @@ export async function copyPromptAction(
     }
 
     // Rate limiting: 30 copies per minute per user
-    const rateCheck = engagementRateLimiter.check(`${user.id}:copy`, 30);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('copy_prompt', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Rate limit exceeded.' };
     }
 
@@ -372,8 +372,8 @@ export async function recordShareAction(
     const rateLimitKey = user
       ? `share:${user.id}`
       : `share:anon:${creationId}:${channel}`;
-    const rateCheck = shareRateLimiter.check(rateLimitKey, 30);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('share', rateLimitKey);
+    if (!rateCheck.success) {
       return {
         ok: false,
         error: 'Too many share requests. Please wait a moment.',

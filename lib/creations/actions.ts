@@ -25,6 +25,7 @@ import {
   type ResourceKind,
 } from "@/lib/data/creations";
 import { perfLog } from "@/lib/perf";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type Tool = Database["public"]["Tables"]["tools"]["Row"];
 export type Prompt = Database["public"]["Tables"]["prompts"]["Row"];
@@ -77,7 +78,7 @@ export async function saveCreationAction(
   rawPayload: unknown
 ): Promise<ActionResult<SaveCreationResult>> {
   try {
-    await requireOnboardedUser();
+    const { user } = await requireOnboardedUser();
 
     // 1. Validate payload structure
     const parseResult = saveCreationPayloadSchema.safeParse(rawPayload);
@@ -92,6 +93,13 @@ export async function saveCreationAction(
     }
 
     const payload = parseResult.data;
+
+    // Rate limiting: publish (10/min) or draft save (30/min)
+    const rateAction = payload.action === "publish" ? "publish_creation" : "save_creation";
+    const rateCheck = await checkRateLimit(rateAction, user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many save requests. Please wait a moment before trying again.");
+    }
 
     // 2. If publishing, perform strict validation
     if (payload.action === "publish") {
@@ -172,6 +180,12 @@ export async function setCreationStatusAction(
 ): Promise<ActionResult<void>> {
   try {
     const { user } = await requireOnboardedUser();
+
+    const rateCheck = await checkRateLimit("publish_creation", user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many status changes. Please wait a moment.");
+    }
+
     const supabase = await createClient();
 
     const { data: creation, error: fetchErr } = await supabase
@@ -215,6 +229,12 @@ export async function setCreationStatusAction(
 export async function deleteCreationAction(id: string): Promise<ActionResult<void>> {
   try {
     const { user } = await requireOnboardedUser();
+
+    const rateCheck = await checkRateLimit("publish_creation", user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many delete requests. Please wait a moment.");
+    }
+
     const supabase = await createClient();
 
     const { data: creation, error: fetchErr } = await supabase
@@ -266,6 +286,11 @@ export async function proposeToolAction(
       );
     }
 
+    const rateCheck = await checkRateLimit("propose_tool", user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many tool proposals. Please wait a moment.");
+    }
+
     const { name, kind, website_url } = parse.data;
     const slug = slugify(name);
     const supabase = await createClient();
@@ -288,7 +313,6 @@ export async function proposeToolAction(
         slug,
         kind,
         website_url: website_url || null,
-        is_verified: false,
         created_by: user.id,
       })
       .select("*")
@@ -318,6 +342,11 @@ export async function quickCreatePromptAction(
       return actionError(
         parse.error.issues[0]?.message || "Invalid prompt input"
       );
+    }
+
+    const rateCheck = await checkRateLimit("prompt_create", user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many requests. Please wait a moment.");
     }
 
     const { title, body, kind, model_tool_id, is_public } = parse.data;
@@ -360,6 +389,11 @@ export async function quickCreateResourceAction(
       return actionError(
         parse.error.issues[0]?.message || "Invalid resource input"
       );
+    }
+
+    const rateCheck = await checkRateLimit("resource_create", user.id);
+    if (!rateCheck.success) {
+      return actionError("Too many requests. Please wait a moment.");
     }
 
     const { title, kind, url, description, tool_id, is_public } = parse.data;

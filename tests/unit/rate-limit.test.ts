@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { InMemoryRateLimiter } from '@/lib/rate-limit';
+import { InMemoryRateLimiter, checkRateLimit, RATE_LIMIT_CONFIGS } from '@/lib/rate-limit';
 
 describe('InMemoryRateLimiter', () => {
   beforeEach(() => {
@@ -60,5 +60,47 @@ describe('InMemoryRateLimiter', () => {
     expect(limiter.check('user-a', 1).allowed).toBe(false);
 
     expect(limiter.check('user-b', 1).allowed).toBe(true);
+  });
+});
+
+describe('checkRateLimit', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('has configurations for all named actions', () => {
+    expect(RATE_LIMIT_CONFIGS.like.limit).toBe(60);
+    expect(RATE_LIMIT_CONFIGS.save.limit).toBe(60);
+    expect(RATE_LIMIT_CONFIGS.copy_prompt.limit).toBe(30);
+    expect(RATE_LIMIT_CONFIGS.view.limit).toBe(120);
+    expect(RATE_LIMIT_CONFIGS.share.limit).toBe(30);
+    expect(RATE_LIMIT_CONFIGS.save_creation.limit).toBe(30);
+    expect(RATE_LIMIT_CONFIGS.publish_creation.limit).toBe(10);
+    expect(RATE_LIMIT_CONFIGS.propose_tool.limit).toBe(10);
+  });
+
+  it('allows actions within configured limit in fallback mode', async () => {
+    const res = await checkRateLimit('propose_tool', 'user-test-1');
+    expect(res.success).toBe(true);
+    expect(res.remaining).toBe(9);
+  });
+
+  it('blocks actions when limit is exceeded in fallback mode', async () => {
+    const userId = 'user-test-blocked';
+    for (let i = 0; i < 10; i++) {
+      const res = await checkRateLimit('propose_tool', userId);
+      expect(res.success).toBe(true);
+    }
+
+    const exceeded = await checkRateLimit('propose_tool', userId);
+    expect(exceeded.success).toBe(false);
+    expect(exceeded.remaining).toBe(0);
+    expect(exceeded.reset).toBeGreaterThan(0);
   });
 });

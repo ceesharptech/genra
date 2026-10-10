@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireOnboardedUser } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
-import { libraryRateLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit';
 import {
   createPromptSchema,
   updatePromptSchema,
@@ -49,8 +49,8 @@ export async function createPromptAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid prompt data' };
     }
 
-    const rateCheck = libraryRateLimiter.check(`${user.id}:prompt_create`, 20);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('prompt_create', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
@@ -99,6 +99,11 @@ export async function updatePromptAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid prompt data' };
     }
 
+    const rateCheck = await checkRateLimit('prompt_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
+    }
+
     const supabase = await createClient();
 
     // Verify ownership explicitly
@@ -125,7 +130,6 @@ export async function updatePromptAction(
         kind: parsed.data.kind,
         model_tool_id: parsed.data.model_tool_id ?? null,
         is_public: parsed.data.is_public,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', parsed.data.id);
 
@@ -159,6 +163,11 @@ export async function deletePromptAction(
     const parsed = uuidSchema.safeParse(rawId);
     if (!parsed.success) {
       return { ok: false, error: 'Invalid prompt ID' };
+    }
+
+    const rateCheck = await checkRateLimit('prompt_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
     const supabase = await createClient();
@@ -217,8 +226,8 @@ export async function forkPromptAction(
       return { ok: false, error: 'Invalid prompt ID' };
     }
 
-    const rateCheck = libraryRateLimiter.check(`${user.id}:prompt_fork`, 15);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('prompt_fork', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Too many fork requests. Please wait a moment.' };
     }
 
@@ -292,8 +301,8 @@ export async function createResourceAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid resource data' };
     }
 
-    const rateCheck = libraryRateLimiter.check(`${user.id}:resource_create`, 20);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('resource_create', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
@@ -344,6 +353,11 @@ export async function updateResourceAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid resource data' };
     }
 
+    const rateCheck = await checkRateLimit('resource_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
+    }
+
     const supabase = await createClient();
 
     // Verify ownership explicitly
@@ -372,7 +386,6 @@ export async function updateResourceAction(
         body: parsed.data.body && parsed.data.body.trim().length > 0 ? parsed.data.body.trim() : null,
         tool_id: parsed.data.tool_id ?? null,
         is_public: parsed.data.is_public,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', parsed.data.id);
 
@@ -406,6 +419,11 @@ export async function deleteResourceAction(
     const parsed = uuidSchema.safeParse(rawId);
     if (!parsed.success) {
       return { ok: false, error: 'Invalid resource ID' };
+    }
+
+    const rateCheck = await checkRateLimit('resource_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
     const supabase = await createClient();

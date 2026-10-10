@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireUser, getCurrentProfile } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
-import { collectionsRateLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit';
 import {
   createCollectionSchema,
   updateCollectionSchema,
@@ -40,8 +40,8 @@ export async function createCollectionAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid collection input' };
     }
 
-    const rateCheck = collectionsRateLimiter.check(`${user.id}:create_collection`, 20);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('create_collection', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
@@ -91,6 +91,11 @@ export async function updateCollectionAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid collection input' };
     }
 
+    const rateCheck = await checkRateLimit('collection_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
+    }
+
     const supabase = await createClient();
 
     // Verify ownership explicitly
@@ -114,7 +119,6 @@ export async function updateCollectionAction(
         title: parsed.data.title,
         description: parsed.data.description || null,
         is_public: parsed.data.is_public,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', parsed.data.id);
 
@@ -148,6 +152,11 @@ export async function deleteCollectionAction(
     const parsed = uuidSchema.safeParse(rawId);
     if (!parsed.success) {
       return { ok: false, error: 'Invalid collection ID' };
+    }
+
+    const rateCheck = await checkRateLimit('collection_crud', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
     const supabase = await createClient();
@@ -207,8 +216,8 @@ export async function addCollectionItemAction(
       return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid item data' };
     }
 
-    const rateCheck = collectionsRateLimiter.check(`${user.id}:add_item`, 60);
-    if (!rateCheck.allowed) {
+    const rateCheck = await checkRateLimit('collection_add_item', user.id);
+    if (!rateCheck.success) {
       return { ok: false, error: 'Too many requests. Please wait a moment.' };
     }
 
@@ -253,6 +262,11 @@ export async function removeCollectionItemAction(
       return { ok: false, error: 'Invalid collection item parameters' };
     }
 
+    const rateCheck = await checkRateLimit('collection_item', user.id);
+    if (!rateCheck.success) {
+      return { ok: false, error: 'Too many requests. Please wait a moment.' };
+    }
+
     const supabase = await createClient();
 
     // Verify collection ownership
@@ -282,11 +296,6 @@ export async function removeCollectionItemAction(
       return { ok: false, error: 'Failed to remove item from collection' };
     }
 
-    // Touch collection updated_at
-    await supabase
-      .from('collections')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', parsed.data.collectionId);
 
     revalidatePath(`/collections/${parsed.data.collectionId}`);
     return { ok: true, data: { success: true } };

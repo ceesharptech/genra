@@ -1,7 +1,8 @@
 'use server'
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 import {
   discoverCards,
   type CreationCardItem,
@@ -54,6 +55,15 @@ export async function recordViewAction(
     if (cookieStore.has(cookieName)) {
       // Already viewed within the last 30 minutes
       return { success: true }
+    }
+
+    const headerList = await headers()
+    const forwardedFor = headerList.get('x-forwarded-for')
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : (headerList.get('x-real-ip') ?? '127.0.0.1')
+
+    const rateCheck = await checkRateLimit('view', `${clientIp}:${creationId}`)
+    if (!rateCheck.success) {
+      return { success: false }
     }
 
     const supabase = await createClient()
