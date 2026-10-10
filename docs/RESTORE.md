@@ -8,20 +8,22 @@ This document defines the procedure for decrypting and restoring database backup
 
 - PostgreSQL Client utilities installed (`psql` and `pg_dump` v15+).
 - GnuPG (`gpg`).
-- Decryption passphrase (stored in project password manager / `BACKUP_ENCRYPTION_KEY`).
-- Target Supabase PostgreSQL direct URI:
+- Decryption passphrase (stored in project secret manager / `BACKUP_PASSPHRASE`).
+- Target Supabase PostgreSQL connection string using the **session pooler** (IPv4-compatible):
   ```bash
-  postgresql://postgres:[YOUR-DB-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+  postgresql://postgres.[PROJECT-REF]:[YOUR-DB-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
   ```
+  > [!IMPORTANT]
+  > Direct database hostnames (`db.<ref>.supabase.co:5432`) are IPv6-only on Supabase Free. GitHub Actions runners and IPv4-only networks cannot connect to direct hosts. Always use the Supabase session pooler on port 5432 (user `postgres.<ref>`).
 
 ---
 
 ## 2. Decrypting the Backup Artifact
 
-1. Download the artifact `db-backup-YYYYMMDD_HHMMSS.gpg` from the GitHub Actions **Scheduled Database Backup** run.
-2. In your secure terminal, decrypt the file using `gpg`:
+1. Download the artifact `db-backup-[ENV]-YYYYMMDD_HHMMSS.gpg` from the GitHub Actions **Scheduled Database Backup** run.
+2. In your secure terminal, decrypt the file using `gpg` and `BACKUP_PASSPHRASE`:
    ```bash
-   gpg --decrypt --batch --passphrase "$BACKUP_ENCRYPTION_KEY" -o restore.sql db-backup-YYYYMMDD_HHMMSS.gpg
+   gpg --decrypt --batch --passphrase "$BACKUP_PASSPHRASE" -o restore.sql db-backup-[ENV]-YYYYMMDD_HHMMSS.gpg
    ```
 3. Inspect the first few lines of the decrypted SQL to verify schema definitions:
    ```bash
@@ -37,11 +39,11 @@ This document defines the procedure for decrypting and restoring database backup
 
 1. Test connection to the target database:
    ```bash
-   psql "$TARGET_DB_URL" -c "SELECT current_database(), current_user;"
+   psql "$SUPABASE_DB_URL_DEV" -c "SELECT current_database(), current_user;"
    ```
 2. Execute the restore SQL:
    ```bash
-   psql "$TARGET_DB_URL" -f restore.sql
+   psql "$SUPABASE_DB_URL_DEV" -f restore.sql
    ```
 3. Inspect database status and row counts:
    ```sql
@@ -85,3 +87,13 @@ After restoring data:
   rm -P restore.sql   # macOS
   shred -u restore.sql # Linux
   ```
+
+---
+
+## 5. GitHub Actions Secrets Reference
+
+| Secret Name | Description |
+|---|---|
+| `SUPABASE_DB_URL_DEV` | Session pooler PostgreSQL URI for development project (`aws-0-<region>.pooler.supabase.com:5432`) |
+| `SUPABASE_DB_URL_PROD` | Session pooler PostgreSQL URI for production project |
+| `BACKUP_PASSPHRASE` | Symmetric AES256 encryption passphrase for backup artifacts |

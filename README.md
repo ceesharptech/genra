@@ -56,3 +56,62 @@ Database types in `types/database.ts` are generated from the hosted Supabase sch
   - Preview image routes (`/c/*/og`, `/u/*/og`) remain fully crawlable in `robots.ts`.
   - `sitemap.xml` dynamically queries published creations and active creator profiles using a cookie-less public client.
 - **Search Ranking Order:** The `discover_cards` PostgreSQL function ranks full-text search vector matches (`match_type = 1`) strictly ahead of fallback title pattern matches (`match_type = 0`).
+
+---
+
+## Observability & Diagnostics (Phase 07 & 07a)
+
+### 1. PostHog Web Analytics & Local Debugging
+
+Genra routes PostHog telemetry through a first-party reverse proxy at `/ingest/*` using default browser persistence (`localStorage+cookie`) to populate web analytics (Visitors, Page views, Sessions, Bounce rate, Paths, and Referrers).
+
+- **Production:** Automatically enabled when `NEXT_PUBLIC_POSTHOG_KEY` is provided. Captures `$pageview` and `$pageleave` with automated URL scrubbing (search text scrubbed to `has_query=true`, auth tokens stripped).
+- **Local Development:** PostHog is **disabled by default in development** to avoid polluting production data.
+  To test locally without affecting production metrics:
+  ```bash
+  NEXT_PUBLIC_POSTHOG_DEBUG=true
+  ```
+  This activates PostHog in development mode and invokes `posthog.debug()` to print all telemetry events and decisions to the browser console.
+
+### 2. Sentry Error Tracking & Debug Mode
+
+Sentry is initialized across browser (`instrumentation-client.ts`), Node.js server (`sentry.server.config.ts`), and Edge (`sentry.edge.config.ts`), with `onRequestError` capturing unhandled server errors.
+
+- **Debug Logging:** Set `SENTRY_DEBUG=true` (server) or `NEXT_PUBLIC_SENTRY_DEBUG=true` (client) to enable verbose SDK diagnostic logging.
+- **Local Smoke Test:** Run the local Node SDK smoke test script to verify credentials and connectivity:
+  ```bash
+  npm run sentry:test
+  ```
+  This dispatches a test message and exception with tag `smoke_test: true` and prints the search URL to inspect issues in your Sentry dashboard.
+
+### 3. Sentry Source Maps & Production Verification Playbook (Owner)
+
+1. **Create Sentry Organization Auth Token:**
+   - In Sentry, go to **Settings** > **Developer Settings** > **Custom Integrations** (or **Auth Tokens**).
+   - Create a token with the following scopes:
+     - `project:read`
+     - `project:releases`
+     - `org:read`
+2. **Add Vercel Variables (Server-Only & Sensitive):**
+   - In your Vercel Project Settings > Environment Variables, add:
+     - `SENTRY_AUTH_TOKEN`: your Sentry auth token (mark as Sensitive).
+     - `SENTRY_ORG`: your organization slug (e.g. `ceesharp-technologies`).
+     - `SENTRY_PROJECT`: your project slug (e.g. `javascript-nextjs`).
+     - *Note:* These build-time variables allow `withSentryConfig` to upload source maps during `next build` and delete them from the public output before serving.
+3. **Run Production End-to-End Verification:**
+   - In Vercel, temporarily add the variable `SENTRY_TEST_TOKEN` set to a secure random string (e.g. `test-token-7a8f9`).
+   - Trigger a redeploy on Vercel.
+   - Open `https://<your-app>.vercel.app/sentry-test?token=test-token-7a8f9` in your browser.
+   - Test each button:
+     1. **Trigger Client Error:** Dispatches a client-side exception through the browser SDK.
+     2. **Trigger Server Action Error:** Invokes a Server Action throwing an unhandled exception.
+     3. **Send Plain Message:** Dispatches info-level messages from client and server.
+     4. **Trigger API Route Error:** Invokes `/api/sentry-test` to test `onRequestError` capture.
+   - Open Sentry issues and verify:
+     - Events appear with environment `production` and the release commit SHA.
+     - Stack traces are de-minified and readable (confirming source map upload).
+     - URL parameters and user identity are free of personal data.
+4. **Decommission Test Console:**
+   - Delete `SENTRY_TEST_TOKEN` from Vercel environment variables and redeploy.
+   - Confirm that navigating to `/sentry-test` returns an HTTP 404.
+

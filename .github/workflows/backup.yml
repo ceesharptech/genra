@@ -5,6 +5,15 @@ on:
     # Runs weekly on Sunday at 03:00 UTC
     - cron: '0 3 * * 0'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target database environment (dev or prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
 
 jobs:
   backup:
@@ -18,32 +27,47 @@ jobs:
 
       - name: Dump Database
         env:
-          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ENV_TARGET: ${{ inputs.environment || 'dev' }}
+          DB_URL_DEV: ${{ secrets.SUPABASE_DB_URL_DEV }}
+          DB_URL_PROD: ${{ secrets.SUPABASE_DB_URL_PROD }}
         run: |
+          if [ "$ENV_TARGET" = "prod" ]; then
+            DB_URL="$DB_URL_PROD"
+          else
+            DB_URL="$DB_URL_DEV"
+          fi
+
           if [ -z "$DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL secret is not configured. Cannot perform dump."
+            echo "::error::Database connection URL for '$ENV_TARGET' is not configured. Check SUPABASE_DB_URL_DEV or SUPABASE_DB_URL_PROD secret."
+            exit 1
+          fi
+
+          # Direct connection check: Supabase Free direct connection is IPv6 only and fails on IPv4 GitHub Actions runners
+          if echo "$DB_URL" | grep -q -E 'db\.[a-z0-9]+\.supabase\.co'; then
+            echo "::error::Direct database connections (db.<ref>.supabase.co) are IPv6-only on Supabase Free and fail on GitHub Actions runners. You MUST use the IPv4-compatible session pooler connection string (e.g. postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres)."
             exit 1
           fi
 
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          echo "Dumping public schema at $TIMESTAMP..."
+          echo "Dumping public schema for $ENV_TARGET at $TIMESTAMP via session pooler..."
           pg_dump "$DB_URL" \
             --schema=public \
             --no-owner \
             --no-privileges \
             --clean \
             --if-exists \
-            -f "genra_backup_${TIMESTAMP}.sql"
+            -f "genra_backup_${ENV_TARGET}_${TIMESTAMP}.sql"
 
-          echo "DUMP_FILE=genra_backup_${TIMESTAMP}.sql" >> $GITHUB_ENV
+          echo "DUMP_FILE=genra_backup_${ENV_TARGET}_${TIMESTAMP}.sql" >> $GITHUB_ENV
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          echo "ENV_TARGET=$ENV_TARGET" >> $GITHUB_ENV
 
       - name: Encrypt Backup Artifact
         env:
-          PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
           if [ -z "$PASSPHRASE" ]; then
-            echo "::error::BACKUP_ENCRYPTION_KEY secret is not set. Encrypted backup cannot be produced."
+            echo "::error::BACKUP_PASSPHRASE secret is not set. Encrypted backup cannot be produced."
             exit 1
           fi
 
@@ -61,6 +85,6 @@ jobs:
       - name: Upload Encrypted Backup Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: db-backup-${{ env.TIMESTAMP }}.gpg
+          name: db-backup-${{ env.ENV_TARGET }}-${{ env.TIMESTAMP }}.gpg
           path: ${{ env.DUMP_FILE }}.gpg
           retention-days: 30
