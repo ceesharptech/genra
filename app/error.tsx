@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import * as Sentry from '@sentry/nextjs'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -13,8 +14,7 @@ export default function ErrorPage({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error for diagnostics
-    console.error('Unhandled application error:', error)
+    Sentry.captureException(error)
   }, [error])
 
   return (

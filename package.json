@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:env": "node scripts/check-env.mjs",
-    "check:bundle": "node scripts/scan-client-bundle.mjs"
+    "check:bundle": "node scripts/scan-client-bundle.mjs",
+    "sentry:test": "node scripts/sentry-smoke-test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
