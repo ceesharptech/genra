@@ -115,6 +115,8 @@ export async function setLikeAction(
         .eq('id', targetId)
         .single();
       count = data?.like_count ?? 0;
+      revalidatePath('/prompts');
+      revalidatePath(`/prompts/${targetId}`);
     } else if (targetType === 'resource') {
       const { data } = await supabase
         .from('resources')
@@ -122,6 +124,8 @@ export async function setLikeAction(
         .eq('id', targetId)
         .single();
       count = data?.like_count ?? 0;
+      revalidatePath('/resources');
+      revalidatePath(`/resources/${targetId}`);
     }
 
     revalidatePath('/');
@@ -234,6 +238,8 @@ export async function setSaveAction(
         .eq('id', targetId)
         .single();
       count = data?.save_count ?? 0;
+      revalidatePath('/prompts');
+      revalidatePath(`/prompts/${targetId}`);
     } else if (targetType === 'resource') {
       const { data } = await supabase
         .from('resources')
@@ -241,6 +247,8 @@ export async function setSaveAction(
         .eq('id', targetId)
         .single();
       count = data?.save_count ?? 0;
+      revalidatePath('/resources');
+      revalidatePath(`/resources/${targetId}`);
     }
 
     revalidatePath('/saved');

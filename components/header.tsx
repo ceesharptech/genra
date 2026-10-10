@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { UserMenu } from '@/components/auth/user-menu'
+import { cn } from '@/lib/utils'
 
 export function Header() {
   const pathname = usePathname()
@@ -35,28 +36,43 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Dribbble-style Left Navigation */}
+          {/* Primary Navigation */}
           <nav
             className="hidden items-center gap-6 text-sm font-normal md:flex"
             aria-label="Main Navigation"
           >
             <Link
               href="/discover"
-              className="text-foreground/80 hover:text-foreground transition-colors"
+              className={cn(
+                'transition-colors hover:text-foreground',
+                pathname.startsWith('/discover')
+                  ? 'font-medium text-foreground'
+                  : 'text-foreground/80'
+              )}
             >
-              Explore
+              Discover
             </Link>
             <Link
-              href="/discover?sort=new"
-              className="text-foreground/80 hover:text-foreground transition-colors"
+              href="/prompts"
+              className={cn(
+                'transition-colors hover:text-foreground',
+                pathname.startsWith('/prompts')
+                  ? 'font-medium text-foreground'
+                  : 'text-foreground/80'
+              )}
             >
-              Newest
+              Prompts
             </Link>
             <Link
-              href="/discover?sort=trending"
-              className="text-foreground/80 hover:text-foreground transition-colors"
+              href="/resources"
+              className={cn(
+                'transition-colors hover:text-foreground',
+                pathname.startsWith('/resources')
+                  ? 'font-medium text-foreground'
+                  : 'text-foreground/80'
+              )}
             >
-              Trending
+              Resources
             </Link>
           </nav>
         </div>

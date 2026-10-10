@@ -19,9 +19,9 @@ import {
   PlayIcon,
   EyeIcon,
   Maximize02Icon,
+  DocumentCodeIcon,
 } from '@hugeicons/core-free-icons'
 import { EngagementBar } from '@/components/engagement/engagement-bar'
-import { ShareButton } from '@/components/engagement/share-button'
 import { CopyPromptButton } from '@/components/engagement/copy-prompt-button'
 import { ShareRefTracker } from '@/components/analytics/ref-tracker'
 import { cn } from '@/lib/utils'
@@ -125,13 +125,6 @@ export function CreationView({
           </div>
 
           <div className="flex items-center gap-2">
-            <ShareButton
-              creationId={creation.id}
-              title={creation.title}
-              summary={creation.summary || ''}
-              className="h-8 min-h-[32px] sm:min-h-[32px] px-3 py-1 text-xs"
-            />
-
             {isOwner && (
               <Link href={`/c/${creation.slug}/edit`}>
                 <Button
@@ -368,7 +361,7 @@ export function CreationView({
             return (
               <Link
                 key={t.tool_id}
-                href={`/discover?tools=${encodeURIComponent(t.tool.slug)}`}
+                href={`/tools/${t.tool.slug}`}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-normal transition-colors',
                   isPrimary
@@ -470,40 +463,60 @@ export function CreationView({
             </h2>
 
             <div className="space-y-4">
-              {creation.prompts.map((item) => (
-                <div
-                  key={item.prompt_id}
-                  id={`prompt-${item.prompt_id}`}
-                  className="border-border bg-card space-y-3 rounded-xl border p-5 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-foreground text-sm font-medium">
-                        {item.prompt.title}
-                      </h3>
-                      <span className="bg-secondary text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
-                        {item.prompt.kind}
-                      </span>
+              {creation.prompts.map((item) => {
+                if (!item.prompt) {
+                  return (
+                    <div
+                      key={item.prompt_id}
+                      className="border-border/60 bg-muted/20 text-muted-foreground flex items-center gap-2 rounded-xl border p-4 text-xs italic"
+                    >
+                      <HugeiconsIcon
+                        icon={DocumentCodeIcon}
+                        className="size-4 shrink-0 text-muted-foreground/60"
+                      />
+                      <span>This prompt is no longer available.</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={item.prompt_id}
+                    id={`prompt-${item.prompt_id}`}
+                    className="border-border bg-card space-y-3 rounded-xl border p-5 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/prompts/${item.prompt.id}`}
+                          className="text-foreground hover:text-brand text-sm font-medium transition-colors hover:underline"
+                        >
+                          {item.prompt.title}
+                        </Link>
+                        <span className="bg-secondary text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
+                          {item.prompt.kind}
+                        </span>
+                      </div>
+
+                      <CopyPromptButton
+                        promptId={item.prompt_id}
+                        promptBody={item.prompt.body}
+                        isSignedIn={isSignedIn}
+                      />
                     </div>
 
-                    <CopyPromptButton
-                      promptId={item.prompt_id}
-                      promptBody={item.prompt.body}
-                      isSignedIn={isSignedIn}
-                    />
+                    {item.note && (
+                      <p className="text-text-subtle text-xs italic">
+                        Note: {item.note}
+                      </p>
+                    )}
+
+                    <pre className="border-border bg-surface text-foreground overflow-x-auto rounded-lg border p-4 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap">
+                      {item.prompt.body}
+                    </pre>
                   </div>
-
-                  {item.note && (
-                    <p className="text-text-subtle text-xs italic">
-                      Note: {item.note}
-                    </p>
-                  )}
-
-                  <pre className="border-border bg-surface text-foreground overflow-x-auto rounded-lg border p-4 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap">
-                    {item.prompt.body}
-                  </pre>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -521,52 +534,72 @@ export function CreationView({
             </h2>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {creation.resources.map((item) => (
-                <div
-                  key={item.resource_id}
-                  className="border-border bg-card flex flex-col justify-between space-y-3 rounded-xl border p-5"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-foreground truncate text-sm font-medium">
-                        {item.resource.title}
-                      </h3>
-                      <span className="bg-secondary text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
-                        {item.resource.kind.replace('_', ' ')}
-                      </span>
+              {creation.resources.map((item) => {
+                if (!item.resource) {
+                  return (
+                    <div
+                      key={item.resource_id}
+                      className="border-border/60 bg-muted/20 text-muted-foreground flex items-center gap-2 rounded-xl border p-4 text-xs italic"
+                    >
+                      <HugeiconsIcon
+                        icon={DocumentCodeIcon}
+                        className="size-4 shrink-0 text-muted-foreground/60"
+                      />
+                      <span>This resource is no longer available.</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={item.resource_id}
+                    className="border-border bg-card flex flex-col justify-between space-y-3 rounded-xl border p-5"
+                  >
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <Link
+                          href={`/resources/${item.resource.id}`}
+                          className="text-foreground hover:text-brand truncate text-sm font-medium transition-colors hover:underline"
+                        >
+                          {item.resource.title}
+                        </Link>
+                        <span className="bg-secondary text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase">
+                          {item.resource.kind.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      {item.resource.description && (
+                        <p className="text-muted-foreground line-clamp-2 text-xs">
+                          {item.resource.description}
+                        </p>
+                      )}
+
+                      {item.note && (
+                        <p className="text-brand-text text-xs font-medium">
+                          Usage: {item.note}
+                        </p>
+                      )}
                     </div>
 
-                    {item.resource.description && (
-                      <p className="text-muted-foreground line-clamp-2 text-xs">
-                        {item.resource.description}
-                      </p>
-                    )}
-
-                    {item.note && (
-                      <p className="text-brand-text text-xs font-medium">
-                        Usage: {item.note}
-                      </p>
+                    {item.resource.url && (
+                      <div className="border-border/60 border-t pt-2">
+                        <a
+                          href={item.resource.url}
+                          target="_blank"
+                          rel="nofollow ugc noopener"
+                          className="text-brand-text flex items-center gap-1 truncate text-xs font-medium hover:underline"
+                        >
+                          <HugeiconsIcon
+                            icon={GlobeIcon}
+                            className="size-3 shrink-0"
+                          />
+                          <span>{item.resource.url}</span>
+                        </a>
+                      </div>
                     )}
                   </div>
-
-                  {item.resource.url && (
-                    <div className="border-border/60 border-t pt-2">
-                      <a
-                        href={item.resource.url}
-                        target="_blank"
-                        rel="nofollow ugc noopener"
-                        className="text-brand-text flex items-center gap-1 truncate text-xs font-medium hover:underline"
-                      >
-                        <HugeiconsIcon
-                          icon={GlobeIcon}
-                          className="size-3 shrink-0"
-                        />
-                        <span>{item.resource.url}</span>
-                      </a>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

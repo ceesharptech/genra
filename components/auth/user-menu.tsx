@@ -23,6 +23,8 @@ import {
   PlusSignIcon,
   DashboardSquare01Icon,
   Bookmark02Icon,
+  DocumentCodeIcon,
+  Folder01Icon,
 } from '@hugeicons/core-free-icons'
 
 export function UserMenu() {
@@ -123,6 +125,22 @@ export function UserMenu() {
                 className="mr-2 h-4 w-4"
               />
               <span>My creations</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href={`/u/${username}?tab=library`} />}>
+              <HugeiconsIcon
+                icon={DocumentCodeIcon}
+                strokeWidth={1.5}
+                className="mr-2 h-4 w-4"
+              />
+              <span>My library</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href={`/u/${username}?tab=collections`} />}>
+              <HugeiconsIcon
+                icon={Folder01Icon}
+                strokeWidth={1.5}
+                className="mr-2 h-4 w-4"
+              />
+              <span>My collections</span>
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/saved" />}>
               <HugeiconsIcon

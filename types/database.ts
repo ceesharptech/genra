@@ -1045,6 +1045,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_collection_item: {
+        Args: {
+          p_collection_id: string
+          p_note?: string
+          p_target_id: string
+          p_target_type: Database["public"]["Enums"]["engagement_target"]
+        }
+        Returns: undefined
+      }
       can_view_creation: { Args: { cid: string }; Returns: boolean }
       category_counts: {
         Args: never
@@ -1053,6 +1062,36 @@ export type Database = {
           name: string
           parent_slug: string
           slug: string
+        }[]
+      }
+      collection_page: { Args: { p_collection_id: string }; Returns: Json }
+      creations_using_item: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_target_id: string
+          p_target_type: Database["public"]["Enums"]["engagement_target"]
+        }
+        Returns: {
+          category_name: string
+          category_slug: string
+          comment_count: number
+          cover_alt: string
+          cover_height: number
+          cover_storage_path: string
+          cover_width: number
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_username: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          summary: string
+          title: string
+          tool_count: number
+          tools: Json
+          view_count: number
         }[]
       }
       discover_cards: {
@@ -1087,11 +1126,80 @@ export type Database = {
           view_count: number
         }[]
       }
+      discover_prompts: {
+        Args: {
+          p_author_username?: string
+          p_limit?: number
+          p_offset?: number
+          p_sort?: string
+          p_tool_slug?: string
+          q?: string
+        }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          body_preview: string
+          copy_count: number
+          created_at: string
+          fork_of_id: string
+          id: string
+          kind: Database["public"]["Enums"]["prompt_kind"]
+          like_count: number
+          model_tool_name: string
+          model_tool_slug: string
+          save_count: number
+          title: string
+          used_in_count: number
+        }[]
+      }
+      discover_resources: {
+        Args: {
+          p_author_username?: string
+          p_kind?: Database["public"]["Enums"]["resource_kind"]
+          p_limit?: number
+          p_offset?: number
+          p_sort?: string
+          p_tool_slug?: string
+          q?: string
+        }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          created_at: string
+          description_preview: string
+          id: string
+          kind: Database["public"]["Enums"]["resource_kind"]
+          like_count: number
+          save_count: number
+          title: string
+          tool_name: string
+          tool_slug: string
+          url_host: string
+          used_in_count: number
+        }[]
+      }
       increment_prompt_copy: {
         Args: { p_prompt_id: string }
         Returns: undefined
       }
       increment_view: { Args: { p_creation_id: string }; Returns: undefined }
+      my_collections_for_item: {
+        Args: {
+          p_target_id: string
+          p_target_type: Database["public"]["Enums"]["engagement_target"]
+        }
+        Returns: {
+          contains_item: boolean
+          description: string
+          id: string
+          is_public: boolean
+          item_count: number
+          title: string
+          updated_at: string
+        }[]
+      }
       owns_creation: { Args: { cid: string }; Returns: boolean }
       popular_tools: {
         Args: { p_limit?: number }
@@ -1154,6 +1262,45 @@ export type Database = {
           tool_count: number
           tools: Json
           view_count: number
+        }[]
+      }
+      saved_prompts: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          body_preview: string
+          copy_count: number
+          created_at: string
+          fork_of_id: string
+          id: string
+          kind: Database["public"]["Enums"]["prompt_kind"]
+          like_count: number
+          model_tool_name: string
+          model_tool_slug: string
+          save_count: number
+          title: string
+          used_in_count: number
+        }[]
+      }
+      saved_resources: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          created_at: string
+          description_preview: string
+          id: string
+          kind: Database["public"]["Enums"]["resource_kind"]
+          like_count: number
+          save_count: number
+          title: string
+          tool_name: string
+          tool_slug: string
+          url_host: string
+          used_in_count: number
         }[]
       }
       search_creations: {
@@ -1257,6 +1404,7 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      tool_page: { Args: { p_slug: string }; Returns: Json }
     }
     Enums: {
       ai_job_kind:

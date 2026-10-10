@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/discover', '/c/', '/u/'],
+        allow: ['/', '/discover', '/prompts', '/resources', '/tools/', '/collections/', '/c/', '/u/'],
         disallow: [
           '/saved',
           '/creations',
@@ -18,6 +18,10 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/new',
           '/c/*/edit',
+          '/prompts/new',
+          '/prompts/*/edit',
+          '/resources/new',
+          '/resources/*/edit',
           '/design',
           '/auth/',
           '/api/',

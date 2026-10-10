@@ -65,7 +65,7 @@ export default async function Image() {
               borderRadius: '9999px',
               backgroundColor: '#18181b',
               border: '1px solid #27272a',
-              width: 'fit-content',
+              alignSelf: 'flex-start',
             }}
           >
             <div
