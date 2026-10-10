@@ -1,0 +1,28 @@
+name: Supabase Database Keep-Alive
+
+on:
+  schedule:
+    # Runs every 3 days at 06:00 UTC to prevent Supabase Free Tier auto-pause
+    - cron: '0 6 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    name: Ping Health & Keep Database Active
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping App Health Endpoint
+        run: |
+          URL="${{ secrets.NEXT_PUBLIC_SITE_URL || vars.SITE_URL || 'https://genra.vercel.app' }}/api/health"
+          echo "Pinging $URL..."
+          RESPONSE=$(curl -s -f -m 15 "$URL" || true)
+          echo "Response: $RESPONSE"
+          if [[ -z "$RESPONSE" ]]; then
+            echo "Direct Supabase fallback ping..."
+            if [[ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" && -n "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]]; then
+              curl -s -f -m 15 "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/tools?select=id&limit=1" \
+                -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+                -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" || true
+            fi
+          fi
+          echo "Keep-alive ping completed."

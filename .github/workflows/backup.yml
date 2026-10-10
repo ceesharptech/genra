@@ -1,0 +1,66 @@
+name: Scheduled Database Backup
+
+on:
+  schedule:
+    # Runs weekly on Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Database Dump & Encrypt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL Client Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client gnupg
+
+      - name: Dump Database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not configured. Cannot perform dump."
+            exit 1
+          fi
+
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          echo "Dumping public schema at $TIMESTAMP..."
+          pg_dump "$DB_URL" \
+            --schema=public \
+            --no-owner \
+            --no-privileges \
+            --clean \
+            --if-exists \
+            -f "genra_backup_${TIMESTAMP}.sql"
+
+          echo "DUMP_FILE=genra_backup_${TIMESTAMP}.sql" >> $GITHUB_ENV
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+
+      - name: Encrypt Backup Artifact
+        env:
+          PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: |
+          if [ -z "$PASSPHRASE" ]; then
+            echo "::error::BACKUP_ENCRYPTION_KEY secret is not set. Encrypted backup cannot be produced."
+            exit 1
+          fi
+
+          gpg --symmetric \
+            --cipher-algo AES256 \
+            --batch \
+            --passphrase "$PASSPHRASE" \
+            -o "${DUMP_FILE}.gpg" \
+            "$DUMP_FILE"
+
+          # Remove unencrypted plain SQL dump immediately
+          rm -f "$DUMP_FILE"
+          echo "Backup encrypted to ${DUMP_FILE}.gpg"
+
+      - name: Upload Encrypted Backup Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ env.TIMESTAMP }}.gpg
+          path: ${{ env.DUMP_FILE }}.gpg
+          retention-days: 30
