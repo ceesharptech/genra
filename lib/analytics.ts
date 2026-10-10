@@ -4,11 +4,12 @@ import posthog from 'posthog-js';
  * Genra Analytics Telemetry Module (Client & Universal).
  *
  * Privacy Guarantees:
- * 1. Cookieless: uses memory persistence on client.
+ * 1. Default browser persistence (localStorage+cookie) for reliable web analytics (visitors, sessions, bounce rate).
  * 2. Anonymity: users identified by UUID only; never emails, names, or IPs.
- * 3. Clean payloads: only structured metadata (IDs, categories, channels); NO free text or prompt contents.
- * 4. Reverse Proxied: routed through /ingest to avoid adblockers and 3rd party connections.
- * 5. Fail-Safe: missing credentials or network errors never disrupt user interactions.
+ * 3. Clean payloads: only structured metadata (IDs, categories, channels); NO free text, prompt contents, or secret query params.
+ * 4. URL Scrubbing: automatic pageview URLs stripped of sensitive tokens (code, next, intent, etc.) and search text replaced with has_query=true.
+ * 5. Reverse Proxied: routed through /ingest to avoid adblockers and 3rd party connections.
+ * 6. Fail-Safe: missing credentials or network errors never disrupt user interactions.
  */
 
 export interface AnalyticsEventMap {

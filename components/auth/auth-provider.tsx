@@ -12,6 +12,7 @@ import type { Profile } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { signOutAction } from "@/lib/auth/actions";
+import { identifyUser, resetUser } from "@/lib/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -39,6 +40,15 @@ export function AuthProvider({
   const router = useRouter();
   const supabase = createClient();
 
+  const lastIdentifiedRef = React.useRef<string | null>(initialUser?.id ?? null);
+
+  // Identify on initial render if user already authenticated
+  useEffect(() => {
+    if (initialUser?.id) {
+      identifyUser(initialUser.id);
+    }
+  }, [initialUser?.id]);
+
   const refreshProfile = async () => {
     if (!user) {
       setProfile(null);
@@ -60,6 +70,15 @@ export function AuthProvider({
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+
+      const currentUserId = currentUser?.id ?? null;
+      if (currentUserId && currentUserId !== lastIdentifiedRef.current) {
+        lastIdentifiedRef.current = currentUserId;
+        identifyUser(currentUserId);
+      } else if (!currentUserId && lastIdentifiedRef.current !== null) {
+        lastIdentifiedRef.current = null;
+        resetUser();
+      }
 
       if (currentUser) {
         const { data } = await supabase
@@ -85,6 +104,8 @@ export function AuthProvider({
   const signOut = async () => {
     setIsLoading(true);
     try {
+      lastIdentifiedRef.current = null;
+      resetUser();
       // 1. Sign out on the browser client to clear localStorage/storage and notify listeners
       await supabase.auth.signOut();
       // 2. Sign out on the server to clear auth cookies
@@ -96,6 +117,8 @@ export function AuthProvider({
       router.replace("/");
       router.refresh();
     } catch {
+      lastIdentifiedRef.current = null;
+      resetUser();
       setUser(null);
       setProfile(null);
       router.replace("/");
