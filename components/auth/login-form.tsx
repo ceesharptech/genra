@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
+import { TurnstileWidget } from '@/components/auth/turnstile-widget'
 
 interface LoginFormProps {
   mode?: 'login' | 'signup'
@@ -41,6 +42,7 @@ export function LoginForm({
   const [step, setStep] = useState<'email' | 'otp' | 'magic_link_sent'>('email')
   const [email, setEmail] = useState('')
   const [otpCode, setOtpCode] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [dismissedErrorParam, setDismissedErrorParam] = useState<string | null>(
@@ -190,6 +192,7 @@ export function LoginForm({
           options: {
             shouldCreateUser: true,
             emailRedirectTo: callbackUrl,
+            captchaToken: turnstileToken || undefined,
           },
         })
 
@@ -214,6 +217,7 @@ export function LoginForm({
           email: email.trim(),
           options: {
             shouldCreateUser: true,
+            captchaToken: turnstileToken || undefined,
           },
         })
 
@@ -259,6 +263,7 @@ export function LoginForm({
         options: {
           shouldCreateUser: true,
           emailRedirectTo: callbackUrl,
+          captchaToken: turnstileToken || undefined,
         },
       })
 
@@ -292,6 +297,7 @@ export function LoginForm({
         email: email.trim(),
         options: {
           shouldCreateUser: true,
+          captchaToken: turnstileToken || undefined,
         },
       })
 
@@ -481,6 +487,12 @@ export function LoginForm({
                 className="border-border bg-card placeholder:text-muted-foreground/60 h-11 rounded-full px-5 text-xs sm:text-sm"
               />
             </div>
+
+            <TurnstileWidget
+              onToken={setTurnstileToken}
+              onError={() => setTurnstileToken(null)}
+              onExpire={() => setTurnstileToken(null)}
+            />
 
             <Button
               type="submit"
