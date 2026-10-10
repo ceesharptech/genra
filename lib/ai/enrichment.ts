@@ -1,3 +1,4 @@
+import 'server-only'
 import type { Database } from '@/types/database'
 
 export type AIJobKind = Database['public']['Enums']['ai_job_kind']
