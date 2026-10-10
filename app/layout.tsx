@@ -14,6 +14,7 @@ import { AuthProvider } from '@/components/auth/auth-provider'
 import { AuthModalProvider } from '@/components/auth/auth-modal-provider'
 import { IntentReplay } from '@/components/auth/intent-replay'
 import { AuthHashHandler } from '@/components/auth/auth-hash-handler'
+import { PostHogProvider } from '@/components/providers/posthog-provider'
 import { getSiteUrl } from '@/lib/site'
 
 const geistSans = Geist({
@@ -105,18 +106,20 @@ export default async function RootLayout({
     >
       <body className="bg-background text-foreground flex min-h-full flex-col transition-colors">
         <ThemeProvider>
-          <AuthProvider initialUser={user} initialProfile={profile}>
-            <AuthModalProvider>
-              <TooltipProvider>
-                <IntentReplay />
-                <AuthHashHandler />
-                <Header />
-                <main className="flex flex-1 flex-col">{children}</main>
-                <Footer />
-                <Toaster position="bottom-right" />
-              </TooltipProvider>
-            </AuthModalProvider>
-          </AuthProvider>
+          <PostHogProvider>
+            <AuthProvider initialUser={user} initialProfile={profile}>
+              <AuthModalProvider>
+                <TooltipProvider>
+                  <IntentReplay />
+                  <AuthHashHandler />
+                  <Header />
+                  <main className="flex flex-1 flex-col">{children}</main>
+                  <Footer />
+                  <Toaster position="bottom-right" />
+                </TooltipProvider>
+              </AuthModalProvider>
+            </AuthProvider>
+          </PostHogProvider>
         </ThemeProvider>
       </body>
     </html>

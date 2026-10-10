@@ -1,7 +1,15 @@
+import posthog from 'posthog-js';
+import { PostHog } from 'posthog-node';
+
 /**
- * Lightweight in-app analytics event stub.
- * In Phase 05, this logs structured events and keeps clean extension seams
- * ready for Phase 07 telemetry providers (PostHog, Plausible, etc.).
+ * Genra Analytics Telemetry Module.
+ *
+ * Privacy Guarantees:
+ * 1. Cookieless: uses memory persistence on client.
+ * 2. Anonymity: users identified by UUID only; never emails, names, or IPs.
+ * 3. Clean payloads: only structured metadata (IDs, categories, channels); NO free text or prompt contents.
+ * 4. Reverse Proxied: routed through /ingest to avoid adblockers and 3rd party connections.
+ * 5. Fail-Safe: missing credentials or network errors never disrupt user interactions.
  */
 
 export interface AnalyticsEventMap {
@@ -14,16 +22,97 @@ export interface AnalyticsEventMap {
     channel: string;
     creationId: string;
   };
+  creation_publish: {
+    creationId: string;
+    category: string;
+  };
+  prompt_copy: {
+    promptId: string;
+  };
+  collection_create: {
+    collectionId: string;
+  };
+  like_toggle: {
+    creationId: string;
+    action: 'like' | 'unlike';
+  };
+  save_toggle: {
+    creationId: string;
+    action: 'save' | 'unsave';
+  };
+}
+
+let serverPostHog: PostHog | null = null;
+
+function getServerPostHog(): PostHog | null {
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (!key) return null;
+
+  if (!serverPostHog) {
+    const host =
+      process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
+    serverPostHog = new PostHog(key, {
+      host,
+      flushAt: 1,
+      flushInterval: 0,
+    });
+  }
+  return serverPostHog;
 }
 
 export function track<K extends keyof AnalyticsEventMap>(
   event: K,
-  properties: AnalyticsEventMap[K]
+  properties: AnalyticsEventMap[K],
+  distinctId?: string
 ): void {
-  if (typeof window !== 'undefined') {
-    // Client-side execution
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug(`[Analytics] ${event}:`, properties);
+  try {
+    if (typeof window !== 'undefined') {
+      // Client-side capture
+      if (posthog.__loaded) {
+        posthog.capture(event, properties);
+      } else if (process.env.NODE_ENV !== 'production') {
+        console.debug(`[Analytics:Client] ${event}:`, properties);
+      }
+    } else {
+      // Server-side capture
+      const ph = getServerPostHog();
+      if (ph) {
+        ph.capture({
+          distinctId: distinctId || 'server-anonymous',
+          event,
+          properties,
+        });
+      } else if (process.env.NODE_ENV !== 'production') {
+        console.debug(`[Analytics:Server] ${event}:`, properties);
+      }
     }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[Analytics Error]', err);
+    }
+  }
+}
+
+export function identifyUser(userId: string): void {
+  try {
+    if (typeof window !== 'undefined') {
+      if (posthog.__loaded) {
+        posthog.identify(userId);
+      }
+    }
+  } catch {
+    // Fail silently
+  }
+}
+
+export function resetUser(): void {
+  try {
+    if (typeof window !== 'undefined') {
+      if (posthog.__loaded) {
+        posthog.reset();
+      }
+    }
+  } catch {
+    // Fail silently
   }
 }
