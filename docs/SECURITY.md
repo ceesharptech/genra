@@ -113,3 +113,11 @@ Rate limiting is enforced at the application boundary using Upstash Redis slidin
 2. **`profiles.is_admin` Visibility**:
    - *Risk*: `profiles.is_admin` is readable by all users via `SELECT` on `profiles`.
    - *Mitigation*: Direct client writes to `is_admin` are completely revoked (`GRANT UPDATE (...)` on `profiles` excludes `is_admin`). Admin checks in server code and RLS always verify ownership and authority independently; reading `is_admin` does not confer any write privilege.
+3. **Authentication CAPTCHA Deferral & Email Rate Limiting**:
+   - *Risk*: Without a frontend CAPTCHA challenge, automated scripts could attempt to trigger excess magic link or OTP emails to target addresses.
+   - *Mitigation*:
+     - Frontend enforces a 60-second cooldown timer between submissions.
+     - Supabase Auth applies built-in IP-level and per-email rate limits on `signInWithOtp`.
+     - Error handling gracefully guides rate-limited users to Google OAuth.
+     - Re-enabling Turnstile or another CAPTCHA provider is documented in [docs/CAPTCHA.md](file:///c:/Users/SPY/Desktop/DEV/genra/docs/CAPTCHA.md) and supported by the provider-agnostic `lib/auth/captcha.ts` seam.
+

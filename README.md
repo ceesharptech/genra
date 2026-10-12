@@ -35,6 +35,14 @@ Genra supports two passwordless email sign-in modes controlled by `NEXT_PUBLIC_E
      2. Edit the email templates ("Confirm signup" and "Magic Link") to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
      3. Set `NEXT_PUBLIC_EMAIL_AUTH_MODE=otp` in your environment variables.
 
+## CAPTCHA & Bot Protection
+
+In Phase 07a2, frontend CAPTCHA challenges (Cloudflare Turnstile) were removed and deferred:
+- Passwordless sign-in and sign-up operate without CAPTCHA tokens, eliminating external script overhead.
+- Requests are protected by client cooldowns and Supabase Auth built-in rate limits.
+- A provider-agnostic seam (`lib/auth/captcha.ts`) preserves room to restore Turnstile or another provider in under 30 minutes. Full details and archived code are in [`docs/CAPTCHA.md`](./docs/CAPTCHA.md).
+
+
 ## Regenerating Database Types
 
 Database types in `types/database.ts` are generated from the hosted Supabase schema. After applying schema migrations via the Supabase MCP, regenerate the TypeScript types using the MCP `generate_typescript_types` tool:

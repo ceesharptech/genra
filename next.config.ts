@@ -14,12 +14,12 @@ if (supabaseUrl) {
 
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://us.i.posthog.com https://eu.i.posthog.com https://us-assets.i.posthog.com https://eu-assets.i.posthog.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us.i.posthog.com https://eu.i.posthog.com https://us-assets.i.posthog.com https://eu-assets.i.posthog.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com data:;
   img-src 'self' blob: data: https://*.supabase.co https://lh3.googleusercontent.com https://us.i.posthog.com https://eu.i.posthog.com;
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://us.i.posthog.com https://eu.i.posthog.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.upstash.io;
-  frame-src 'self' https://challenges.cloudflare.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://eu.i.posthog.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.upstash.io;
+  frame-src 'self';
   object-src 'none';
   base-uri 'self';
   form-action 'self';

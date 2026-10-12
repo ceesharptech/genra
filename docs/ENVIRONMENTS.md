@@ -24,7 +24,6 @@ This document details all environment variables used by Genra, their sensitivity
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | Supabase anonymous public key (JWT with role `anon`) |
 | `NEXT_PUBLIC_SITE_URL` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | App URL for canonical redirects & sitemaps (e.g. `http://localhost:3000`) |
 | `NEXT_PUBLIC_EMAIL_AUTH_MODE` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | Email auth flow: `magic_link` (default) or `otp` |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | Cloudflare Turnstile public site key |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | PostHog public project API key |
 | `NEXT_PUBLIC_POSTHOG_HOST` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | PostHog endpoint (e.g. `https://eu.i.posthog.com`) |
 | `NEXT_PUBLIC_POSTHOG_DEBUG` | Public / Client | **Build & Runtime** | `NEXT_PUBLIC_` | Enables PostHog in development with `posthog.debug()` (default `false`) |
@@ -48,7 +47,6 @@ Only the following exact variable names are permitted to carry the `NEXT_PUBLIC_
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_EMAIL_AUTH_MODE`
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
 - `NEXT_PUBLIC_POSTHOG_KEY`
 - `NEXT_PUBLIC_POSTHOG_HOST`
 - `NEXT_PUBLIC_POSTHOG_DEBUG`

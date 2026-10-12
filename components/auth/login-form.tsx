@@ -14,7 +14,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
-import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/turnstile-widget'
+import {
+  useCaptcha,
+  buildSignInOptions,
+  isSubmitDisabled,
+  handleCaptchaError,
+} from '@/lib/auth/captcha'
 
 interface LoginFormProps {
   mode?: 'login' | 'signup'
@@ -42,8 +47,7 @@ export function LoginForm({
   const [step, setStep] = useState<'email' | 'otp' | 'magic_link_sent'>('email')
   const [email, setEmail] = useState('')
   const [otpCode, setOtpCode] = useState('')
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileRef = useRef<TurnstileWidgetRef>(null)
+  const captcha = useCaptcha()
   const [isLoading, setIsLoading] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [dismissedErrorParam, setDismissedErrorParam] = useState<string | null>(
@@ -178,11 +182,6 @@ export function LoginForm({
       return
     }
 
-    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
-      setErrorMessage('Please complete the verification check before continuing.')
-      return
-    }
-
     setIsLoading(true)
 
     try {
@@ -193,19 +192,25 @@ export function LoginForm({
           intent,
         })
 
-        const { error } = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: {
+        const options = buildSignInOptions(
+          {
             shouldCreateUser: true,
             emailRedirectTo: callbackUrl,
-            captchaToken: turnstileToken || undefined,
           },
+          captcha.token
+        )
+
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email.trim(),
+          options,
         })
 
         if (error) {
-          turnstileRef.current?.reset()
-          setTurnstileToken(null)
-          if (error.status === 429) {
+          captcha.reset()
+          const captchaMsg = handleCaptchaError(error)
+          if (captchaMsg) {
+            setErrorMessage(captchaMsg)
+          } else if (error.status === 429) {
             setErrorMessage(
               'Too many emails requested. Please wait a few minutes or continue with Google.'
             )
@@ -221,18 +226,22 @@ export function LoginForm({
         setCooldown(60)
       } else {
         // OTP mode
+        const options = buildSignInOptions(
+          { shouldCreateUser: true },
+          captcha.token
+        )
+
         const { error } = await supabase.auth.signInWithOtp({
           email: email.trim(),
-          options: {
-            shouldCreateUser: true,
-            captchaToken: turnstileToken || undefined,
-          },
+          options,
         })
 
         if (error) {
-          turnstileRef.current?.reset()
-          setTurnstileToken(null)
-          if (error.status === 429) {
+          captcha.reset()
+          const captchaMsg = handleCaptchaError(error)
+          if (captchaMsg) {
+            setErrorMessage(captchaMsg)
+          } else if (error.status === 429) {
             setErrorMessage(
               'Too many requests. Please wait a minute before trying again.'
             )
@@ -249,8 +258,7 @@ export function LoginForm({
         setCooldown(60)
       }
     } catch {
-      turnstileRef.current?.reset()
-      setTurnstileToken(null)
+      captcha.reset()
       setErrorMessage('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -270,17 +278,25 @@ export function LoginForm({
         intent,
       })
 
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: {
+      const options = buildSignInOptions(
+        {
           shouldCreateUser: true,
           emailRedirectTo: callbackUrl,
-          captchaToken: turnstileToken || undefined,
         },
+        captcha.token
+      )
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options,
       })
 
       if (error) {
-        if (error.status === 429) {
+        captcha.reset()
+        const captchaMsg = handleCaptchaError(error)
+        if (captchaMsg) {
+          setErrorMessage(captchaMsg)
+        } else if (error.status === 429) {
           setErrorMessage(
             'Too many emails requested. Please wait a few minutes or continue with Google.'
           )
@@ -292,6 +308,7 @@ export function LoginForm({
 
       setCooldown(60)
     } catch {
+      captcha.reset()
       setErrorMessage('Failed to resend link. Please try again.')
     } finally {
       setIsLoading(false)
@@ -305,16 +322,24 @@ export function LoginForm({
     setIsLoading(true)
 
     try {
+      const options = buildSignInOptions(
+        { shouldCreateUser: true },
+        captcha.token
+      )
+
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
-        options: {
-          shouldCreateUser: true,
-          captchaToken: turnstileToken || undefined,
-        },
+        options,
       })
 
       if (error) {
-        setErrorMessage(error.message || 'Failed to resend code.')
+        captcha.reset()
+        const captchaMsg = handleCaptchaError(error)
+        if (captchaMsg) {
+          setErrorMessage(captchaMsg)
+        } else {
+          setErrorMessage(error.message || 'Failed to resend code.')
+        }
         return
       }
 
@@ -500,18 +525,17 @@ export function LoginForm({
               />
             </div>
 
-            <TurnstileWidget
-              ref={turnstileRef}
-              action={mode === 'signup' ? 'signup' : 'login'}
-              onToken={setTurnstileToken}
-              onError={() => setTurnstileToken(null)}
-              onExpire={() => setTurnstileToken(null)}
-            />
+            {captcha.widget}
 
             <Button
               type="submit"
               loading={isLoading}
-              disabled={!email.trim()}
+              disabled={isSubmitDisabled({
+                email,
+                isLoading,
+                captchaEnabled: captcha.enabled,
+                captchaToken: captcha.token,
+              })}
               className="bg-primary text-primary-foreground hover:bg-primary/90 h-11 w-full rounded-full text-xs font-medium transition-opacity sm:text-sm"
             >
               Continue

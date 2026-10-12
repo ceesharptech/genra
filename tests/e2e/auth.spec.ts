@@ -75,7 +75,68 @@ test.describe('Phase 01 & 01b — Auth and Profiles Smoke Tests', () => {
     await expect(html).not.toHaveClass(/dark/)
   })
 
+  test('Phase 07a2 — /login loads cleanly without Cloudflare Turnstile requests and enables submit immediately', async ({
+    page,
+  }) => {
+    const cloudflareRequests: string[] = []
+    page.on('request', (req) => {
+      if (req.url().includes('challenges.cloudflare.com')) {
+        cloudflareRequests.push(req.url())
+      }
+    })
+
+    await page.goto('/login')
+    await expect(page.getByRole('heading', { name: /Welcome back/i })).toBeVisible()
+
+    // Verify zero requests to challenges.cloudflare.com
+    expect(cloudflareRequests).toHaveLength(0)
+
+    // Verify no Turnstile widget container in the DOM
+    const turnstileWidget = page.locator('.cf-turnstile')
+    await expect(turnstileWidget).toHaveCount(0)
+
+    // Verify submit button is disabled initially (empty email)
+    const submitBtn = page.getByRole('button', { name: /Continue/i })
+    await expect(submitBtn).toBeDisabled()
+
+    // Typing email enables the submit button immediately without waiting for a CAPTCHA token
+    const emailInput = page.getByPlaceholder(/Enter email address/i)
+    await emailInput.fill('tester@example.com')
+    await expect(submitBtn).toBeEnabled()
+  })
+
+  test('Phase 07a2 — /signup loads cleanly without Cloudflare Turnstile requests and enables submit immediately', async ({
+    page,
+  }) => {
+    const cloudflareRequests: string[] = []
+    page.on('request', (req) => {
+      if (req.url().includes('challenges.cloudflare.com')) {
+        cloudflareRequests.push(req.url())
+      }
+    })
+
+    await page.goto('/signup')
+    await expect(
+      page.getByRole('heading', { name: /Welcome to Genra/i })
+    ).toBeVisible()
+
+    // Verify zero requests to challenges.cloudflare.com
+    expect(cloudflareRequests).toHaveLength(0)
+
+    // Verify no Turnstile widget container in the DOM
+    const turnstileWidget = page.locator('.cf-turnstile')
+    await expect(turnstileWidget).toHaveCount(0)
+
+    // Typing email enables the submit button immediately
+    const emailInput = page.getByPlaceholder(/Enter email address/i)
+    const submitBtn = page.getByRole('button', { name: /Continue/i })
+    await expect(submitBtn).toBeDisabled()
+    await emailInput.fill('newuser@example.com')
+    await expect(submitBtn).toBeEnabled()
+  })
+
   test.skip('Google OAuth login flow (requires live credentials, manual verification)', async () => {
     // This flow redirects through accounts.google.com and is verified manually by the owner
   })
 })
+
