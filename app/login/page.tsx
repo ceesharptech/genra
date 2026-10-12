@@ -60,10 +60,10 @@ export default async function LoginPage({
               alt="Genra Logo"
               width={28}
               height={28}
-              className="size-6 shrink-0 rounded-full"
+              className="h-6 w-5 shrink-0 rounded-full"
               priority
             />
-            <span className="font-bricolage text-foreground text-xl font-semibold tracking-tight">
+            <span className="font-albert text-foreground text-xl font-semibold tracking-tight">
               Genra
             </span>
           </Link>
@@ -104,7 +104,7 @@ export default async function LoginPage({
         {/* Creator Credit Badge in bottom right */}
         <div className="absolute right-6 bottom-6 z-10">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3.5 py-1.5 font-sans text-xs font-medium text-white/90 shadow-lg backdrop-blur-md">
-            @magnifik
+            @magnific
           </span>
         </div>
       </div>

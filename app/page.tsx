@@ -36,7 +36,7 @@ async function CategoriesGridSection() {
 
   return (
     <section
-      className="mt-10 space-y-8 sm:mt-16 sm:space-y-10 lg:mt-28"
+      className="mt-18 space-y-8 sm:mt-16 sm:space-y-10 lg:mt-28"
       aria-labelledby="categories-heading"
     >
       <div className="text-center">
@@ -77,7 +77,7 @@ function SectionSkeleton() {
 
 export default async function HomePage() {
   return (
-    <div className="relative mx-auto w-full max-w-7xl space-y-8 px-4 py-2 sm:px-6 lg:px-8">
+    <div className="relative mx-auto w-full max-w-7xl space-y-8 px-4 py-6 sm:px-6 lg:px-8">
       {/* =========================================================================
           [EXPERIMENTAL] HERO GRADIENT CONTAINER
           To remove this container:
@@ -85,7 +85,7 @@ export default async function HomePage() {
           2. Change the inner <section> padding back to:
              "flex flex-col items-center justify-center pt-8 pb-10 text-center sm:pt-14 sm:pb-16 lg:pt-18 lg:pb-20"
           ========================================================================= */}
-      <div className="border-border/70 via-background dark:via-background/90 relative overflow-hidden rounded-[32px] border bg-gradient-to-br from-[#F6F3FF]/70 to-[#EFF6FF]/70 p-6 py-14 shadow-2xs transition-colors sm:rounded-[32px] sm:p-12 sm:py-20 lg:p-16 lg:py-32 dark:border-white/[0.08] dark:from-[#774CFF]/[0.08] dark:to-[#3B82F6]/[0.06]">
+      <div className="border-border/70 via-background dark:via-background/90 relative overflow-hidden rounded-[24px] border bg-gradient-to-br from-[#F6F3FF]/70 to-[#EFF6FF]/70 p-6 py-28 shadow-2xs transition-colors sm:rounded-[32px] sm:p-12 sm:py-20 lg:p-16 lg:py-32 dark:border-white/[0.08] dark:from-[#774CFF]/[0.08] dark:to-[#3B82F6]/[0.06]">
         {/* Soft corner ambient blooms (soft sky blue top-right, soft brand lavender bottom-left) */}
         <div
           className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-[#DBEAFE]/80 blur-3xl dark:bg-[#3B82F6]/15"
@@ -104,7 +104,7 @@ export default async function HomePage() {
 
           <p className="text-muted-foreground mt-4 max-w-xl text-base font-normal text-pretty sm:mt-5 sm:text-lg">
             The open discovery platform for AI-made work. Browse creations,
-            prompts, and the process behind every build.
+            prompts, and the process.
           </p>
 
           <div className="mt-8 sm:mt-10">
