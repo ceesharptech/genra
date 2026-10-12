@@ -43,27 +43,27 @@ export function HeroSwappingIcon() {
 
   const stageClasses = {
     visible: 'opacity-100 translate-y-0 scale-100 filter-none duration-350',
-    exit: 'opacity-0 -translate-y-3.5 scale-90 blur-[2px] duration-300',
-    enter: 'opacity-0 translate-y-3.5 scale-90 blur-[2px] duration-0',
+    exit: 'opacity-0 -translate-y-2.5 scale-95 blur-[1px] duration-300',
+    enter: 'opacity-0 translate-y-2.5 scale-95 blur-[1px] duration-0',
   }[stage]
 
   return (
     <span
-      className="group/icon border-border/80 bg-card relative mx-1.5 inline-flex size-10 -translate-y-0.5 items-center justify-center overflow-hidden rounded-lg border align-middle shadow-2xs ring-1 ring-black/5 transition-transform duration-200 select-none hover:scale-105 sm:mx-2 sm:size-12 sm:-translate-y-1 sm:rounded-2xl lg:size-14 dark:shadow-none dark:ring-white/10"
+      className="group/icon relative mx-1.5 inline-flex size-10 -translate-y-0.5 items-center justify-center overflow-hidden rounded-[10px] border border-black/10 bg-white align-middle shadow-xs transition-transform duration-200 select-none hover:scale-105 sm:mx-2 sm:size-12 sm:-translate-y-1 sm:rounded-[12px] lg:mx-2.5 lg:size-14 lg:-translate-y-1.5 lg:rounded-[14px]"
       role="img"
       aria-label={`AI tool: ${currentTool.name}`}
       title={currentTool.name}
     >
       <span
         key={currentTool.name}
-        className={`relative flex size-full items-center justify-center p-2 transition-all ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transform-none motion-reduce:filter-none motion-reduce:transition-opacity sm:p-2.5 ${stageClasses}`}
+        className={`relative flex size-full items-center justify-center transition-all ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transform-none motion-reduce:filter-none motion-reduce:transition-opacity ${stageClasses}`}
       >
         <Image
           src={currentTool.src}
           alt={currentTool.name}
-          width={36}
-          height={36}
-          className="size-6 object-contain sm:size-7 lg:size-8"
+          fill
+          sizes="(max-width: 640px) 40px, (max-width: 1024px) 48px, 56px"
+          className="size-full object-cover"
           priority
         />
       </span>

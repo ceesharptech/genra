@@ -85,24 +85,24 @@ export default async function HomePage() {
           2. Change the inner <section> padding back to:
              "flex flex-col items-center justify-center pt-8 pb-10 text-center sm:pt-14 sm:pb-16 lg:pt-18 lg:pb-20"
           ========================================================================= */}
-      <div className="border-border/70 via-background dark:via-background/90 relative overflow-hidden rounded-[24px] border bg-gradient-to-br from-[#F6F3FF]/70 to-[#EFF6FF]/70 p-6 py-28 shadow-2xs transition-colors sm:rounded-[32px] sm:p-12 sm:py-20 lg:p-16 lg:py-32 dark:border-white/[0.08] dark:from-[#774CFF]/[0.08] dark:to-[#3B82F6]/[0.06]">
+      <div className="relative overflow-hidden rounded-[24px] border border-[#E8E8EE] bg-gradient-to-br from-[#F6F3FF] via-[#FAF9FD] to-[#EFF6FF] p-6 py-28 shadow-2xs transition-colors sm:rounded-[32px] sm:p-12 sm:py-20 lg:p-16 lg:py-32">
         {/* Soft corner ambient blooms (soft sky blue top-right, soft brand lavender bottom-left) */}
         <div
-          className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-[#DBEAFE]/80 blur-3xl dark:bg-[#3B82F6]/15"
+          className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-[#DBEAFE]/80 blur-3xl"
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute -bottom-24 -left-24 size-80 rounded-full bg-[#EAE3FF]/90 blur-3xl dark:bg-[#774CFF]/15"
+          className="pointer-events-none absolute -bottom-24 -left-24 size-80 rounded-full bg-[#EAE3FF]/90 blur-3xl"
           aria-hidden="true"
         />
 
-        {/* Hero Section Content */}
+        {/* Hero Section Content (Light color maintained in both themes) */}
         <section className="relative z-10 flex flex-col items-center justify-center text-center">
-          <h1 className="font-bricolage text-foreground max-w-4xl text-4xl font-medium tracking-tighter text-balance sm:text-5xl lg:text-6xl">
+          <h1 className="font-bricolage text-[#111113] max-w-4xl text-4xl font-medium tracking-tighter text-balance sm:text-5xl lg:text-6xl">
             Discover what creators are building with AI <HeroSwappingIcon />
           </h1>
 
-          <p className="text-muted-foreground mt-4 max-w-xl text-base font-normal text-pretty sm:mt-5 sm:text-lg">
+          <p className="text-[#5F5F68] mt-4 max-w-xl text-base font-normal text-pretty sm:mt-5 sm:text-lg">
             The open discovery platform for AI-made work. Browse creations,
             prompts, and the process.
           </p>
