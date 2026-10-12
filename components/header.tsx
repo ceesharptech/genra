@@ -28,7 +28,7 @@ export function Header() {
               alt="Genra Logo"
               width={28}
               height={28}
-              className="size-5 shrink-0 rounded-full"
+              className="h-6 w-5 shrink-0 rounded-full"
               priority
             />
             <span className="font-albert-sans text-foreground text-xl font-semibold tracking-tight">
@@ -44,9 +44,9 @@ export function Header() {
             <Link
               href="/discover"
               className={cn(
-                'transition-colors hover:text-foreground',
+                'hover:text-foreground transition-colors',
                 pathname.startsWith('/discover')
-                  ? 'font-medium text-foreground'
+                  ? 'text-foreground font-medium'
                   : 'text-foreground/80'
               )}
             >
@@ -55,9 +55,9 @@ export function Header() {
             <Link
               href="/prompts"
               className={cn(
-                'transition-colors hover:text-foreground',
+                'hover:text-foreground transition-colors',
                 pathname.startsWith('/prompts')
-                  ? 'font-medium text-foreground'
+                  ? 'text-foreground font-medium'
                   : 'text-foreground/80'
               )}
             >
@@ -66,9 +66,9 @@ export function Header() {
             <Link
               href="/resources"
               className={cn(
-                'transition-colors hover:text-foreground',
+                'hover:text-foreground transition-colors',
                 pathname.startsWith('/resources')
-                  ? 'font-medium text-foreground'
+                  ? 'text-foreground font-medium'
                   : 'text-foreground/80'
               )}
             >

@@ -20,7 +20,7 @@ export function Footer() {
           {/* Logo on Left */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 transition-opacity hover:opacity-85"
+            className="flex items-center gap-2 transition-opacity hover:opacity-85"
             aria-label="Genra Home"
           >
             <Image
@@ -28,9 +28,9 @@ export function Footer() {
               alt="Genra Logo"
               width={26}
               height={26}
-              className="size-6.5 rounded-full"
+              className="h-7 w-6 rounded-full"
             />
-            <span className="font-bricolage text-foreground text-base font-semibold tracking-tight">
+            <span className="font-albert text-foreground text-xl font-semibold tracking-tight">
               Genra
             </span>
           </Link>

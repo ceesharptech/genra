@@ -110,6 +110,14 @@ export function UserMenu() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+            <DropdownMenuItem render={<Link href="/new" />} className="sm:hidden font-medium text-foreground">
+              <HugeiconsIcon
+                icon={PlusSignIcon}
+                strokeWidth={1.5}
+                className="mr-2 h-4 w-4"
+              />
+              <span>New creation</span>
+            </DropdownMenuItem>
             <DropdownMenuItem render={<Link href={`/u/${username}`} />}>
               <HugeiconsIcon
                 icon={UserIcon}

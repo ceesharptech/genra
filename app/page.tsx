@@ -1,268 +1,130 @@
 import { Suspense } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { discoverCards, categoryCounts } from '@/lib/data/creations'
 import {
   CreationGrid,
   CreationGridSkeleton,
 } from '@/components/creations/creation-grid'
-import { HeroSearch } from '@/components/home/hero-search'
-import { HeroDynamicText } from '@/components/home/hero-dynamic-text'
+import { HeroSwappingIcon } from '@/components/home/hero-swapping-icon'
+import { HeroCtaButtons } from '@/components/home/hero-cta-buttons'
+import { TrendingSearch } from '@/components/home/trending-search'
+import { CategoryShowcase } from '@/components/home/category-showcase'
 import { Skeleton } from '@/components/ui/skeleton'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 
 export const revalidate = 60 // Cache for 60 seconds
 
-const CATEGORY_IMAGE_MAP: Record<string, string> = {
-  websites: '/images/categories/websites.jpg',
-  apps: '/images/categories/apps.jpg',
-  images: '/images/categories/images.jpg',
-  video: '/images/categories/video.jpg',
-  agents: '/images/categories/agents.jpg',
-  automations: '/images/categories/automations.jpg',
-  design: '/images/categories/design.jpg',
-  '3d': '/images/categories/3d.jpg',
-  workflows: '/images/categories/automations.jpg',
-  code: '/images/categories/websites.jpg',
-}
-
-async function TrendingSection() {
+async function TrendingCreations() {
   const { data: trending, error } = await discoverCards({
     sort: 'trending',
-    limit: 6,
+    limit: 8,
   })
 
-  if (error || trending.length === 0) {
+  if (error || !trending || trending.length === 0) {
     return null
   }
 
-  return (
-    <section className="space-y-6" aria-labelledby="trending-heading">
-      <div className="flex flex-col justify-start pb-1 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2
-            id="trending-heading"
-            className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
-          >
-            Trending now
-          </h2>
-          <p className="text-text-subtle mt-1 text-sm">
-            The most engaging AI creations in the community this week
-          </p>
-        </div>
-        <Link
-          href="/discover?sort=trending"
-          className="group text-muted-foreground hover:text-foreground mt-3 inline-flex items-center gap-1 text-sm font-medium transition-colors sm:text-sm"
-        >
-          <span>View all</span>
-          <HugeiconsIcon
-            icon={ArrowRight01Icon}
-            className="size-4 transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
-      </div>
-
-      <CreationGrid creations={trending} priorityCount={3} />
-    </section>
-  )
+  return <CreationGrid creations={trending} priorityCount={4} />
 }
 
 async function CategoriesGridSection() {
   const { data: categories } = await categoryCounts()
 
-  if (!categories || categories.length === 0) {
-    return null
-  }
-
-  // Filter for categories with custom visual artwork, limited to top 8
-  const featured = categories
-    .filter((cat) => CATEGORY_IMAGE_MAP[cat.slug])
-    .slice(0, 8)
+  const categoryData = (categories || []).map((cat) => ({
+    slug: cat.slug,
+    name: cat.name,
+    count: cat.creation_count,
+  }))
 
   return (
-    <section className="space-y-6" aria-labelledby="categories-heading">
-      <div className="flex flex-col justify-start pb-1 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2
-            id="categories-heading"
-            className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
-          >
-            Explore by category
-          </h2>
-          <p className="text-text-subtle mt-1 text-sm">
-            Find creations tailored to specific creative disciplines
-          </p>
-        </div>
-        <Link
-          href="/discover"
-          className="group text-muted-foreground hover:text-foreground mt-3 inline-flex items-center gap-1 text-sm font-medium transition-colors sm:text-sm"
+    <section
+      className="mt-10 space-y-8 sm:mt-16 sm:space-y-10 lg:mt-28"
+      aria-labelledby="categories-heading"
+    >
+      <div className="text-center">
+        <h2
+          id="categories-heading"
+          className="font-bricolage text-foreground text-3xl font-semibold tracking-tighter text-balance sm:text-4xl lg:text-5xl"
         >
-          <span>All categories</span>
-          <HugeiconsIcon
-            icon={ArrowRight01Icon}
-            className="size-4 transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
+          One library
+          <br className="hidden sm:inline" /> for all your builds.
+        </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-3.5 lg:grid-cols-4 xl:grid-cols-8">
-        {featured.map((cat) => {
-          const imageSrc = CATEGORY_IMAGE_MAP[cat.slug]
-          return (
-            <Link
-              key={cat.slug}
-              href={`/discover?category=${encodeURIComponent(cat.slug)}`}
-              className="group flex flex-col focus-visible:outline-none"
-            >
-              {/* Minimal High-Quality Preview Tile (Compact Size) */}
-              <div className="bg-surface-2 ring-border/50 group-focus-visible:ring-brand relative aspect-[4/3] w-full overflow-hidden rounded-lg shadow-2xs ring-1 transition-all duration-300 ease-out group-hover:scale-[1.03] group-hover:shadow-xs group-focus-visible:ring-2">
-                {imageSrc && (
-                  <Image
-                    src={imageSrc}
-                    alt={cat.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 12vw"
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                  />
-                )}
-                <div
-                  className="pointer-events-none absolute inset-0 ring-1 ring-black/5 ring-inset dark:ring-white/10"
-                  aria-hidden="true"
-                />
-              </div>
-
-              {/* Title & Count beneath artwork */}
-              <div className="mt-2 flex flex-col px-0.5">
-                <span className="text-foreground group-hover:text-brand truncate text-xs font-semibold tracking-tight transition-colors">
-                  {cat.name}
-                </span>
-                <span className="text-text-subtle text-[11px] tabular-nums">
-                  {cat.creation_count}{' '}
-                  {cat.creation_count === 1 ? 'creation' : 'creations'}
-                </span>
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+      <CategoryShowcase categories={categoryData} />
     </section>
   )
 }
 
 function SectionSkeleton() {
   return (
-    <div className="space-y-6">
-      <div className="pb-1">
-        <Skeleton className="h-7 w-48" />
-        <Skeleton className="mt-2 h-4 w-72" />
+    <div className="mt-10 space-y-8 sm:mt-16 sm:space-y-10 lg:mt-20">
+      <div className="flex flex-col items-center justify-center text-center">
+        <Skeleton className="h-10 w-72 sm:h-12 sm:w-96" />
       </div>
-      <CreationGridSkeleton count={6} />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-3.5">
+            <Skeleton className="aspect-[4/3] w-full rounded-3xl sm:aspect-[16/11]" />
+            <div className="flex flex-col items-center gap-1.5 pt-0.5">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
 export default async function HomePage() {
   return (
-    <div className="relative mx-auto w-full max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
-      {/* <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `
-        linear-gradient(to right, #f0f0f0 1px, transparent 1px),
-        linear-gradient(to bottom, #f0f0f0 1px, transparent 1px),
-        radial-gradient(circle 800px at 100% 200px, #d5c5ff, transparent)
-      `,
-          backgroundSize: '96px 64px, 96px 64px, 100% 100%',
-        }}
-      /> */}
+    <div className="relative mx-auto w-full max-w-7xl space-y-8 px-4 py-2 sm:px-6 lg:px-8">
+      {/* =========================================================================
+          [EXPERIMENTAL] HERO GRADIENT CONTAINER
+          To remove this container:
+          1. Delete the outer <div> and its closing </div> tag (marked below).
+          2. Change the inner <section> padding back to:
+             "flex flex-col items-center justify-center pt-8 pb-10 text-center sm:pt-14 sm:pb-16 lg:pt-18 lg:pb-20"
+          ========================================================================= */}
+      <div className="border-border/70 via-background dark:via-background/90 relative overflow-hidden rounded-[32px] border bg-gradient-to-br from-[#F6F3FF]/70 to-[#EFF6FF]/70 p-6 py-14 shadow-2xs transition-colors sm:rounded-[32px] sm:p-12 sm:py-20 lg:p-16 lg:py-32 dark:border-white/[0.08] dark:from-[#774CFF]/[0.08] dark:to-[#3B82F6]/[0.06]">
+        {/* Soft corner ambient blooms (soft sky blue top-right, soft brand lavender bottom-left) */}
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-[#DBEAFE]/80 blur-3xl dark:bg-[#3B82F6]/15"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-24 -left-24 size-80 rounded-full bg-[#EAE3FF]/90 blur-3xl dark:bg-[#774CFF]/15"
+          aria-hidden="true"
+        />
 
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center pt-4 pb-6 text-center sm:pt-8 sm:pb-10">
-        {/* Eyebrow with Overlapping 3D AI App Icons */}
-        <div className="text-muted-foreground mb-6 inline-flex items-center gap-2 text-xs">
-          <div className="flex items-center -space-x-2">
-            {[
-              { src: '/images/ai-icons/claude-ai-logo.png', alt: 'Claude' },
-              { src: '/images/ai-icons/chatgpt-ai-logo.png', alt: 'ChatGPT' },
-              { src: '/images/ai-icons/gemini-ai-logo.png', alt: 'Gemini' },
-              { src: '/images/ai-icons/grok-ai-logo.png', alt: 'Grok' },
-            ].map((tool) => (
-              <div
-                key={tool.alt}
-                className="border-border/80 bg-card hover:border-border relative size-7 cursor-pointer overflow-hidden rounded-full border p-1 shadow-2xs transition-all duration-200 ease-out hover:z-30 hover:scale-125 hover:shadow-md"
-                title={tool.alt}
-              >
-                <Image
-                  src={tool.src}
-                  alt={tool.alt}
-                  width={28}
-                  height={28}
-                  className="size-full object-contain"
-                />
-              </div>
-            ))}
+        {/* Hero Section Content */}
+        <section className="relative z-10 flex flex-col items-center justify-center text-center">
+          <h1 className="font-bricolage text-foreground max-w-4xl text-4xl font-medium tracking-tighter text-balance sm:text-5xl lg:text-6xl">
+            Discover what creators are building with AI <HeroSwappingIcon />
+          </h1>
+
+          <p className="text-muted-foreground mt-4 max-w-xl text-base font-normal text-pretty sm:mt-5 sm:text-lg">
+            The open discovery platform for AI-made work. Browse creations,
+            prompts, and the process behind every build.
+          </p>
+
+          <div className="mt-8 sm:mt-10">
+            <HeroCtaButtons />
           </div>
+        </section>
+      </div>
+      {/* === END [EXPERIMENTAL] HERO GRADIENT CONTAINER === */}
 
-          <span className="text-foreground/70 text-xs font-medium md:text-sm">
-            The open discovery platform for AI creations
-          </span>
-        </div>
+      {/* Trending Section: Search, Suggestions & Creations */}
+      <section
+        className="space-y-6 sm:space-y-7"
+        aria-label="Trending Creations"
+      >
+        <TrendingSearch />
 
-        <h1 className="font-bricolage text-foreground max-w-4xl text-4xl font-semibold tracking-tighter text-balance sm:text-5xl lg:text-6xl">
-          Discover what creators are <HeroDynamicText />
-        </h1>
-
-        <p className="text-text-subtle mt-4 max-w-2xl text-base text-pretty sm:text-lg">
-          Browse real websites, apps, designs, videos, and workflows. Inspect
-          the exact tools, prompts, and steps behind every output.
-        </p>
-
-        {/* Hero Search */}
-        <div className="mt-8 flex w-full justify-center">
-          <HeroSearch />
-        </div>
-
-        {/* Quick Suggestion Links */}
-        <div className="text-text-subtle mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-          <span className="text-muted-foreground">Try searching:</span>
-          <Link
-            href="/discover?category=websites"
-            className="border-border hover:bg-secondary hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
-          >
-            Websites
-          </Link>
-          <Link
-            href="/discover?category=images"
-            className="border-border hover:bg-secondary hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
-          >
-            Images
-          </Link>
-          <Link
-            href="/discover?tools=midjourney"
-            className="border-border hover:bg-secondary hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
-          >
-            Midjourney
-          </Link>
-          <Link
-            href="/discover?tools=cursor"
-            className="border-border hover:bg-secondary hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
-          >
-            Cursor
-          </Link>
-          <Link
-            href="/discover?tools=chatgpt"
-            className="border-border hover:bg-secondary hover:text-foreground rounded-full border px-2.5 py-1 transition-colors"
-          >
-            ChatGPT
-          </Link>
-        </div>
+        <Suspense fallback={<CreationGridSkeleton count={8} />}>
+          <TrendingCreations />
+        </Suspense>
       </section>
-
-      {/* Main Content Sections with independent Suspense boundaries */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <TrendingSection />
-      </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
         <CategoriesGridSection />

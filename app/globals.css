@@ -65,8 +65,17 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-bricolage: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-albert: var(--font-albert), ui-sans-serif, system-ui, sans-serif;
+  --font-albert-sans: var(--font-albert), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@utility font-albert-sans {
+  font-family: var(--font-albert), ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility font-albert {
+  font-family: var(--font-albert), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
