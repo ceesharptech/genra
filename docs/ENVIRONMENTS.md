@@ -56,3 +56,28 @@ Only the following exact variable names are permitted to carry the `NEXT_PUBLIC_
 - `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`
 
 Any other variable starting with `NEXT_PUBLIC_` will trigger a build and CI error via `scripts/check-env.mjs`.
+
+---
+
+## 4. Environment Topology & Production Packaging
+
+Genra maintains strict separation between the Development environment and the Production environment:
+
+| Attribute | Development Environment | Production Environment |
+| :--- | :--- | :--- |
+| **Hosting** | Local (`localhost:3000`) & Vercel Preview | Vercel Production (`*.vercel.app`) |
+| **Supabase Project** | Hosted Dev (`ngofkoeclkrxgpefkbuv`) | Hosted Production (Separate project) |
+| **Agent Access** | Connected via Supabase MCP | **Agent NEVER connects to Production** |
+| **Migrations** | Applied incrementally (`0001` - `0019`) via MCP | Applied manually via `supabase/prod/consolidated.sql` |
+| **Schema Verification** | `supabase/tests/*.sql` | `supabase/prod/verify.sql` |
+| **Service Role Key** | Strictly prohibited | Strictly prohibited |
+
+### Production Deployment Script:
+To regenerate the consolidated production script after any database change:
+```bash
+npm run build:prod-sql
+```
+This generates:
+- `supabase/prod/consolidated.sql`: The full database definition.
+- `supabase/prod/verify.sql`: Automated verification suite asserting all 22 public tables, RLS policies, 26 functions, storage buckets, and seeds.
+See [`supabase/prod/README.md`](../supabase/prod/README.md) for full instructions.

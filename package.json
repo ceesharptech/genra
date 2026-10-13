@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "check:env": "node scripts/check-env.mjs",
     "check:bundle": "node scripts/scan-client-bundle.mjs",
-    "sentry:test": "node scripts/sentry-smoke-test.mjs"
+    "sentry:test": "node --env-file=.env.local scripts/sentry-smoke-test.mjs",
+    "build:prod-sql": "node scripts/build-prod-sql.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
