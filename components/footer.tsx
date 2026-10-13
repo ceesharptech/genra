@@ -159,7 +159,26 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:justify-end">
+          {/* Creator Attribution */}
+          <div className="text-muted-foreground flex items-center justify-center text-xs">
+            <p>
+              Built with{' '}
+              <span className="text-red-500" aria-label="love">
+                ❤
+              </span>{' '}
+              by{' '}
+              <a
+                href="https://eniolamusu.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground decoration-muted-foreground/40 hover:text-brand hover:decoration-brand underline underline-offset-4 transition-colors"
+              >
+                Eniola
+              </a>
+            </p>
+          </div>
+
+          {/* <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:justify-end">
             <Link
               href="/guidelines"
               className="hover:text-foreground transition-colors"
@@ -184,7 +203,7 @@ export function Footer() {
             >
               Support
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

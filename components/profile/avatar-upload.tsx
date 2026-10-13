@@ -139,10 +139,10 @@ export function AvatarUpload({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-2 w-full min-w-0">
+      <div className="flex items-start sm:items-center gap-3.5 sm:gap-4 w-full min-w-0">
         {/* Avatar Preview */}
-        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface-2">
+        <div className="relative flex size-14 sm:size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface-2">
           {avatarPreview ? (
             <Image
               src={avatarPreview}
@@ -167,8 +167,8 @@ export function AvatarUpload({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             <input
               type="file"
               ref={fileInputRef}
@@ -205,7 +205,7 @@ export function AvatarUpload({
             )}
           </div>
 
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground leading-normal break-words max-w-full text-pretty">
             JPEG, PNG or WebP under 2 MB. Square center-cropped to 512×512.
           </p>
         </div>

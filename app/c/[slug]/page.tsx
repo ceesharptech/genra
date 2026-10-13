@@ -158,7 +158,7 @@ async function MoreFromCreatorSection({
       className="border-border space-y-6 border-t pt-10"
       aria-labelledby="more-creator-heading"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <h2
           id="more-creator-heading"
           className="font-bricolage text-foreground text-2xl font-semibold tracking-tight"
@@ -233,8 +233,7 @@ export default async function CreationPage({ params }: CreationPageProps) {
   const jsonLd = buildCreationJsonLd(creation, pageDescription)
 
   const cookieStore = await cookies()
-  const isJoinDismissed =
-    cookieStore.get('genra_join_dismissed')?.value === '1'
+  const isJoinDismissed = cookieStore.get('genra_join_dismissed')?.value === '1'
 
   return (
     <>
@@ -260,7 +259,7 @@ export default async function CreationPage({ params }: CreationPageProps) {
       />
 
       {/* Discovery sections below main creation content */}
-      <div className="mx-auto max-w-7xl space-y-12 px-4 pb-20 sm:px-6">
+      <div className="mx-auto w-full max-w-5xl space-y-12 px-4 pb-20 sm:px-6">
         {!currentUser && !isJoinDismissed && <JoinCard />}
 
         <Suspense fallback={<CreationGridSkeleton count={4} />}>

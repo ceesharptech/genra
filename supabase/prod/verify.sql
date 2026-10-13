@@ -23,11 +23,12 @@ DECLARE
     'comments',
     'likes',
     'saves',
-    'shares',
+    'share_events',
     'collections',
     'collection_items',
     'reports',
-    'moderation_actions'
+    'moderation_actions',
+    'ai_jobs'
   ];
   v_table text;
   v_missing_tables text[] := ARRAY[]::text[];
@@ -104,7 +105,7 @@ BEGIN
   IF array_length(v_unprotected_tables, 1) > 0 THEN
     RAISE EXCEPTION 'FAILED: Tables without RLS enabled: %', v_unprotected_tables;
   ELSE
-    RAISE NOTICE '[OK] Row Level Security (RLS) is enabled on all 22 public tables.';
+    RAISE NOTICE '[OK] Row Level Security (RLS) is enabled on all % public tables.', v_table_count;
   END IF;
 
   -- 2. Verify critical functions exist
@@ -145,6 +146,6 @@ BEGIN
 
   RAISE NOTICE '=======================================================';
   RAISE NOTICE 'SUCCESS: Production database schema verification PASSED.';
-  RAISE NOTICE 'All 22 tables, RLS policies, functions, and seeds are verified.';
+  RAISE NOTICE 'All % tables, RLS policies, functions, and seeds are verified.', v_table_count;
   RAISE NOTICE '=======================================================';
 END $$;

@@ -35,7 +35,7 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6 shadow-xs sm:p-8">
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 md:p-8 shadow-xs w-full min-w-0 overflow-hidden">
         <SettingsForm userId={user.id} profile={profile} />
       </div>
 

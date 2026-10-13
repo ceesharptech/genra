@@ -255,7 +255,7 @@ export function DiscoverFilterBar({
 
               {/* Tool Popover Content */}
               {isToolPopoverOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-xl border border-border bg-popover p-3 shadow-lg z-50 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-xl border border-border bg-popover p-3 shadow-lg z-50 animate-in fade-in-0 zoom-in-95 duration-100">
                   <div className="relative mb-2.5">
                     <HugeiconsIcon
                       icon={Search01Icon}

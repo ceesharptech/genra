@@ -1,14 +1,10 @@
 import { Suspense } from 'react'
 import { discoverCards, categoryCounts } from '@/lib/data/creations'
-import {
-  CreationGrid,
-  CreationGridSkeleton,
-} from '@/components/creations/creation-grid'
+import { CreationGrid } from '@/components/creations/creation-grid'
 import { HeroSwappingIcon } from '@/components/home/hero-swapping-icon'
 import { HeroCtaButtons } from '@/components/home/hero-cta-buttons'
 import { TrendingSearch } from '@/components/home/trending-search'
 import { CategoryShowcase } from '@/components/home/category-showcase'
-import { Skeleton } from '@/components/ui/skeleton'
 
 export const revalidate = 60 // Cache for 60 seconds
 
@@ -54,23 +50,14 @@ async function CategoriesGridSection() {
   )
 }
 
-function SectionSkeleton() {
+function SpinnerFallback() {
   return (
-    <div className="mt-10 space-y-8 sm:mt-16 sm:space-y-10 lg:mt-20">
-      <div className="flex flex-col items-center justify-center text-center">
-        <Skeleton className="h-10 w-72 sm:h-12 sm:w-96" />
-      </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-3.5">
-            <Skeleton className="aspect-[4/3] w-full rounded-3xl sm:aspect-[16/11]" />
-            <div className="flex flex-col items-center gap-1.5 pt-0.5">
-              <Skeleton className="h-5 w-24" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="flex min-h-36 w-full items-center justify-center py-12">
+      <div
+        className="size-8 animate-spin rounded-full border-2 border-border border-t-foreground"
+        role="status"
+        aria-label="Loading content"
+      />
     </div>
   )
 }
@@ -121,12 +108,12 @@ export default async function HomePage() {
       >
         <TrendingSearch />
 
-        <Suspense fallback={<CreationGridSkeleton count={8} />}>
+        <Suspense fallback={<SpinnerFallback />}>
           <TrendingCreations />
         </Suspense>
       </section>
 
-      <Suspense fallback={<SectionSkeleton />}>
+      <Suspense fallback={<SpinnerFallback />}>
         <CategoriesGridSection />
       </Suspense>
     </div>

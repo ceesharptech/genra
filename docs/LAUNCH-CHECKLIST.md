@@ -22,7 +22,7 @@ Run and verify all local quality gates before initiating production deployment:
 ### 2.1 Supabase Production Project
 - [ ] Create a new project on [Supabase.com](https://supabase.com) (Free Tier, Region: `eu-west-1` or closest to audience).
 - [ ] In SQL Editor, run `supabase/prod/consolidated.sql`.
-- [ ] In SQL Editor, run `supabase/prod/verify.sql` and ensure all 22 tables and 26 RPCs pass.
+- [ ] In SQL Editor, run `supabase/prod/verify.sql` and ensure all 23 tables and 26 RPCs pass.
 - [ ] Set **Site URL** to `https://<your-app>.vercel.app` in Authentication > URL Configuration.
 - [ ] Add `https://<your-app>.vercel.app/auth/callback` to Redirect URLs.
 - [ ] Check Storage buckets: `avatars` and `creation-media` are created and marked public.

@@ -27,7 +27,7 @@ export default async function MyCreationsPage() {
   const { data: creations, error } = await listMyCreations(user.id)
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-5xl min-w-0 px-4 py-8 sm:px-6 sm:py-10">
       <CreationsDashboard initialCreations={creations} error={error} />
     </div>
   )

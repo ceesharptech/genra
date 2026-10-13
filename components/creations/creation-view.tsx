@@ -49,7 +49,6 @@ export function CreationView({
   const [activeMediaIndex, setActiveMediaIndex] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
-
   const currentMedia = creation.media[activeMediaIndex] || creation.media[0]
   const currentMediaUrl = currentMedia
     ? getMediaUrl(currentMedia.storage_path || currentMedia.external_url)
@@ -68,7 +67,7 @@ export function CreationView({
     : null
 
   return (
-    <div className="bg-background text-foreground min-h-screen pb-20">
+    <div className="bg-background text-foreground min-h-screen pb-16">
       <ShareRefTracker creationId={creation.id} />
       {/* Lightbox for full-screen media inspection */}
       {creation.media.length > 0 && (
@@ -82,39 +81,45 @@ export function CreationView({
       )}
 
       {/* Owner preview alert for non-published or moderated creations */}
-      {isOwner && (creation.moderation_locked || creation.status !== 'published') && (
-        <div
-          className={cn(
-            'border-b px-4 py-2.5 text-center text-xs',
-            creation.moderation_locked
-              ? 'border-destructive/30 bg-destructive/10 text-destructive'
-              : 'border-warning/30 bg-warning-soft text-warning'
-          )}
-        >
-          <div className="mx-auto flex max-w-5xl items-center justify-between">
-            {creation.moderation_locked ? (
-              <span className="flex items-center gap-1.5 font-medium">
-                <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0" />
-                This creation was removed by moderators and cannot be published.{' '}
-                <Link href="/content-policy" className="underline hover:text-foreground font-semibold">
-                  See Content Policy
+      {isOwner &&
+        (creation.moderation_locked || creation.status !== 'published') && (
+          <div
+            className={cn(
+              'border-b px-4 py-2.5 text-center text-xs',
+              creation.moderation_locked
+                ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                : 'border-warning/30 bg-warning-soft text-warning'
+            )}
+          >
+            <div className="mx-auto flex max-w-5xl items-center justify-between">
+              {creation.moderation_locked ? (
+                <span className="flex items-center gap-1.5 font-medium">
+                  <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0" />
+                  This creation was removed by moderators and cannot be
+                  published.{' '}
+                  <Link
+                    href="/content-policy"
+                    className="hover:text-foreground font-semibold underline"
+                  >
+                    See Content Policy
+                  </Link>
+                </span>
+              ) : (
+                <span>
+                  You are viewing a <strong>{creation.status}</strong> creation.
+                  Only you can see this page.
+                </span>
+              )}
+              {!creation.moderation_locked && (
+                <Link href={`/c/${creation.slug}/edit`}>
+                  <Button variant="secondary" size="sm" className="h-7 text-xs">
+                    Edit creation
+                  </Button>
                 </Link>
-              </span>
-            ) : (
-              <span>
-                You are viewing a <strong>{creation.status}</strong> creation. Only you can see this page.
-              </span>
-            )}
-            {!creation.moderation_locked && (
-              <Link href={`/c/${creation.slug}/edit`}>
-                <Button variant="secondary" size="sm" className="h-7 text-xs">
-                  Edit creation
-                </Button>
-              </Link>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Breadcrumb Navigation Bar */}
       <div className="border-border bg-card/40">
@@ -311,7 +316,7 @@ export function CreationView({
                   alt={currentMedia.alt_text || creation.title}
                   fill
                   sizes="(max-width: 1200px) 100vw, 1024px"
-                  className="object-contain transition-transform duration-200 ease-out group-hover:scale-[1.01]"
+                  className="object-cover object-top transition-transform duration-200 ease-out group-hover:scale-[1.01]"
                   priority
                 />
               ) : null}
@@ -492,11 +497,11 @@ export function CreationView({
                     >
                       <HugeiconsIcon
                         icon={DocumentCodeIcon}
-                        className="size-4 shrink-0 text-muted-foreground/60"
+                        className="text-muted-foreground/60 size-4 shrink-0"
                       />
                       <span>This prompt is no longer available.</span>
                     </div>
-                  );
+                  )
                 }
 
                 return (
@@ -535,7 +540,7 @@ export function CreationView({
                       {item.prompt.body}
                     </pre>
                   </div>
-                );
+                )
               })}
             </div>
           </section>
@@ -563,11 +568,11 @@ export function CreationView({
                     >
                       <HugeiconsIcon
                         icon={DocumentCodeIcon}
-                        className="size-4 shrink-0 text-muted-foreground/60"
+                        className="text-muted-foreground/60 size-4 shrink-0"
                       />
                       <span>This resource is no longer available.</span>
                     </div>
-                  );
+                  )
                 }
 
                 return (
@@ -618,7 +623,7 @@ export function CreationView({
                       </div>
                     )}
                   </div>
-                );
+                )
               })}
             </div>
           </section>

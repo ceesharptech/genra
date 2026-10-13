@@ -73,12 +73,22 @@ export const metadata: Metadata = {
     title: 'Genra — Discover and share AI creations',
     description:
       'The open discovery platform for things people build with AI. Browse creations, learn from prompts and processes, and share your work.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Genra — Discover and share AI creations',
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Genra — Discover and share AI creations',
     description:
       'The open discovery platform for things people build with AI. Browse creations, learn from prompts and processes, and share your work.',
+    images: ['/og-image.png'],
   },
 }
 
@@ -104,7 +114,7 @@ export default async function RootLayout({
         'font-sans'
       )}
     >
-      <body className="bg-background text-foreground flex min-h-full flex-col transition-colors">
+      <body className="bg-background text-foreground flex min-h-full flex-col overflow-x-clip transition-colors">
         <ThemeProvider>
           <PostHogProvider>
             <AuthProvider initialUser={user} initialProfile={profile}>
@@ -113,7 +123,7 @@ export default async function RootLayout({
                   <IntentReplay />
                   <AuthHashHandler />
                   <Header />
-                  <main className="flex flex-1 flex-col">{children}</main>
+                  <main className="flex flex-1 flex-col w-full min-w-0">{children}</main>
                   <Footer />
                   <Toaster position="bottom-right" />
                 </TooltipProvider>

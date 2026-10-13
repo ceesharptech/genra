@@ -132,7 +132,7 @@ export function CreationsDashboard({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       {/* Header with Title & "New Creation" CTA */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -153,14 +153,14 @@ export function CreationsDashboard({
       </div>
 
       {/* Tabs */}
-      <div className="border-border flex gap-2 overflow-x-auto pb-2 text-xs font-semibold">
+      <div className="border-border flex w-full max-w-full gap-2 overflow-x-auto pb-2 text-xs font-semibold no-scrollbar">
         {(['all', 'published', 'draft', 'archived'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setFilter(tab)}
             className={cn(
-              'flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 capitalize transition-colors',
+              'flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 capitalize transition-colors',
               filter === tab
                 ? 'bg-foreground text-background'
                 : 'bg-muted text-muted-foreground hover:text-foreground'
@@ -183,13 +183,13 @@ export function CreationsDashboard({
 
       {/* Creations Grid */}
       {filteredCreations.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 w-full min-w-0">
           {filteredCreations.map((item) => {
             const coverUrl = getCoverUrl(item.coverStoragePath)
             return (
               <div
                 key={item.id}
-                className="group border-border bg-card hover:border-foreground/30 relative flex flex-col overflow-hidden rounded-3xl border transition-all hover:shadow-xs"
+                className="group border-border bg-card hover:border-foreground/30 relative flex w-full min-w-0 flex-col overflow-hidden rounded-3xl border transition-all hover:shadow-xs"
               >
                 {/* Media Thumbnail */}
                 <Link
@@ -235,8 +235,8 @@ export function CreationsDashboard({
                 </Link>
 
                 {/* Card Content */}
-                <div className="flex flex-1 flex-col justify-between space-y-3 p-4">
-                  <div className="space-y-1">
+                <div className="flex flex-1 min-w-0 flex-col justify-between space-y-3 p-4">
+                  <div className="space-y-1 min-w-0">
                     <div className="text-muted-foreground text-[11px] font-medium uppercase">
                       {item.categoryName}
                     </div>
@@ -286,8 +286,8 @@ export function CreationsDashboard({
                   </div>
 
                   {/* Actions Footer */}
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between pt-1 gap-2 min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       {!item.moderation_locked && (
                         <Link href={`/c/${item.slug}/edit`}>
                           <Button variant="secondary" size="sm">

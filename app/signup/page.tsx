@@ -72,14 +72,14 @@ export default async function SignUpPage({
         </div>
 
         {/* Center: Auth Form Container - vertically centered */}
-        <div className="mx-auto my-auto w-full max-w-sm py-8 sm:py-10 space-y-4">
+        <div className="mx-auto my-auto w-full max-w-sm space-y-4 py-8 sm:py-10">
           <LoginForm
             mode="signup"
             next={safeNext}
             intent={intent}
             errorParam={error}
           />
-          <p className="text-center text-[11px] text-muted-foreground/75 leading-relaxed">
+          {/* <p className="text-center text-[11px] text-muted-foreground/75 leading-relaxed">
             By continuing, you agree to Genra&rsquo;s{' '}
             <Link href="/terms" className="underline hover:text-foreground">
               Terms of Service
@@ -88,7 +88,7 @@ export default async function SignUpPage({
             <Link href="/privacy" className="underline hover:text-foreground">
               Privacy Policy
             </Link>.
-          </p>
+          </p> */}
         </div>
 
         {/* Bottom footer text (keeps balance on all screen heights) */}

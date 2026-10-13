@@ -1,12 +1,12 @@
 -- =============================================================================
 -- GENRA PRODUCTION CONSOLIDATED SCHEMA
--- Generated automatically: 2026-10-13T12:25:43.228Z
+-- Generated automatically: 2026-10-13T13:29:05.700Z
 -- Source migrations: 19 files (0001 through 0019)
 -- =============================================================================
 -- INSTRUCTIONS:
 -- 1. Open the SQL Editor in your fresh production Supabase project dashboard.
 -- 2. Paste and run this script in its entirety.
--- 3. Run supabase/prod/verify.sql to confirm that all 22 tables, functions,
+-- 3. Run supabase/prod/verify.sql to confirm that all 23 tables, functions,
 --    RLS policies, and storage buckets are properly provisioned.
 -- =============================================================================
 

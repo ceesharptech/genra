@@ -32,8 +32,8 @@ This package contains the consolidated SQL script and verification suite to prov
 3. Click **Run**.
 4. Check the **Results / Messages** panel. You should see:
    ```
-   [OK] All 22 expected public tables exist.
-   [OK] Row Level Security (RLS) is enabled on all 22 public tables.
+   [OK] All 23 expected public tables exist.
+   [OK] Row Level Security (RLS) is enabled on all 23 public tables.
    [OK] All 26 core functions (RPCs) exist.
    [OK] Initial category seeds present (count: 6).
    [OK] Storage buckets "avatars" and "creation-media" exist.
