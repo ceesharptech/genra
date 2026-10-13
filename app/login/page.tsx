@@ -71,13 +71,23 @@ export default async function LoginPage({
         </div>
 
         {/* Center: Auth Form Container - vertically centered */}
-        <div className="mx-auto my-auto w-full max-w-sm py-8 sm:py-10">
+        <div className="mx-auto my-auto w-full max-w-sm py-8 sm:py-10 space-y-4">
           <LoginForm
             mode="login"
             next={safeNext}
             intent={intent}
             errorParam={error}
           />
+          <p className="text-center text-[11px] text-muted-foreground/75 leading-relaxed">
+            By continuing, you agree to Genra&rsquo;s{' '}
+            <Link href="/terms" className="underline hover:text-foreground">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="underline hover:text-foreground">
+              Privacy Policy
+            </Link>.
+          </p>
         </div>
 
         {/* Bottom footer text (keeps balance on all screen heights) */}

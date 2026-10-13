@@ -146,10 +146,16 @@ export function Footer() {
               Privacy
             </Link>
             <Link
-              href="/cookies"
+              href="/content-policy"
               className="hover:text-foreground transition-colors"
             >
-              Cookies
+              Content Policy
+            </Link>
+            <Link
+              href="/copyright"
+              className="hover:text-foreground transition-colors"
+            >
+              Copyright
             </Link>
           </div>
 
