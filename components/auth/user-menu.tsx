@@ -25,6 +25,7 @@ import {
   Bookmark02Icon,
   DocumentCodeIcon,
   Folder01Icon,
+  BadgeCheckIcon,
 } from '@hugeicons/core-free-icons'
 
 export function UserMenu() {
@@ -166,6 +167,16 @@ export function UserMenu() {
               />
               <span>Settings</span>
             </DropdownMenuItem>
+            {profile?.is_admin && (
+              <DropdownMenuItem render={<Link href="/admin" />}>
+                <HugeiconsIcon
+                  icon={BadgeCheckIcon}
+                  strokeWidth={1.5}
+                  className="mr-2 h-4 w-4 text-brand"
+                />
+                <span className="font-medium text-foreground">Admin panel</span>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem

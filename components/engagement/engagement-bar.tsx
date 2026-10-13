@@ -4,6 +4,7 @@ import React from 'react';
 import { LikeButton } from './like-button';
 import { SaveButton } from './save-button';
 import { ShareButton } from './share-button';
+import { ReportButton } from '@/components/moderation/report-button';
 import { cn } from '@/lib/utils';
 import type { EngagementTargetType } from '@/lib/validation/engagement';
 
@@ -19,6 +20,7 @@ export interface EngagementBarProps {
   summary?: string;
   url?: string;
   showShare?: boolean;
+  showReport?: boolean;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ export function EngagementBar({
   summary,
   url,
   showShare = true,
+  showReport = true,
   className,
 }: EngagementBarProps) {
   return (
@@ -62,6 +65,14 @@ export function EngagementBar({
           title={title}
           summary={summary}
           url={url}
+        />
+      )}
+      {showReport && (
+        <ReportButton
+          targetType={targetType}
+          targetId={targetId}
+          targetTitle={title}
+          isSignedIn={isSignedIn}
         />
       )}
     </div>

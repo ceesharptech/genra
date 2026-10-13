@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
 import { LikeButton } from '@/components/engagement/like-button';
 import { SaveButton } from '@/components/engagement/save-button';
+import { ReportButton } from '@/components/moderation/report-button';
 import { CreationGrid } from '@/components/creations/creation-grid';
 import { MarkdownView } from '@/components/ui/markdown-view';
 import { buildResourceJsonLd, safeJsonLdReplacer } from '@/lib/seo/json-ld';
@@ -133,6 +134,22 @@ export default async function ResourceDetailPage({ params }: PageProps) {
           </Link>
         </div>
 
+        {/* Moderation Locked Notice */}
+        {resource.moderation_locked && isAuthor && (
+          <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive flex items-start gap-2.5">
+            <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-sm">Removed by moderators</p>
+              <p className="text-destructive/90">
+                This resource violated platform policies and cannot be published or shared.{' '}
+                <Link href="/content-policy" className="underline font-semibold hover:text-foreground">
+                  See Content Policy
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header section */}
         <header className="space-y-4 border-b border-border/60 pb-6">
           {/* Top badges: kind, tool, private */}
@@ -224,6 +241,15 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                   <span>Visit resource</span>
                   <HugeiconsIcon icon={LinkSquare01Icon} className="size-3.5" />
                 </a>
+              )}
+
+              {!isAuthor && (
+                <ReportButton
+                  targetType="resource"
+                  targetId={resource.id}
+                  targetTitle={resource.title}
+                  isSignedIn={Boolean(user)}
+                />
               )}
 
               {isAuthor && (

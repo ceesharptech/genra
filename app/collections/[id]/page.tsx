@@ -7,6 +7,7 @@ import { getCollectionPage } from '@/lib/data/collections';
 import { CollectionItemCard } from '@/components/collections/collection-item-card';
 import { CollectionSettingsDialog } from '@/components/collections/collection-settings-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ReportButton } from '@/components/moderation/report-button';
 import { buildCollectionJsonLd, safeJsonLdReplacer } from '@/lib/seo/json-ld';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
@@ -148,8 +149,8 @@ export default async function CollectionDetailPage({ params }: PageProps) {
               )}
             </div>
 
-            {/* Owner Controls */}
-            {isOwner && (
+            {/* Owner Controls or Report button */}
+            {isOwner ? (
               <div className="shrink-0">
                 <CollectionSettingsDialog
                   collection={{
@@ -159,6 +160,18 @@ export default async function CollectionDetailPage({ params }: PageProps) {
                     is_public: collection.is_public,
                     owner_username: collection.owner.username,
                   }}
+                />
+              </div>
+            ) : (
+              <div className="shrink-0">
+                <ReportButton
+                  targetType="collection"
+                  targetId={collection.id}
+                  targetTitle={collection.title}
+                  isSignedIn={Boolean(user)}
+                  variant="outline"
+                  size="sm"
+                  showLabel
                 />
               </div>
             )}

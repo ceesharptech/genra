@@ -11,6 +11,7 @@ import { LikeButton } from '@/components/engagement/like-button';
 import { SaveButton } from '@/components/engagement/save-button';
 import { CopyPromptButton } from '@/components/engagement/copy-prompt-button';
 import { ForkPromptButton } from '@/components/library/fork-prompt-button';
+import { ReportButton } from '@/components/moderation/report-button';
 import { CreationGrid } from '@/components/creations/creation-grid';
 import { buildPromptJsonLd, safeJsonLdReplacer } from '@/lib/seo/json-ld';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -136,6 +137,22 @@ export default async function PromptDetailPage({ params }: PageProps) {
           </Link>
         </div>
 
+        {/* Moderation Locked Notice */}
+        {prompt.moderation_locked && isAuthor && (
+          <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive flex items-start gap-2.5">
+            <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-sm">Removed by moderators</p>
+              <p className="text-destructive/90">
+                This prompt violated platform policies and cannot be published or shared.{' '}
+                <Link href="/content-policy" className="underline font-semibold hover:text-foreground">
+                  See Content Policy
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header section */}
         <header className="space-y-4 border-b border-border/60 pb-6">
           {/* Top badges: kind, tool, private */}
@@ -233,6 +250,15 @@ export default async function PromptDetailPage({ params }: PageProps) {
                 promptId={prompt.id}
                 isSignedIn={Boolean(user)}
               />
+
+              {!isAuthor && (
+                <ReportButton
+                  targetType="prompt"
+                  targetId={prompt.id}
+                  targetTitle={prompt.title}
+                  isSignedIn={Boolean(user)}
+                />
+              )}
 
               {isAuthor && (
                 <Link

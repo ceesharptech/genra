@@ -16,6 +16,7 @@ import {
   AiSettingIcon,
   WorkflowSquare01Icon,
   Alert02Icon,
+  LockIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -26,6 +27,7 @@ export interface DashboardCreationItem {
   title: string
   summary: string | null
   status: 'draft' | 'published' | 'archived'
+  moderation_locked?: boolean
   created_at: string
   updated_at: string
   published_at: string | null
@@ -209,19 +211,26 @@ export function CreationsDashboard({
                   )}
 
                   {/* Status Pill */}
-                  <div className="absolute top-2.5 left-2.5">
-                    <span
-                      className={cn(
-                        'rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase shadow-xs backdrop-blur-md',
-                        item.status === 'published'
-                          ? 'bg-emerald-500/90 text-white'
-                          : item.status === 'archived'
-                            ? 'bg-muted/90 text-muted-foreground'
-                            : 'bg-brand/90 text-white'
-                      )}
-                    >
-                      {item.status}
-                    </span>
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                    {item.moderation_locked ? (
+                      <span className="rounded-full bg-red-600/95 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase text-white shadow-xs backdrop-blur-md flex items-center gap-1">
+                        <HugeiconsIcon icon={LockIcon} className="size-3" />
+                        <span>Removed</span>
+                      </span>
+                    ) : (
+                      <span
+                        className={cn(
+                          'rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase shadow-xs backdrop-blur-md',
+                          item.status === 'published'
+                            ? 'bg-emerald-500/90 text-white'
+                            : item.status === 'archived'
+                              ? 'bg-muted/90 text-muted-foreground'
+                              : 'bg-brand/90 text-white'
+                        )}
+                      >
+                        {item.status}
+                      </span>
+                    )}
                   </div>
                 </Link>
 
@@ -244,6 +253,21 @@ export function CreationsDashboard({
                     )}
                   </div>
 
+                  {item.moderation_locked && (
+                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-2.5 text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
+                      <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <p className="font-semibold">Removed by moderators</p>
+                        <p className="text-[11px] text-red-600/80 dark:text-red-400/80">
+                          This creation violated policies and cannot be published.{' '}
+                          <Link href="/content-policy" className="underline hover:text-foreground font-medium">
+                            See Content Policy
+                          </Link>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Metadata Stats */}
                   <div className="text-muted-foreground border-border/60 flex items-center gap-3 border-t pt-1 text-[11px]">
                     <span className="flex items-center gap-1">
@@ -264,15 +288,17 @@ export function CreationsDashboard({
                   {/* Actions Footer */}
                   <div className="flex items-center justify-between pt-1">
                     <div className="flex items-center gap-1.5">
-                      <Link href={`/c/${item.slug}/edit`}>
-                        <Button variant="secondary" size="sm">
-                          <HugeiconsIcon
-                            icon={Edit02Icon}
-                            className="size-3.5"
-                          />
-                          Edit
-                        </Button>
-                      </Link>
+                      {!item.moderation_locked && (
+                        <Link href={`/c/${item.slug}/edit`}>
+                          <Button variant="secondary" size="sm">
+                            <HugeiconsIcon
+                              icon={Edit02Icon}
+                              className="size-3.5"
+                            />
+                            Edit
+                          </Button>
+                        </Link>
+                      )}
 
                       <Link href={`/c/${item.slug}`}>
                         <Button

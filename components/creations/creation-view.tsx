@@ -20,6 +20,7 @@ import {
   EyeIcon,
   Maximize02Icon,
   DocumentCodeIcon,
+  LockIcon,
 } from '@hugeicons/core-free-icons'
 import { EngagementBar } from '@/components/engagement/engagement-bar'
 import { CopyPromptButton } from '@/components/engagement/copy-prompt-button'
@@ -80,19 +81,37 @@ export function CreationView({
         />
       )}
 
-      {/* Owner preview alert for non-published creations */}
-      {creation.status !== 'published' && isOwner && (
-        <div className="border-warning/30 bg-warning-soft text-warning border-b px-4 py-2.5 text-center text-xs">
+      {/* Owner preview alert for non-published or moderated creations */}
+      {isOwner && (creation.moderation_locked || creation.status !== 'published') && (
+        <div
+          className={cn(
+            'border-b px-4 py-2.5 text-center text-xs',
+            creation.moderation_locked
+              ? 'border-destructive/30 bg-destructive/10 text-destructive'
+              : 'border-warning/30 bg-warning-soft text-warning'
+          )}
+        >
           <div className="mx-auto flex max-w-5xl items-center justify-between">
-            <span>
-              You are viewing a <strong>{creation.status}</strong> creation.
-              Only you can see this page.
-            </span>
-            <Link href={`/c/${creation.slug}/edit`}>
-              <Button variant="secondary" size="sm" className="h-7 text-xs">
-                Edit creation
-              </Button>
-            </Link>
+            {creation.moderation_locked ? (
+              <span className="flex items-center gap-1.5 font-medium">
+                <HugeiconsIcon icon={LockIcon} className="size-4 shrink-0" />
+                This creation was removed by moderators and cannot be published.{' '}
+                <Link href="/content-policy" className="underline hover:text-foreground font-semibold">
+                  See Content Policy
+                </Link>
+              </span>
+            ) : (
+              <span>
+                You are viewing a <strong>{creation.status}</strong> creation. Only you can see this page.
+              </span>
+            )}
+            {!creation.moderation_locked && (
+              <Link href={`/c/${creation.slug}/edit`}>
+                <Button variant="secondary" size="sm" className="h-7 text-xs">
+                  Edit creation
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -209,6 +228,7 @@ export function CreationView({
                 title={creation.title}
                 summary={creation.summary || ''}
                 isSignedIn={isSignedIn}
+                showReport={!isOwner}
               />
 
               <div className="text-text-subtle border-border flex items-center gap-3 border-r pr-4 text-xs tabular-nums">

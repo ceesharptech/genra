@@ -14,6 +14,7 @@ import { ResourceGrid } from '@/components/library/resource-grid';
 import { CollectionCard } from '@/components/collections/collection-card';
 import { buttonVariants, Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ReportButton } from '@/components/moderation/report-button';
 import { cn } from '@/lib/utils';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
@@ -189,7 +190,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
               </span>
             </div>
 
-            {isOwnProfile && (
+            {isOwnProfile ? (
               <div className="flex items-center gap-2">
                 <Link
                   href="/creations"
@@ -214,6 +215,18 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                   <HugeiconsIcon icon={Settings01Icon} className="size-3.5" />
                   Edit profile
                 </Link>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <ReportButton
+                  targetType="profile"
+                  targetId={profile.id}
+                  targetTitle={`@${profile.username}`}
+                  isSignedIn={Boolean(currentUser)}
+                  variant="outline"
+                  size="sm"
+                  showLabel
+                />
               </div>
             )}
           </div>
