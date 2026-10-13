@@ -3,18 +3,39 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { motion, useReducedMotion } from 'motion/react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { UserMenu } from '@/components/auth/user-menu'
 import { cn } from '@/lib/utils'
 
 export function Header() {
   const pathname = usePathname()
+  const shouldReduceMotion = useReducedMotion()
+
   if (pathname === '/login' || pathname === '/signup') {
     return null
   }
 
+  const isHome = pathname === '/'
+
   return (
-    <header className="bg-background/85 sticky top-0 z-40 w-full backdrop-blur-md transition-colors">
+    <motion.header
+      initial={
+        isHome
+          ? {
+              opacity: 0,
+              y: shouldReduceMotion ? 0 : -20,
+            }
+          : false
+      }
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.55,
+        delay: isHome ? 0.82 : 0,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className="bg-background/85 sticky top-0 z-40 w-full backdrop-blur-md transition-colors"
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Brand and Primary Navigation */}
         <div className="flex items-center gap-8">
@@ -83,6 +104,6 @@ export function Header() {
           <UserMenu />
         </div>
       </div>
-    </header>
+    </motion.header>
   )
 }
