@@ -153,6 +153,10 @@ export type Database = {
           description: string | null
           id: string
           is_public: boolean
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           owner_id: string
           title: string
           updated_at: string
@@ -162,6 +166,10 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           owner_id: string
           title: string
           updated_at?: string
@@ -171,6 +179,10 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           owner_id?: string
           title?: string
           updated_at?: string
@@ -480,6 +492,10 @@ export type Database = {
           id: string
           like_count: number
           live_url: string | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           published_at: string | null
           repo_url: string | null
           save_count: number
@@ -506,6 +522,10 @@ export type Database = {
           id?: string
           like_count?: number
           live_url?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           published_at?: string | null
           repo_url?: string | null
           save_count?: number
@@ -532,6 +552,10 @@ export type Database = {
           id?: string
           like_count?: number
           live_url?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           published_at?: string | null
           repo_url?: string | null
           save_count?: number
@@ -594,6 +618,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_actions: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          note: string | null
+          report_id: string | null
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          report_id?: string | null
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          report_id?: string | null
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
             referencedColumns: ["id"]
           },
         ]
@@ -691,6 +756,10 @@ export type Database = {
           kind: Database["public"]["Enums"]["prompt_kind"]
           like_count: number
           model_tool_id: number | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           save_count: number
           search: unknown
           title: string
@@ -708,6 +777,10 @@ export type Database = {
           kind?: Database["public"]["Enums"]["prompt_kind"]
           like_count?: number
           model_tool_id?: number | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           save_count?: number
           search?: unknown
           title: string
@@ -725,6 +798,10 @@ export type Database = {
           kind?: Database["public"]["Enums"]["prompt_kind"]
           like_count?: number
           model_tool_id?: number | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           save_count?: number
           search?: unknown
           title?: string
@@ -757,27 +834,42 @@ export type Database = {
       reports: {
         Row: {
           created_at: string
+          details: string | null
           id: string
           reason: string
-          reporter_id: string
+          reporter_id: string | null
+          resolution: string | null
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: string
         }
         Insert: {
           created_at?: string
+          details?: string | null
           id?: string
           reason: string
-          reporter_id: string
+          reporter_id?: string | null
+          resolution?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: string
         }
         Update: {
           created_at?: string
+          details?: string | null
           id?: string
           reason?: string
-          reporter_id?: string
+          reporter_id?: string | null
+          resolution?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["report_status"]
           target_id?: string
           target_type?: string
@@ -803,6 +895,10 @@ export type Database = {
           is_public: boolean
           kind: Database["public"]["Enums"]["resource_kind"]
           like_count: number
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           save_count: number
           search: unknown
           storage_path: string | null
@@ -821,6 +917,10 @@ export type Database = {
           is_public?: boolean
           kind?: Database["public"]["Enums"]["resource_kind"]
           like_count?: number
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           save_count?: number
           search?: unknown
           storage_path?: string | null
@@ -839,6 +939,10 @@ export type Database = {
           is_public?: boolean
           kind?: Database["public"]["Enums"]["resource_kind"]
           like_count?: number
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_locked?: boolean
+          moderation_reason?: string | null
           save_count?: number
           search?: unknown
           storage_path?: string | null
@@ -1054,6 +1158,82 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_activity_log: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          action: string
+          admin_id: string
+          admin_username: string
+          created_at: string
+          id: string
+          note: string
+          report_id: string
+          target_id: string
+          target_type: string
+        }[]
+      }
+      admin_merge_tools: {
+        Args: { p_from_id: number; p_into_id: number }
+        Returns: Json
+      }
+      admin_report_queue: {
+        Args: { p_limit?: number; p_offset?: number; p_status?: string }
+        Returns: {
+          created_at: string
+          details: string
+          id: string
+          other_reports_count: number
+          reason: string
+          reporter_id: string
+          reporter_username: string
+          resolution: string
+          resolution_note: string
+          reviewed_at: string
+          reviewed_by: string
+          status: Database["public"]["Enums"]["report_status"]
+          target_hidden: boolean
+          target_id: string
+          target_owner_username: string
+          target_title: string
+          target_type: string
+        }[]
+      }
+      admin_resolve_report: {
+        Args: { p_action: string; p_note?: string; p_report_id: string }
+        Returns: Json
+      }
+      admin_restore_item: {
+        Args: { p_note?: string; p_target_id: string; p_target_type: string }
+        Returns: Json
+      }
+      admin_unverified_tools: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["tool_kind"]
+          logo_url: string
+          name: string
+          parent_id: number
+          slug: string
+          usage_count: number
+          vendor: string
+          website_url: string
+        }[]
+      }
+      admin_update_tool: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["tool_kind"]
+          p_logo_url?: string
+          p_name: string
+          p_parent_id?: number
+          p_tool_id: number
+          p_vendor?: string
+          p_website_url?: string
+        }
+        Returns: Json
+      }
+      admin_verify_tool: { Args: { p_tool_id: number }; Returns: Json }
       can_view_creation: { Args: { cid: string }; Returns: boolean }
       category_counts: {
         Args: never
@@ -1094,6 +1274,7 @@ export type Database = {
           view_count: number
         }[]
       }
+      delete_my_account: { Args: never; Returns: Json }
       discover_cards: {
         Args: {
           p_category?: string
@@ -1180,11 +1361,13 @@ export type Database = {
           used_in_count: number
         }[]
       }
+      export_my_data: { Args: never; Returns: Json }
       increment_prompt_copy: {
         Args: { p_prompt_id: string }
         Returns: undefined
       }
       increment_view: { Args: { p_creation_id: string }; Returns: undefined }
+      is_admin: { Args: never; Returns: boolean }
       my_collections_for_item: {
         Args: {
           p_target_id: string
@@ -1325,6 +1508,10 @@ export type Database = {
           id: string
           like_count: number
           live_url: string | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           published_at: string | null
           repo_url: string | null
           save_count: number
@@ -1359,6 +1546,10 @@ export type Database = {
           kind: Database["public"]["Enums"]["prompt_kind"]
           like_count: number
           model_tool_id: number | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           save_count: number
           search: unknown
           title: string
@@ -1387,6 +1578,10 @@ export type Database = {
           is_public: boolean
           kind: Database["public"]["Enums"]["resource_kind"]
           like_count: number
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_locked: boolean
+          moderation_reason: string | null
           save_count: number
           search: unknown
           storage_path: string | null
@@ -1405,6 +1600,7 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       tool_page: { Args: { p_slug: string }; Returns: Json }
+      validate_social_links: { Args: { links: Json }; Returns: boolean }
     }
     Enums: {
       ai_job_kind:
