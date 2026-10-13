@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth/server";
 import { SettingsForm } from "@/components/profile/settings-form";
+import { AccountDangerZone } from "@/components/profile/account-danger-zone";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -24,8 +25,8 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mb-8">
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12 space-y-8">
+      <div>
         <h1 className="font-bricolage text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           Account Settings
         </h1>
@@ -37,6 +38,8 @@ export default async function SettingsPage() {
       <div className="rounded-xl border border-border bg-card p-6 shadow-xs sm:p-8">
         <SettingsForm userId={user.id} profile={profile} />
       </div>
+
+      <AccountDangerZone username={profile.username} />
     </div>
   );
 }
