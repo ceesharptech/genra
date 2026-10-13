@@ -12,6 +12,13 @@ export class OnboardingRequiredError extends Error {
   }
 }
 
+export class AdminRequiredError extends Error {
+  constructor(message = "Admin required") {
+    super(message);
+    this.name = "AdminRequiredError";
+  }
+}
+
 export type ActionResult<T = void> =
   | { ok: true; data: T }
   | { ok: false; error: string; fieldErrors?: Record<string, string[]> };

@@ -53,6 +53,7 @@ export interface PromptDetail {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  moderation_locked?: boolean | null;
   used_in_count: number;
   author: {
     id: string;
@@ -97,6 +98,7 @@ export interface ResourceDetail {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  moderation_locked?: boolean | null;
   used_in_count: number;
   author: {
     id: string;
@@ -256,6 +258,7 @@ export const getPrompt = cache(
         created_at,
         updated_at,
         deleted_at,
+        moderation_locked,
         author:profiles!prompts_author_id_fkey (
           id,
           username,
@@ -322,6 +325,7 @@ export const getPrompt = cache(
       created_at: data.created_at,
       updated_at: data.updated_at,
       deleted_at: data.deleted_at,
+      moderation_locked: Boolean(data.moderation_locked),
       used_in_count: count ?? 0,
       author: data.author,
       model_tool: data.model_tool,
@@ -367,6 +371,7 @@ export const getResource = cache(
         created_at,
         updated_at,
         deleted_at,
+        moderation_locked,
         author:profiles!resources_author_id_fkey (
           id,
           username,
@@ -421,6 +426,7 @@ export const getResource = cache(
       created_at: data.created_at,
       updated_at: data.updated_at,
       deleted_at: data.deleted_at,
+      moderation_locked: Boolean(data.moderation_locked),
       used_in_count: count ?? 0,
       author: data.author,
       tool: data.tool,

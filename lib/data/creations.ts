@@ -32,6 +32,7 @@ export interface CreationWithDetails {
   created_at: string
   updated_at: string
   published_at: string | null
+  moderation_locked?: boolean | null
   like_count: number
   save_count: number
   share_count: number
@@ -705,6 +706,7 @@ export async function listMyCreations(
       title,
       summary,
       status,
+      moderation_locked,
       created_at,
       updated_at,
       published_at,
@@ -716,7 +718,7 @@ export async function listMyCreations(
     `
     )
     .eq('creator_id', creatorId)
-    .is('deleted_at', null)
+    .or('deleted_at.is.null,moderation_locked.eq.true')
     .order('updated_at', { ascending: false })
   perfLog('listMyCreations', performance.now() - start)
 
@@ -731,6 +733,7 @@ export async function listMyCreations(
     title: string
     summary: string | null
     status: CreationStatus
+    moderation_locked?: boolean | null
     created_at: string
     updated_at: string
     published_at: string | null
@@ -751,6 +754,7 @@ export async function listMyCreations(
     title: c.title,
     summary: c.summary,
     status: c.status,
+    moderation_locked: Boolean(c.moderation_locked),
     created_at: c.created_at,
     updated_at: c.updated_at,
     published_at: c.published_at,

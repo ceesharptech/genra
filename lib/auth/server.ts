@@ -2,7 +2,11 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import type { User } from "@supabase/supabase-js";
-import { AuthRequiredError, OnboardingRequiredError } from "./types";
+import {
+  AuthRequiredError,
+  OnboardingRequiredError,
+  AdminRequiredError,
+} from "./types";
 import { perfLog } from "@/lib/perf";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -101,4 +105,20 @@ export async function requireOnboardedUser(): Promise<{
   } finally {
     perfLog("requireOnboardedUser", performance.now() - start);
   }
+}
+
+/**
+ * Requires an authenticated user with is_admin = true.
+ * Throws AuthRequiredError when signed out, or AdminRequiredError when not an admin.
+ */
+export async function requireAdminUser(): Promise<{
+  user: User;
+  profile: Profile;
+}> {
+  const user = await requireUser();
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.is_admin) {
+    throw new AdminRequiredError();
+  }
+  return { user, profile };
 }

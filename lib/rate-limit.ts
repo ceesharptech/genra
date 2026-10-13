@@ -135,7 +135,7 @@ export const RATE_LIMIT_CONFIGS: Record<RateLimitAction, RateLimitConfig> = {
   collection_add_item: { limit: 60, windowSeconds: 60 },
   collection_item: { limit: 60, windowSeconds: 60 },
   propose_tool: { limit: 10, windowSeconds: 60 },
-  report: { limit: 10, windowSeconds: 60 },
+  report: { limit: 10, windowSeconds: 3600 },
   csp_report: { limit: 60, windowSeconds: 60 },
 };
 

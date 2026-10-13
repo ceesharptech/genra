@@ -40,6 +40,10 @@ export interface AnalyticsEventMap {
     creationId: string;
     action: 'save' | 'unsave';
   };
+  report_submitted: {
+    targetType: string;
+    reason: string;
+  };
 }
 
 export function track<K extends keyof AnalyticsEventMap>(

@@ -39,7 +39,7 @@ The CAPTCHA subsystem is encapsulated entirely in `lib/auth/captcha.ts`:
 | Risk | Likelihood | Impact | Current Mitigations |
 | :--- | :--- | :--- | :--- |
 | **Email Enumeration / Scraping** | Low | Low | Supabase returns indistinguishable responses for existing vs new emails. Client redirects to generic "Check your email" screen. |
-| **Email Rate Limit Exhaustion (Spam / Bot loops)** | Low-Medium | Medium | 1. Client-side 60s cooldown timer between requests.<br>2. Supabase built-in IP-level and email-level rate limiting on `signInWithOtp`.<br>3. Handled 429 error message directs users to Google OAuth.<br>4. Upstash Redis rate limiting available in Phase 07b. |
+| **Email Rate Limit Exhaustion (Spam / Bot loops)** | Low-Medium | Medium | 1. Client-side 60s cooldown timer between submissions (UI convenience).<br>2. Supabase built-in server-side IP and email rate limiting on `signInWithOtp`.<br>*(Note: Application-layer Upstash limiters do not cover email sign-in since requests go directly from the browser to Supabase).*<br>3. Handled 429 error message directs users to Google OAuth. |
 | **Accidental Dashboard Activation** | Low | High | If Supabase Dashboard CAPTCHA is toggled on without client code, `handleCaptchaError()` alerts Sentry and displays friendly recovery copy rather than raw API errors. |
 
 ---
