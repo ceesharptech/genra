@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
+import { siteConfig } from '@/lib/site-config'
+
 export function Footer() {
   const pathname = usePathname()
   if (pathname === '/login' || pathname === '/signup') {
@@ -157,6 +159,12 @@ export function Footer() {
             >
               Copyright
             </Link>
+            <a
+              href={`mailto:${siteConfig.supportEmail}`}
+              className="hover:text-foreground transition-colors"
+            >
+              Contact
+            </a>
           </div>
 
           {/* Creator Attribution */}

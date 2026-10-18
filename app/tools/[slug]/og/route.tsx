@@ -159,7 +159,7 @@ export async function GET(_request: Request, context: RouteContext) {
             </div>
 
             <span style={{ color: '#71717a', fontSize: '14px' }}>
-              genra.co/tools/{tool.slug}
+              genra.dev/tools/{tool.slug}
             </span>
           </div>
         </div>

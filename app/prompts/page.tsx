@@ -6,6 +6,8 @@ import { promptsQuerySchema, type PromptsQuery } from '@/lib/validation/library'
 import { PromptsFilterBar } from '@/components/library/prompts-filter-bar';
 import { PromptGrid, PromptGridSkeleton } from '@/components/library/prompt-grid';
 
+import { getSiteUrl } from '@/lib/site';
+
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -16,7 +18,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const tool = typeof resolvedParams.tool === 'string' ? resolvedParams.tool.trim() : '';
   const page = typeof resolvedParams.page === 'string' ? parseInt(resolvedParams.page, 10) : 1;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://genra.co';
+  const siteUrl = getSiteUrl();
   const canonicalUrl = tool ? `${siteUrl}/prompts?tool=${encodeURIComponent(tool)}` : `${siteUrl}/prompts`;
 
   const isFacetCombination = Boolean(q || page > 1);

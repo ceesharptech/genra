@@ -258,7 +258,7 @@ export async function GET(_request: Request, context: RouteContext) {
           </div>
 
           <div style={{ color: '#6A6D7C', fontSize: '14px' }}>
-            Discover and learn from AI creations · genra.art
+            Discover and learn from AI creations · genra.dev
           </div>
         </div>
       </div>

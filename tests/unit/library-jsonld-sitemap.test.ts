@@ -98,8 +98,11 @@ describe('Library & Collections JSON-LD Builders', () => {
 
 describe('Robots Configuration for Library & Collections', () => {
   it('allows public discovery, tool, and collection routes and disallows mutations', () => {
-    const robotRules = robots();
-    const rule = Array.isArray(robotRules.rules) ? robotRules.rules[0] : robotRules.rules;
+    const prev = process.env.VERCEL_ENV;
+    process.env.VERCEL_ENV = 'production';
+    try {
+      const robotRules = robots();
+      const rule = Array.isArray(robotRules.rules) ? robotRules.rules[0] : robotRules.rules;
 
     expect(rule).toBeDefined();
     const allowList = Array.isArray(rule?.allow) ? rule.allow : [rule?.allow];
@@ -114,5 +117,9 @@ describe('Robots Configuration for Library & Collections', () => {
     expect(disallowList).toContain('/prompts/*/edit');
     expect(disallowList).toContain('/resources/new');
     expect(disallowList).toContain('/resources/*/edit');
+    } finally {
+      process.env.VERCEL_ENV = prev;
+    }
   });
 });
+

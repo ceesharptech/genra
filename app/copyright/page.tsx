@@ -70,7 +70,7 @@ export default function CopyrightPage() {
             <p>Please deliver all infringement notices to our Designated Agent:</p>
             <div className="rounded-xl border border-border/80 bg-card p-5 text-xs text-foreground space-y-1 shadow-xs font-mono">
               <p className="font-semibold text-sm font-sans">{siteConfig.legalName} — Copyright Agent</p>
-              <p>Email: <a href={`mailto:${siteConfig.dmcaEmail}`} className="underline text-brand">{siteConfig.dmcaEmail}</a></p>
+              <p>Email: <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-brand">{siteConfig.supportEmail}</a></p>
               <p>Subject Line: &ldquo;DMCA Notice of Infringement&rdquo;</p>
               <p>Governing Jurisdiction: {siteConfig.governingLaw}</p>
             </div>

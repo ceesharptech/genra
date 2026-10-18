@@ -6,6 +6,8 @@ import { resourcesQuerySchema, type ResourcesQuery } from '@/lib/validation/libr
 import { ResourcesFilterBar } from '@/components/library/resources-filter-bar';
 import { ResourceGrid, ResourceGridSkeleton } from '@/components/library/resource-grid';
 
+import { getSiteUrl } from '@/lib/site';
+
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -17,7 +19,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const tool = typeof resolvedParams.tool === 'string' ? resolvedParams.tool.trim() : '';
   const page = typeof resolvedParams.page === 'string' ? parseInt(resolvedParams.page, 10) : 1;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://genra.co';
+  const siteUrl = getSiteUrl();
   let canonicalUrl = `${siteUrl}/resources`;
   if (kind && !tool && !q) {
     canonicalUrl = `${siteUrl}/resources?kind=${encodeURIComponent(kind)}`;

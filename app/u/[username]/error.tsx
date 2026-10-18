@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -11,11 +12,12 @@ export default function ProfileError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Profile error:", error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
     <div className="mx-auto flex min-h-[50vh] w-full max-w-md flex-col items-center justify-center px-4 text-center">
+      <meta name="robots" content="noindex, nofollow" />
       <h2 className="font-bricolage text-lg font-semibold tracking-tight text-foreground">
         Could not load profile
       </h2>

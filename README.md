@@ -1,4 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Genra
+
+The discovery and learning platform for things people create with AI. Live at **[https://genra.dev](https://genra.dev)**.
+
+Creators publish a **creation** (website, app, image, video, agent, workflow) together with how it was made: tools, prompts, process steps, and resources. Visitors browse, filter, learn from the process, and reuse prompts and resources.
+
+For full production deployment instructions, see the **[Production Go-Live Runbook](./docs/LAUNCH-CHECKLIST.md)**.
 
 ## Getting Started
 
@@ -109,7 +115,7 @@ Sentry is initialized across browser (`instrumentation-client.ts`), Node.js serv
 3. **Run Production End-to-End Verification:**
    - In Vercel, temporarily add the variable `SENTRY_TEST_TOKEN` set to a secure random string (e.g. `test-token-7a8f9`).
    - Trigger a redeploy on Vercel.
-   - Open `https://<your-app>.vercel.app/sentry-test?token=test-token-7a8f9` in your browser.
+   - Open `https://genra.dev/sentry-test?token=test-token-7a8f9` in your browser.
    - Test each button:
      1. **Trigger Client Error:** Dispatches a client-side exception through the browser SDK.
      2. **Trigger Server Action Error:** Invokes a Server Action throwing an unhandled exception.

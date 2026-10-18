@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Ping App Health Endpoint
         run: |
-          URL="${{ secrets.NEXT_PUBLIC_SITE_URL || vars.SITE_URL || 'https://genra.vercel.app' }}/api/health"
+          URL="${{ secrets.NEXT_PUBLIC_SITE_URL || vars.SITE_URL || 'https://genra.dev' }}/api/health"
           echo "Pinging $URL..."
           RESPONSE=$(curl -s -f -m 15 "$URL" || true)
           echo "Response: $RESPONSE"

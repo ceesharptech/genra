@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getToolPage, discoverPrompts, discoverResources } from '@/lib/data/library';
 import { discoverCards } from '@/lib/data/creations';
+import { getSiteUrl } from '@/lib/site';
 import { CreationGrid, CreationGridSkeleton } from '@/components/creations/creation-grid';
 import { PromptGrid, PromptGridSkeleton } from '@/components/library/prompt-grid';
 import { ResourceGrid, ResourceGridSkeleton } from '@/components/library/resource-grid';
@@ -50,7 +51,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://genra.co';
+  const siteUrl = getSiteUrl();
   const tab = resolvedSearchParams.tab;
   const canonicalUrl = tab ? `${siteUrl}/tools/${slug}?tab=${encodeURIComponent(tab)}` : `${siteUrl}/tools/${slug}`;
   const ogImageUrl = `${siteUrl}/tools/${slug}/og`;

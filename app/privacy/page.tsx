@@ -132,8 +132,8 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-foreground">8. Privacy Inquiries and Contact</h2>
             <p>
               If you have any questions, requests, or concerns regarding your privacy or data protection on {siteConfig.name}, please contact our data team at{' '}
-              <a href={`mailto:${siteConfig.legalEmail}`} className="text-foreground underline hover:text-brand">
-                {siteConfig.legalEmail}
+              <a href={`mailto:${siteConfig.supportEmail}`} className="text-foreground underline hover:text-brand">
+                {siteConfig.supportEmail}
               </a>.
             </p>
           </section>

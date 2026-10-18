@@ -243,7 +243,7 @@ export function LoginForm({
             setErrorMessage(captchaMsg)
           } else if (error.status === 429) {
             setErrorMessage(
-              'Too many requests. Please wait a minute before trying again.'
+              'Too many sign-in attempts. Please wait a few minutes before requesting another code, or continue with Google.'
             )
           } else {
             setErrorMessage(
@@ -337,6 +337,10 @@ export function LoginForm({
         const captchaMsg = handleCaptchaError(error)
         if (captchaMsg) {
           setErrorMessage(captchaMsg)
+        } else if (error.status === 429) {
+          setErrorMessage(
+            'Too many sign-in attempts. Please wait a few minutes before requesting another code, or continue with Google.'
+          )
         } else {
           setErrorMessage(error.message || 'Failed to resend code.')
         }
@@ -689,13 +693,10 @@ export function LoginForm({
       {step === 'otp' && (
         <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
           <div>
-            <h3 className="font-bricolage text-base font-semibold">
-              Enter your 6-digit code
+            <h3 className="font-bricolage text-base font-semibold leading-snug">
+              Enter the 6-digit code we sent to{' '}
+              <span className="text-foreground font-semibold break-all">{email}</span>
             </h3>
-            <p className="text-muted-foreground mt-1 text-xs">
-              Sent to{' '}
-              <span className="text-foreground font-medium">{email}</span>
-            </p>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -721,6 +722,9 @@ export function LoginForm({
               required
               className="h-11 rounded-full text-center font-mono text-lg tracking-widest"
             />
+            <p className="text-muted-foreground text-[11px] leading-relaxed">
+              Check your spam or junk folder if you don&apos;t see it within a minute.
+            </p>
           </div>
 
           <Button

@@ -5,7 +5,7 @@ import { buildSentryClientConfig } from '@/lib/monitoring/sentry-config';
 
 // 1. Sentry Client Initialization
 const sentryConfig = buildSentryClientConfig({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN,
   nodeEnv: process.env.NODE_ENV,
   vercelEnv: process.env.NEXT_PUBLIC_VERCEL_ENV,
   release:

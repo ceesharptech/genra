@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Bricolage_Grotesque } from 'next/font/google'
 import { Albert_Sans } from 'next/font/google'
@@ -42,9 +42,33 @@ const albertSans = Albert_Sans({
 })
 
 const siteUrl = getSiteUrl()
+const isProduction = process.env.VERCEL_ENV === 'production'
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FAF9FD' },
+    { media: '(prefers-color-scheme: dark)', color: '#111113' },
+  ],
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  robots: isProduction
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+      },
   icons: {
     icon: '/favicon.ico',
     apple: '/images/genra-logo.png',

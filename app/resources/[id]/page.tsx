@@ -25,6 +25,8 @@ import {
   Link01Icon,
 } from '@hugeicons/core-free-icons';
 
+import { getSiteUrl } from '@/lib/site';
+
 interface PageProps {
   params: Promise<{
     id: string;
@@ -43,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://genra.co';
+  const siteUrl = getSiteUrl();
   const canonicalUrl = `${siteUrl}/resources/${id}`;
   const ogImageUrl = `${siteUrl}/resources/${id}/og`;
 

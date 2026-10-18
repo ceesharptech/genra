@@ -1,6 +1,6 @@
 # Genra Growth Triggers & Infrastructure Upgrade Path
 
-This document defines the quantitative thresholds, cost triggers, and step-by-step action plans for graduating Genra from its zero-cost free tiers to production scale.
+This document defines the quantitative thresholds, cost triggers, and step-by-step action plans for graduating Genra from its zero-cost free tiers (Vercel Hobby, Supabase Free, Upstash Redis, PostHog Free, Sentry Developer) to production scale.
 
 ---
 
@@ -18,22 +18,22 @@ This document defines the quantitative thresholds, cost triggers, and step-by-st
 
 ## 2. Growth Triggers & Action Plans
 
-### Trigger 1: Supabase Free Tier Limits Reached
+### Trigger 1: Supabase Free Tier Storage & Disk Limits Reached
 - **Threshold**:
   - Database disk reaches **400 MB** (80% of 500 MB).
   - Storage bucket usage reaches **800 MB** (80% of 1 GB).
   - Egress bandwidth reaches **4 GB** (80% of 5 GB).
-  - Or database auto-pauses due to inactivity.
+  - Or database auto-pauses due to inactivity (mitigated by `.github/workflows/keepalive.yml` pinging `https://genra.dev/api/health`).
 - **Action Plan**:
   1. Upgrade to **Supabase Pro** ($25/month).
-  2. Enables: 8 GB database, 100 GB storage, 50 GB egress, daily backups, no project pausing.
-  3. No code modifications required; upgrades seamlessly in the Supabase Dashboard.
+  2. Enables: 8 GB database, 100 GB storage, 50 GB egress, daily automated backups, no project pausing.
+  3. No application code modifications required; upgrades seamlessly in the Supabase Dashboard.
 
 ---
 
 ### Trigger 2: High Media Volume -> Migrate Storage to Cloudflare R2
 - **Threshold**:
-  - Image and video uploads exceed **5 GB** or egress costs escalate on Supabase.
+  - Image and video uploads exceed **5 GB** or Supabase egress costs escalate.
 - **Action Plan**:
   1. Provision a Cloudflare R2 bucket with zero egress fees ($0.015/GB storage).
   2. Implement `R2StorageProvider` conforming to `StorageProvider` in `lib/storage/types.ts`.
@@ -45,22 +45,20 @@ This document defines the quantitative thresholds, cost triggers, and step-by-st
 ### Trigger 3: Email Delivery Rate Limits -> Custom SMTP & OTP Code Mode
 - **Threshold**:
   - Sign-ups exceed **30 emails per hour** (Supabase default mailer limit).
-  - Or branded email templates are required.
+  - Or custom branded transactional templates are required.
 - **Action Plan**:
-  1. Configure transactional email provider (Resend, Postmark, or Amazon SES) in Supabase **Project Settings > Authentication > SMTP**.
-  2. Switch `NEXT_PUBLIC_EMAIL_AUTH_MODE=otp` in Vercel environment variables to enable the 6-digit OTP code verification flow instead of magic links.
-  3. Customize confirmation email templates with branded styling.
+  1. Follow [`docs/EMAIL-TEMPLATES.md`](./EMAIL-TEMPLATES.md) for DNS verification (Resend / AWS SES).
+  2. Configure SMTP in Supabase **Project Settings > Authentication > SMTP**.
+  3. Switch `NEXT_PUBLIC_EMAIL_AUTH_MODE=otp` in Vercel environment variables to enable the 6-digit OTP code verification flow instead of magic links.
+  4. Paste branded templates from [`docs/EMAIL-TEMPLATES.md`](./EMAIL-TEMPLATES.md).
 
 ---
 
-### Trigger 4: Custom Domain Adoption
-- **Threshold**:
-  - Production readiness for public marketing and branding.
-- **Action Plan**:
-  1. Purchase domain (e.g. `genra.co` or `genra.ai`).
-  2. Add domain in **Vercel Project Settings > Domains** and configure DNS A/CNAME records.
-  3. Update `NEXT_PUBLIC_SITE_URL` to `https://genra.co`.
-  4. In **Supabase Authentication > URL Configuration**, update Site URL and Redirect URLs to `https://genra.co/auth/callback` and `https://genra.co/**`.
+### Trigger 4: Live Domain Configuration (Achieved)
+- **Status:** **COMPLETE**
+- **Canonical Domain:** **`https://genra.dev`** (Apex canonical, `www.genra.dev` redirects).
+- **DNS:** A record (`76.76.21.21`), CNAME (`cname.vercel-dns.com`).
+- **Auth URLs:** Configured for `https://genra.dev/**` and `https://genra.dev/auth/callback`.
 
 ---
 
@@ -72,6 +70,7 @@ This document defines the quantitative thresholds, cost triggers, and step-by-st
   2. Create a Cloudflare Turnstile widget (free tier).
   3. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in environment variables.
   4. Restore the Turnstile widget render in `components/auth/login-form.tsx` and enable verification in `lib/auth/captcha.ts`.
+  5. Add `https://challenges.cloudflare.com` to CSP `script-src` and `frame-src` per [`docs/CSP.md`](./CSP.md).
 
 ---
 

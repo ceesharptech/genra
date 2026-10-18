@@ -19,6 +19,7 @@ export default function ErrorPage({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+      <meta name="robots" content="noindex, nofollow" />
       <div className="max-w-md space-y-4">
         <p className="text-destructive font-mono text-xs font-semibold tracking-wider uppercase">
           Error

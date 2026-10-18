@@ -121,8 +121,8 @@ export default function TermsPage() {
             <h2 className="text-lg font-semibold text-foreground">8. Contact Information</h2>
             <p>
               If you have any questions about these Terms, please contact us at{' '}
-              <a href={`mailto:${siteConfig.legalEmail}`} className="text-foreground underline hover:text-brand">
-                {siteConfig.legalEmail}
+              <a href={`mailto:${siteConfig.supportEmail}`} className="text-foreground underline hover:text-brand">
+                {siteConfig.supportEmail}
               </a>.
             </p>
           </section>

@@ -5,6 +5,10 @@ import { createPublicClient } from '@/lib/supabase/public';
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (process.env.VERCEL_ENV !== 'production') {
+    return [];
+  }
+
   const siteUrl = getSiteUrl();
   const supabase = createPublicClient();
 

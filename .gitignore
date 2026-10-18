@@ -43,3 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 genra-docs/
+docs/
+AGENTS.md
+DESIGN.md

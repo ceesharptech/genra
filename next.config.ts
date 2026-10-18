@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs/config';
+import { buildCspHeader, getCspHeaderKey } from './lib/csp';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 let supabaseHostname: string | undefined;
@@ -12,21 +13,8 @@ if (supabaseUrl) {
   }
 }
 
-const cspHeader = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us.i.posthog.com https://eu.i.posthog.com https://us-assets.i.posthog.com https://eu-assets.i.posthog.com;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src 'self' https://fonts.gstatic.com data:;
-  img-src 'self' blob: data: https://*.supabase.co https://lh3.googleusercontent.com https://us.i.posthog.com https://eu.i.posthog.com;
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://eu.i.posthog.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://*.upstash.io;
-  frame-src 'self';
-  object-src 'none';
-  base-uri 'self';
-  form-action 'self';
-  report-uri /api/csp-report;
-`
-  .replace(/\s{2,}/g, ' ')
-  .trim();
+const cspHeader = buildCspHeader();
+const cspHeaderKey = getCspHeaderKey();
 
 const posthogHost =
   process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
@@ -91,7 +79,7 @@ const nextConfig: NextConfig = {
             value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
-            key: 'Content-Security-Policy-Report-Only',
+            key: cspHeaderKey,
             value: cspHeader,
           },
         ],

@@ -16,6 +16,9 @@ export default function GlobalError({
 
   return (
     <html lang="en">
+      <head>
+        <meta name="robots" content="noindex, nofollow" />
+      </head>
       <body className="flex min-h-screen items-center justify-center bg-background text-foreground font-sans p-4">
         <div className="max-w-md text-center space-y-4">
           <h2 className="text-xl font-bold">Something went critically wrong</h2>
