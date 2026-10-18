@@ -455,7 +455,7 @@ export function LoginForm({
               {mode === 'signup' ? 'Welcome to Genra' : 'Welcome back'}
             </h1>
             {message || getIntentContextMessage(intent) ? (
-              <div className="mt-2.5 inline-flex max-w-sm items-center justify-center rounded-full border border-brand/20 bg-brand/10 px-3.5 py-1 text-xs font-medium text-brand dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
+              <div className="border-brand/20 bg-brand/10 text-brand dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300 mt-2.5 inline-flex max-w-sm items-center justify-center rounded-full border px-3.5 py-1 text-xs font-medium">
                 <span>{message || getIntentContextMessage(intent)}</span>
               </div>
             ) : (
@@ -550,14 +550,14 @@ export function LoginForm({
           <p className="text-muted-foreground text-center text-[11px] leading-normal">
             By continuing, you agree to our{' '}
             <Link
-              href="/"
+              href="/terms"
               className="hover:text-foreground underline underline-offset-2"
             >
               Terms
             </Link>{' '}
             and{' '}
             <Link
-              href="/"
+              href="/privacy-policy"
               className="hover:text-foreground underline underline-offset-2"
             >
               Privacy Policy
@@ -693,9 +693,11 @@ export function LoginForm({
       {step === 'otp' && (
         <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
           <div>
-            <h3 className="font-bricolage text-base font-semibold leading-snug">
+            <h3 className="font-bricolage text-base leading-snug font-semibold">
               Enter the 6-digit code we sent to{' '}
-              <span className="text-foreground font-semibold break-all">{email}</span>
+              <span className="text-foreground font-semibold break-all">
+                {email}
+              </span>
             </h3>
           </div>
 
@@ -723,7 +725,8 @@ export function LoginForm({
               className="h-11 rounded-full text-center font-mono text-lg tracking-widest"
             />
             <p className="text-muted-foreground text-[11px] leading-relaxed">
-              Check your spam or junk folder if you don&apos;t see it within a minute.
+              Check your spam or junk folder if you don&apos;t see it within a
+              minute.
             </p>
           </div>
 
