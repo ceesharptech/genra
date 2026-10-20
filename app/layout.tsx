@@ -71,7 +71,7 @@ export const metadata: Metadata = {
       },
   icons: {
     icon: '/favicon.ico',
-    apple: '/images/genra-logo.png',
+    apple: '/images/genra-icon.png',
   },
   title: {
     template: '%s · Genra',

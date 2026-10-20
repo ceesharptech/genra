@@ -20,6 +20,11 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '180x180',
         type: 'image/png',
       },
+      {
+        src: '/images/genra-icon.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
     ],
   }
 }
